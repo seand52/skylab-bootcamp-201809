@@ -10,6 +10,7 @@ server = http.createServer((req, res) => {
     let result
 
     if (request.pathname === '/api/parsetime') {
+
         result = returnJSON(request.query.iso)
 
         res.writeHead(200, { 'Content-Type': 'application/json' })
