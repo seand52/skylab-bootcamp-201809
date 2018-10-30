@@ -8,13 +8,6 @@ const server = net.createServer(function(socket) {
 server.listen(process.argv[2])
 
 
-
-
-// function getDate() {
-//     let date = new Date()
-//     return `${date.getFullYear()}-${(date.getMonth() + 1< 10 ? '0' + date.getMonth() :date.getMonth() )}-${date.getDate() < 10 ? '0' + date.getDate() : date.getDate()} ${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}\n`
-// }
-
 function getDate() {
     let date = new Date()
     let year = date.getFullYear()
