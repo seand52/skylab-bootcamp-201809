@@ -1,31 +1,14 @@
 const express = require('express')
+const logic = require('./logic')
 
-const { argv: [, , port] } = process
+const { argv: [, , port=8080] } = process
 
 const app = express()
 
-const users = []
-
-let nameUser = ''
-
-let wrongCredentials = null
-
-if (nameUser === '') {
-    app.get('/', (req, res) => {
-        res.send(`<!DOCTYPE html>
-    <html>
-        <head>
-            <title>Hello World!</title>
-        </head>
-        <body>
-            <h1>Hello World!</h1>
-            <a href="/login">Login</a> or <a href="/register">Register</a>
-        </body>
-    </html>`)
-    })
-}
+let error = null
 
 app.get('/', (req, res) => {
+    error = null
     res.send(`<!DOCTYPE html>
 <html>
     <head>
@@ -39,10 +22,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/login', (req, res) => {
-    let wrongText = wrongCredentials=== true ? 'Wrong credentials' : ''
-    resetWrongCredentials = () => {
-        wrongCredentials = null
-    }
+
     res.send(`<!DOCTYPE html>
 <html>
     <head>
@@ -55,8 +35,8 @@ app.get('/login', (req, res) => {
             <input type="password" name="password" placeholder="password">
             <button type="submit">Login</button>
         </form>
-        <p>${wrongText}</p>
-        <a onClick=${resetWrongCredentials()} href="/">go back</a>
+        ${error ? `<p style="color: red">${error}</p>` : ''}
+        <a href="/">go back</a>
     </body>
 </html>`)
 })
@@ -64,27 +44,27 @@ app.get('/login', (req, res) => {
 app.get('/register', (req, res) => {
 
     res.send(`<!DOCTYPE html>
-<html>
-    <head>
-        <title>Hello World!</title>
-    </head>
-    <body>
-        <h1>Hello World!</h1>
-        <form action="/register" method="POST">
-            <input type="text" name="name" placeholder="Name">
-            <input type="text" name="surname" placeholder="Surname">
-            <input type="text" name="username" placeholder="username">
-            <input type="password" name="password" placeholder="password">
-            <button type="submit">Register</button>
-        </form>
-        <a href="/">go back</a>
-    </body>
-</html>`)
+        <html>
+            <head>
+                <title>Hello World!</title>
+            </head>
+            <body>
+                <h1>Hello World!</h1>
+                <form action="/register" method="POST">
+                    <input type="text" name="name" placeholder="Name">
+                    <input type="text" name="surname" placeholder="Surname">
+                    <input type="text" name="username" placeholder="username">
+                    <input type="password" name="password" placeholder="password">
+                    <button type="submit">Register</button>
+                </form>
+                ${error ? `<p style="color:red">${error}</p>`:''}
+
+                <a href="/">go back</a>
+            </body>
+        </html>`)
 })
 
 app.post('/register', (req, res) => {
-
-
     let data = ''
 
     req.on('data', chunk => data += chunk)
@@ -92,7 +72,7 @@ app.post('/register', (req, res) => {
     req.on('end', () => {
         const keyValues = data.split('&')
 
-        const user = { id: Date.now() }
+        const user = {}
 
         keyValues.forEach(keyValue => {
             const [key, value] = keyValue.split('=')
@@ -100,19 +80,36 @@ app.post('/register', (req, res) => {
             user[key] = value
         })
 
-        users.push(user)
+        const {
+            name,
+            surname,
+            username,
+            password
+        } = user
 
-        res.send(`<!DOCTYPE html>
-<html>
-    <head>
-        <title>Hello World!</title>
-    </head>
-    <body>
-        <h1>Hello World!</h1>
-        <p>Ok! user ${user.name} registered.</p>
-        <a href="/">go back</a>
-    </body>
-</html>`)
+        try {
+            logic.registerUser(name, surname, username, password)
+
+            error = null
+
+            res.send(`<!DOCTYPE html>
+                <html>
+                    <head>
+                        <title>Hello World!</title>
+                    </head>
+                    <body>
+                        <h1>Hello World!</h1>
+                        <p>Ok! user ${user.name} registered.</p>
+                        <a href="/">go back</a>
+                    </body>
+                </html>`)
+
+        } catch({message}) {
+            
+                error = message
+                res.redirect('/register')
+        }      
+        
     })
 })
 
@@ -123,37 +120,25 @@ app.post('/login', (req, res) => {
 
     req.on('end', () => {
 
-        let verify = {}
+        const user = {}
 
         const keyValues = data.split('&')
 
         keyValues.forEach(keyValue => {
             const [key, value] = keyValue.split('=')
 
-            verify[key] = value
+            user[key] = value
         })
-
-        users.forEach(item => {
-            console.log(item)
-            if (item.username === verify.username && item.password === verify.password) {
-                return verify = {
-                    ...verify,
-                    authenticate:true
-                }
-            }
-        })
-
-        console.log(verify)
-
-        if (verify.authenticate===true) {
-            nameUser = verify.username 
+        const {username, password} = user
+        try {
+            logic.login(username, password)
+            error = null 
             res.redirect('/home')
-            verify = {}
-        }
-        else {
-            wrongCredentials = true
+        }catch({message}){
+            error = message
+
             res.redirect('/login')
-            verify = {}
+
         }
 
     })
@@ -169,7 +154,7 @@ app.get('/users', (req, res) => {
     <body>
         <h1>Hello World!</h1>
         <ul>
-            ${users.map(user => `<li>${user.id} ${user.name} ${user.surname}</li>`).join('')}
+            ${logic._users.map(user => `<li>${user.id} ${user.name} ${user.surname}</li>`).join('')}
         </ul>
         <a href="/">go back</a>
     </body>
@@ -178,29 +163,25 @@ app.get('/users', (req, res) => {
 
 
 app.get('/home', (req, res) => {
-
-    if (nameUser==='') {
-        res.redirect('/')
-    }
-    else {
+    if (logic.loggedIn) {
     res.send(`<!DOCTYPE html>
 <html>
     <head>
         <title>Hello World!</title>
     </head>
     <body>
-        <h1>Hello ${nameUser}!</h1>
-        <a href="/logoutHandle">Logout</a>
+        <h1>Hello ${logic._user.name}!</h1>
+        <a href="/logout">Logout</a>
     </body>
 </html>`)
     }
+    else res.redirect('/')
 })
 
 
 
-app.get('/logoutHandle', (req, res) => {
-
-    nameUser=''
+app.get('/logout', (req, res) => {
+    logic.logout()
 
     res.redirect('/')
 })
