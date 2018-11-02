@@ -1,9 +1,7 @@
 require('dotenv').config()
 const express = require('express')
 const session = require('express-session')
-// const FileStore = require('session-file-store')(session)
-const sessionFileStore = require('session-file-store')
-const FileStore = sessionFileStore(session)
+const FileStore = require('session-file-store')(session)
 const bodyParser = require('body-parser')
 const buildView = require('./helpers/build-view')
 const logic = require('./logic')
@@ -36,6 +34,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/register', (req, res) => {
+
     res.send(buildView(`<form action="/register" method="POST">
             <input type="text" name="name" placeholder="Name">
             <input type="text" name="surname" placeholder="Surname">
@@ -48,6 +47,7 @@ app.get('/register', (req, res) => {
 })
 
 app.post('/register', formBodyParser, (req, res) => {
+
     const { name, surname, username, password } = req.body
 
     try {
@@ -57,6 +57,7 @@ app.post('/register', formBodyParser, (req, res) => {
 
         res.send(buildView(`<p>Ok! user ${name} registered.</p>
                 <a href="/">go back</a>`))
+
     } catch ({ message }) {
         error = message
 
@@ -65,11 +66,13 @@ app.post('/register', formBodyParser, (req, res) => {
 })
 
 app.get('/login', (req, res) => {
+
     res.send(buildView(`<form action="/login" method="POST">
             <input type="text" name="username" placeholder="username">
             <input type="password" name="password" placeholder="password">
             <button type="submit">Login</button>
         </form>
+
         ${error ? `<p class="error">${error}</p>` : ''}
         <a href="/">go back</a>`))
 })
@@ -82,10 +85,6 @@ app.post('/login', [formBodyParser, mySession], (req, res) => {
 
         req.session.userId = id
 
-        console.log(req.session.userId)
-
-        error = null
-
         res.redirect('/home')
     } catch ({ message }) {
         error = message
@@ -95,8 +94,8 @@ app.post('/login', [formBodyParser, mySession], (req, res) => {
 })
 
 app.get('/home', mySession, (req, res) => {
+
     const id = req.session.userId
-    console.log(id)
 
     if (id) {
         const user = logic.retrieveUser(id)
@@ -122,13 +121,16 @@ app.get('/users', (req, res) => {
 })
 
 app.get('/postits', mySession, (req, res) => {
+
     const id = req.session.userId
+
     if (id) {
+        
         const user = logic.retrieveUser(id)
 
         const listPostits = user.postits.map((item, index) => {
             return `<li>
-           ${item.postit}
+            <input type="text" value=${item.postit}>
            <form action="/postits/${item.id}" method="POST">
             <button type="submit">x</button>
             </form>
@@ -151,15 +153,10 @@ app.get('/postits', mySession, (req, res) => {
 })
 
 app.post('/postits/:id', mySession, (req, res) => {
-
+    
     const id = req.session.userId
 
-    let user = logic.retrieveUser(id)
-
-
-    user.postits = user.postits.filter(item => item.id !== Number(req.params.id))
-
-    user.save()
+    logic.deletePostit(id, req.params.id)
 
     res.redirect('/postits')
 })
@@ -170,38 +167,10 @@ app.post('/postits', [formBodyParser, mySession], (req, res) => {
 
     const { postit } = req.body
 
-    const user = logic.retrieveUser(id)
-
-    user.postits.push({
-        postit: postit,
-        id: Date.now()
-    })
-
-    console.log(user.postits)
-
-    user.save()
+    logic.createPostit(id, postit)
 
     res.redirect('/postits')
 
-
-
-
-
-    // res.redirect('/home')
-
-    // try {
-    //     const id = logic.authenticateUser(username, password)
-
-    //     req.session.userId = id
-
-    //     error = null
-
-    //     res.redirect('/home')
-    // } catch ({ message }) {
-    //     error = message
-
-    //     res.redirect('/login')
-    // }
 })
 
 app.listen(port, () => console.log(`Server up and running on port ${port}`))

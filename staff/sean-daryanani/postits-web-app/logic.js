@@ -1,4 +1,6 @@
-const { User } = require('./data')
+const {
+    User
+} = require('./data')
 
 const logic = {
     registerUser(name, surname, username, password) {
@@ -54,7 +56,29 @@ const logic = {
         // delete _user.password
 
         return _user
+    },
+
+    createPostit(id, postit) {
+
+        const user = this.retrieveUser(id)
+
+        user.postits.push({
+            postit: postit,
+            id: Date.now()
+        })
+
+        user.save()
+    },
+
+    deletePostit(userId,postitId) {
+
+        let user = this.retrieveUser(userId)
+
+        user.postits = user.postits.filter(item => item.id !== Number(postitId))
+
+        user.save()
     }
+
 }
 
 module.exports = logic
