@@ -1,0 +1,13 @@
+extends layout
+block content
+  p Welcome #{user.name}!
+  form(action='/postits' method='POST')
+    input(type='text' name='postit')
+    button(type='submit') Create
+    a(href='/logout') logout
+  ul
+    each val in user.postits
+      li
+        input(type='text' value=val.postit)
+        form(action='/postits/'+val.id method='POST')
+          button(type='submit') x
