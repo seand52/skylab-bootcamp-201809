@@ -52,11 +52,16 @@ app.post('/register', formBodyParser, (req, res) => {
 
     try {
         logic.registerUser(name, surname, username, password)
+            .then(() => {
+                error = null
 
-        error = null
-
-        res.send(buildView(`<p>Ok! user ${name} registered.</p>
-                <a href="/">go back</a>`))
+                res.send(buildView(`<p>Ok! user ${name} registered.</p>
+                        <a href="/">go back</a>`))
+            })
+            .catch(({message}) => {
+                error = message
+                res.redirect('/register')
+            })       
 
     } catch ({ message }) {
         error = message
@@ -81,11 +86,19 @@ app.post('/login', [formBodyParser, mySession], (req, res) => {
     const { username, password } = req.body
 
     try {
-        const id = logic.authenticateUser(username, password)
 
-        req.session.userId = id
+        logic.authenticateUser(username, password)
+            .then(id => {
 
-        res.redirect('/home')
+                req.session.userId = id
+
+                res.redirect('/home')
+            })
+            .catch(({message}) => {
+                req.session.error = message
+
+                res.redirect('/login')
+            })         
     } catch ({ message }) {
         error = message
 
@@ -98,12 +111,24 @@ app.get('/home', mySession, (req, res) => {
     const id = req.session.userId
 
     if (id) {
-        const user = logic.retrieveUser(id)
+        try {
+        logic.retrieveUser(id)
+            .then(({name}) => {
+                res.send(buildView(`<p>Welcome ${name}!</p>
+                <a href="/logout">logout</a><br>
+                <a href="/postits">Make Postit</a>
+                `))
 
-        res.send(buildView(`<p>Welcome ${user.name}!</p>
-                        <a href="/logout">logout</a><br>
-                        <a href="/postits">Make Postit</a>
-                        `))
+
+            })
+            .catch(({message}) => {
+                error = message
+                res.redirect('/')
+            }) 
+        }catch({message}) {
+            error = message
+            res.redirect('/')
+        }       
     } else res.redirect('/')
 })
 
@@ -126,39 +151,53 @@ app.get('/postits', mySession, (req, res) => {
 
     if (id) {
         
-        const user = logic.retrieveUser(id)
-
-        const listPostits = user.postits.map((item, index) => {
-            return `<li>
-            <input type="text" value=${item.postit}>
-           <form action="/postits/${item.id}" method="POST">
-            <button type="submit">x</button>
-            </form>
-            </li>`
-        }).join('')
-
-        res.send(buildView(`
-        <p>Welcome ${user.name}!</p>
-        <form action="/postits" method="POST">
-        <input type="text" name="postit"></input>
-        <button type="submit">Create</button>
-        <a href="/logout">logout</a>
-        </form>
-        <ul>
-            ${listPostits}
-        </ul>
+        logic.retrieveUser(id)
+            .then(user => {
+                const listPostits = user.postits.map((item, index) => {
+                    return `<li>
+                    <input type="text" value=${item.postit}>
+                   <form action="/postits/${item.id}" method="POST">
+                    <button type="submit">x</button>
+                    </form>
+                    </li>`
+                }).join('')
         
-        `))
+                res.send(buildView(`
+                <p>Welcome ${user.name}!</p>
+                <form action="/postits" method="POST">
+                <input type="text" name="postit"></input>
+                <button type="submit">Create</button>
+                <a href="/logout">logout</a>
+                </form>
+                <ul>
+                    ${listPostits}
+                </ul>
+                
+                `))
+            })
+            .catch(({message})=>{
+                error = message
+                res.redirect('/')
+            })
+
+        
     } else res.redirect('/')
 })
 
 app.post('/postits/:id', mySession, (req, res) => {
-    
+
     const id = req.session.userId
 
     logic.deletePostit(id, req.params.id)
+        .then(() => {
+            res.redirect('/postits')
+        })
+        .catch(({message}) => {
+            error = message
+        })
 
-    res.redirect('/postits')
+
+    
 })
 
 app.post('/postits', [formBodyParser, mySession], (req, res) => {
@@ -168,8 +207,14 @@ app.post('/postits', [formBodyParser, mySession], (req, res) => {
     const { postit } = req.body
 
     logic.createPostit(id, postit)
+        .then(() => {
+            res.redirect('/postits')
+        })
+        .catch(({message}) => {
+            error = message
+        })
 
-    res.redirect('/postits')
+    
 
 })
 

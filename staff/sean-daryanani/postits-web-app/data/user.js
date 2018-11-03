@@ -11,52 +11,66 @@ class User {
     }
 
     save() {
-        let json = fs.readFileSync(User._file)
+        return new Promise((resolve, reject) => {
 
-        const users = JSON.parse(json)
+            fs.readFile(User._file, (err, json) => {
+                if (err) return reject(err)
 
-        // const user = users.find(user => user.id === this.id)
+                const users = JSON.parse(json)
 
-        // if (!user) users.push(this)
-        // else {
-        //     user.name = this.name
-        //     user.surname = this.surname
-        //     user.username = this.username
-        //     user.password = this.password
-        // }
+                const index = users.findIndex(user => user.id === this.id)
 
-        const index = users.findIndex(user => user.id === this.id)
+                if (index < 0) users.push(this)
 
-        if (index < 0) users.push(this)
-        else users[index] = this
+                else users[index] = this
 
-        json = JSON.stringify(users)
+                json = JSON.stringify(users)
 
-        fs.writeFileSync(User._file, json)
+                fs.writeFile(User._file, json, err => {
+                    if (err) return reject(err)
+
+                    resolve()
+                })
+            })
+
+        })
     }
 
+
+
     static findByUsername(username) {
-        const json = fs.readFileSync(User._file)
+        return new Promise((resolve, reject) => {
+            
+            fs.readFile(User._file, (err, json) =>{
+                if (err) return reject(err)
 
-        const users = JSON.parse(json)
-
-        const user = users.find(user => user.username === username)
-
-        // TODO is user an instance of User?
-
-        return user
+                const users = JSON.parse(json)
+        
+                const user = users.find(user => user.username === username)
+    
+                resolve(user)
+            })
+    
+        })
+        
     }
 
     static findById(id) {
-        const json = fs.readFileSync(User._file)
+        return new Promise((resolve, reject) => {
 
-        const users = JSON.parse(json)
+            fs.readFile(User._file, (err, json) => {
+                if(err) return reject(err)
 
-        const user = users.find(user => user.id === id)
+                const users = JSON.parse(json)
+        
+                const user = users.find(user => user.id === id)
+        
+                resolve(user)
+                
+            })
+    
 
-        // TODO is user an instance of User?
-
-        return user
+        })
     }
 }
 
