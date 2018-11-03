@@ -162,7 +162,7 @@ app.post('/postits', [formBodyParser, mySession], (req, res) => {
     const id = req.session.userId
 
     const { postit } = req.body
-
+    debugger
     logic.createPostit(id, postit)
         .then(() => {
             res.redirect('/postits')

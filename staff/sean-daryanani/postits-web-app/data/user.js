@@ -1,13 +1,16 @@
 const fs = require('fs')
 
 class User {
-    constructor(name, surname, username, password) {
-        this.id = Date.now()
+    constructor(user) {
+
+        const {id, name, surname, username, password, postits} = user
+
+        this.id = id || Date.now()
         this.name = name
         this.surname = surname
         this.username = username
         this.password = password
-        this.postits = []
+        this.postits = postits || []
     }
 
     save() {
@@ -36,7 +39,11 @@ class User {
         })
     }
 
+    toObject() {
+        const {name, surname, username, password} = this
 
+        return {name, surname, username, password}
+    }
 
     static findByUsername(username) {
         return new Promise((resolve, reject) => {
@@ -48,7 +55,7 @@ class User {
         
                 const user = users.find(user => user.username === username)
     
-                resolve(user)
+                resolve(user ? new User(user): undefined)
             })
     
         })
@@ -65,7 +72,7 @@ class User {
         
                 const user = users.find(user => user.id === id)
         
-                resolve(user)
+                resolve(user ? new User(user): undefined)
                 
             })
     

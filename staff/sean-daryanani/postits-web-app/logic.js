@@ -18,7 +18,7 @@ const logic = {
             .then(user => {
                 if (user) throw Error(`username ${username} already registered`)
 
-                user = new User(name, surname, username, password)
+                user = new User({name, surname, username, password})
 
                 return user.save()
             })
@@ -51,12 +51,7 @@ const logic = {
             .then(user => {
                 if (!user) throw Error(`user with id ${id} not found`)
 
-                const _user = new User(
-                    user.name,
-                    user.surname,
-                    user.username,
-                    user.password
-                )
+                const _user = user.toObject()
 
                 _user.id = user.id
                 _user.postits = user.postits
@@ -69,30 +64,24 @@ const logic = {
     },
 
     createPostit(id, postit) {
-
-        return this.retrieveUser(id)
+        return User.findById(id)
             .then(user => {
-
                 user.postits.push({
                     postit: postit,
                     id: Date.now()
                 })
-        
+                
                return user.save()
-
             })
     },
 
     deletePostit(userId, postitId) {
-
-        return this.retrieveUser(userId)
+        return User.findById(userId) 
             .then(user => {
                 user.postits = user.postits.filter(item => item.id !== Number(postitId))
         
                 return user.save()
-
             })
-
     }
 
 }
