@@ -1,4 +1,5 @@
 class Postit {
+    
     constructor(postit) {
         const {id, text} = postit
 

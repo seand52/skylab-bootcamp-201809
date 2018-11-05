@@ -30,6 +30,7 @@ class User {
                 json = JSON.stringify(users)
 
                 fs.writeFile(User._file, json, err => {
+                    
                     if (err) return reject(err)
 
                     resolve()

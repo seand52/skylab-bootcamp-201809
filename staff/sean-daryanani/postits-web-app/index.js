@@ -23,7 +23,7 @@ const formBodyParser = bodyParser.urlencoded({
 const mySession = session({
     secret: 'my super secret',
     cookie: {
-        maxAge: 60 * 60 * 24
+        maxAge: 60 * 60 * 24 * 1000
     },
     resave: true,
     saveUninitialized: true,
@@ -101,12 +101,13 @@ app.post('/login', [formBodyParser, mySession], (req, res) => {
             .then(id => {
 
                 req.session.userId = id
+                delete req.session.error
+
+                delete req.session.postitId
 
                 res.redirect('/home')
             })
-            .catch(({
-                message
-            }) => {
+            .catch(({ message }) => {
                 req.session.error = message
 
                 res.redirect('/login')
@@ -127,13 +128,9 @@ app.get('/home', mySession, (req, res) => {
     if (id) {
         try {
             logic.retrieveUser(id)
-                .then(({
-                    name
-                }) => {
-                    res.render('home', {
-                        name
-                    })
-
+                .then(({ name }) => {
+                    
+                    res.render('home', { name })
 
                 })
                 .catch(({
@@ -159,7 +156,6 @@ app.get('/logout', mySession, (req, res) => {
 
 
 app.get('/postits', mySession, (req, res) => {
-    debugger
     const id = req.session.userId
 
     if (id) {
@@ -182,10 +178,11 @@ app.get('/postits', mySession, (req, res) => {
 })
 
 app.post('/postits/:id', [mySession, formBodyParser], (req, res) => {
-    debugger
+
     const {
         operation,
-        text
+        text,
+        postitId
     } = req.body
 
     const id = req.session.userId
@@ -204,16 +201,18 @@ app.post('/postits/:id', [mySession, formBodyParser], (req, res) => {
                     })
                 break
             case 'edit':
-                    {
-                        const {postitId} = req.body
 
-                        req.session.postitId = postitId
-                        req.session.newText = text
-                    }
+                logic.editPostit(id, postitId, text)
+                    .then(() => res.redirect('/postits'))
+
+                break
+
             default:
                 res.redirect('/home')
         }
-    } catch({message}) {
+    } catch ({
+        message
+    }) {
         req.session.error = message
         res.redirect('/home')
     }

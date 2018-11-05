@@ -14,7 +14,7 @@ block content
         each val in user.postits
           li
             form(action='/postits/'+val.id method='POST')
-              input(type='text' value=val.text name="text")
-              input(type='hidden' value=val.id name="text")
+              input(class="input-text" type='text' value=val.text name="text")
+              input(type='hidden' value=val.id name="postitId")
+              button(class="save-text" type='submit' value='edit' name='operation') Save
               button(type='submit' value='remove' name='operation')     <i class="fas fa-times"></i>
-              button(type='submit' value='edit' name='operation') Edit

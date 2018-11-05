@@ -94,6 +94,23 @@ const logic = {
         
                 return user.save()
             })
+    },
+
+    editPostit(userId, postitId, newText) {
+        return User.findById(userId)
+
+            .then(user => {
+
+                const {postits} = user
+
+                const postit = postits.find(item => Number(item.id) === Number(postitId))
+
+
+                postit.text = newText
+
+                return user.save()
+
+            })
     }
 
 }

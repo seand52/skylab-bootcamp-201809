@@ -169,9 +169,13 @@
   margin-top: 10px;
 }
 
-.postit-list input {
+.input-text {
   border: none;
-  background-color: #ffc;
+  background-color: red;
+  position: absolute;
+  top: 0;
+  left: 0;
+
 }
 
 .postit-list form {

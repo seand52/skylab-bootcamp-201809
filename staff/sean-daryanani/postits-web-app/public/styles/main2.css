@@ -174,9 +174,23 @@
   position: relative;
   margin-top: 10px;
 }
-.postit-list input {
+
+.input-text {
   border: none;
-  background-color: #ffc;
+  background: #ffc;
+  position: absolute;
+  top: 0;
+  right: 68px;
+
+}
+
+.save-text {
+  border: none;
+  background: #ffc;
+  position: absolute;
+  bottom: -170px;
+  right: 68px;
+
 }
 .postit-list form {
   width: 20px;
