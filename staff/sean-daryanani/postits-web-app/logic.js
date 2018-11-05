@@ -1,5 +1,6 @@
 const {
-    User
+    User,
+    Postit
 } = require('./data')
 
 const logic = {
@@ -63,21 +64,32 @@ const logic = {
 
     },
 
-    createPostit(id, postit) {
+    createPostit(id, text) {
+
+        if (typeof id !== 'number') throw TypeError(`${id} is not a number`)
+
+        if (typeof text !== 'string') throw TypeError(`${text} is not a string`)
+
+        if (!text.trim().length) throw Error('text is empty or blank')
+
         return User.findById(id)
             .then(user => {
-                user.postits.push({
-                    postit: postit,
-                    id: Date.now()
-                })
+                if (!user) throw Error(`user with id ${id} not found`)
+
+                const postit = new Postit({text})
                 
+                user.postits.push(postit)
+
                return user.save()
             })
     },
 
     deletePostit(userId, postitId) {
+
         return User.findById(userId) 
             .then(user => {
+                if (!user) throw Error(`user with id ${userId} not found`)
+
                 user.postits = user.postits.filter(item => item.id !== Number(postitId))
         
                 return user.save()

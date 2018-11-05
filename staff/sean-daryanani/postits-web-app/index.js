@@ -6,7 +6,9 @@ const bodyParser = require('body-parser')
 const logic = require('./logic')
 const package = require('./package.json')
 
-const { argv: [, , port = process.env.PORT || 8080] } = process
+const {
+    argv: [, , port = process.env.PORT || 8080]
+} = process
 
 const app = express()
 
@@ -14,11 +16,15 @@ app.use(express.static('./public'))
 app.set('view engine', 'pug')
 
 
-const formBodyParser = bodyParser.urlencoded({ extended: false })
+const formBodyParser = bodyParser.urlencoded({
+    extended: false
+})
 
-const mySession = session({ 
-    secret: 'my super secret', 
-    cookie: { maxAge: 60 * 60 * 24 },
+const mySession = session({
+    secret: 'my super secret',
+    cookie: {
+        maxAge: 60 * 60 * 24
+    },
     resave: true,
     saveUninitialized: true,
     store: new FileStore({
@@ -37,26 +43,39 @@ app.get('/', (req, res) => {
 
 app.get('/register', (req, res) => {
 
-    res.render('register', {error: req.session.error})
+    res.render('register', {
+        error: req.session.error
+    })
 })
 
 app.post('/register', formBodyParser, (req, res) => {
 
-    const { name, surname, username, password } = req.body
+    const {
+        name,
+        surname,
+        username,
+        password
+    } = req.body
 
     try {
         logic.registerUser(name, surname, username, password)
             .then(() => {
                 req.session.error = null
 
-            res.render('register-confirm', {name})
+                res.render('register-confirm', {
+                    name
+                })
             })
-            .catch(({message}) => {
+            .catch(({
+                message
+            }) => {
                 req.session.error = message
                 res.redirect('/register')
-            })       
+            })
 
-    } catch ({ message }) {
+    } catch ({
+        message
+    }) {
         req.session.error = message
 
         res.redirect('/register')
@@ -65,11 +84,16 @@ app.post('/register', formBodyParser, (req, res) => {
 
 app.get('/login', (req, res) => {
 
-    res.render('login', {error: req.session.error})
+    res.render('login', {
+        error: req.session.error
+    })
 })
 
 app.post('/login', [formBodyParser, mySession], (req, res) => {
-    const { username, password } = req.body
+    const {
+        username,
+        password
+    } = req.body
 
     try {
 
@@ -80,12 +104,16 @@ app.post('/login', [formBodyParser, mySession], (req, res) => {
 
                 res.redirect('/home')
             })
-            .catch(({message}) => {
+            .catch(({
+                message
+            }) => {
                 req.session.error = message
 
                 res.redirect('/login')
-            })         
-    } catch ({ message }) {
+            })
+    } catch ({
+        message
+    }) {
         req.session.error = message
 
         res.redirect('/login')
@@ -98,20 +126,28 @@ app.get('/home', mySession, (req, res) => {
 
     if (id) {
         try {
-        logic.retrieveUser(id)
-            .then(({name}) => {
-                res.render('home', {name})
+            logic.retrieveUser(id)
+                .then(({
+                    name
+                }) => {
+                    res.render('home', {
+                        name
+                    })
 
 
-            })
-            .catch(({message}) => {
-                req.session.error = message
-                res.redirect('/')
-            }) 
-        }catch({message}) {
+                })
+                .catch(({
+                    message
+                }) => {
+                    req.session.error = message
+                    res.redirect('/')
+                })
+        } catch ({
+            message
+        }) {
             req.session.error = message
             res.redirect('/')
-        }       
+        }
     } else res.redirect('/')
 })
 
@@ -123,55 +159,86 @@ app.get('/logout', mySession, (req, res) => {
 
 
 app.get('/postits', mySession, (req, res) => {
-
+    debugger
     const id = req.session.userId
 
     if (id) {
-        
+
         logic.retrieveUser(id)
             .then(user => {
-                res.render('postits', {user: user})
+                res.render('postits', {
+                    user: user
+                })
             })
-            .catch(({message})=>{
+            .catch(({
+                message
+            }) => {
                 error = message
                 res.redirect('/')
             })
 
-        
+
     } else res.redirect('/')
 })
 
-app.post('/postits/:id', mySession, (req, res) => {
+app.post('/postits/:id', [mySession, formBodyParser], (req, res) => {
+    debugger
+    const {
+        operation,
+        text
+    } = req.body
 
     const id = req.session.userId
 
-    logic.deletePostit(id, req.params.id)
-        .then(() => {
-            res.redirect('/postits')
-        })
-        .catch(({message}) => {
-            req.session.error = message
-        })
+    try {
+        switch (operation) {
+            case 'remove':
+                logic.deletePostit(id, req.params.id)
+                    .then(() => {
+                        res.redirect('/postits')
+                    })
+                    .catch(({
+                        message
+                    }) => {
+                        req.session.error = message
+                    })
+                break
+            case 'edit':
+                    {
+                        const {postitId} = req.body
 
-
-    
+                        req.session.postitId = postitId
+                        req.session.newText = text
+                    }
+            default:
+                res.redirect('/home')
+        }
+    } catch({message}) {
+        req.session.error = message
+        res.redirect('/home')
+    }
 })
+
 
 app.post('/postits', [formBodyParser, mySession], (req, res) => {
 
     const id = req.session.userId
 
-    const { postit } = req.body
+    const {
+        postit
+    } = req.body
 
     logic.createPostit(id, postit)
         .then(() => {
             res.redirect('/postits')
         })
-        .catch(({message}) => {
+        .catch(({
+            message
+        }) => {
             req.session.error = message
         })
 
-    
+
 
 })
 

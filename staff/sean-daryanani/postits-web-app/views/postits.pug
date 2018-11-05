@@ -13,7 +13,8 @@ block content
       div(class="postit-grid")
         each val in user.postits
           li
-            input(type='text' value=val.postit)
             form(action='/postits/'+val.id method='POST')
-              button(type='submit') 
-                <i class="fas fa-times"></i>
+              input(type='text' value=val.text name="text")
+              input(type='hidden' value=val.id name="text")
+              button(type='submit' value='remove' name='operation')     <i class="fas fa-times"></i>
+              button(type='submit' value='edit' name='operation') Edit

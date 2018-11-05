@@ -40,9 +40,9 @@ class User {
     }
 
     toObject() {
-        const {name, surname, username, password} = this
+        const {name, surname, username, password, postits} = this
 
-        return {name, surname, username, password}
+        return {name, surname, username, password, postits}
     }
 
     static findByUsername(username) {
