@@ -1,13 +1,19 @@
 extends layout
 block content
-  p Welcome #{user.name}!
-  form(action='/postits' method='POST')
-    input(type='text' name='postit')
-    button(type='submit') Create
-    a(href='/logout') logout
-  ul
-    each val in user.postits
-      li
-        input(type='text' value=val.postit)
-        form(action='/postits/'+val.id method='POST')
-          button(type='submit') x
+  div(class="top-area")
+    p Welcome #{user.name}!
+    a(class="postits__buttons--logout" href='/logout') logout
+    
+  div(class="postits-create-wrapper")
+    form(class="postits__form" action='/postits' method='POST')
+      input(type='text' name='postit')
+      button(class="postits__buttons" type='submit') Create
+  div(class="postit-wrapper")
+    ul(class="postit-list")
+      div(class="postit-grid")
+        each val in user.postits
+          li
+            input(type='text' value=val.postit)
+            form(action='/postits/'+val.id method='POST')
+              button(type='submit') 
+                <i class="fas fa-times"></i>

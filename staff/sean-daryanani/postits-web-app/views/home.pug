@@ -1,5 +1,6 @@
 extends layout
 block content
-      p Welcome #{name}!
-      a(href='/logout') logout <br/>
-      a(href='/postits') Make Postit
+      div(class="home-wrapper")
+        p(class="home__title") Welcome #{name}!
+        a(class="home__buttons" href='/logout') logout <br/>
+        a(class="home__buttons" href='/postits') Make Postit
