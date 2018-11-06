@@ -72,9 +72,9 @@ app.post('/api/auth', jsonBodyParser, (req, res) => {
 app.get('/api/user/:id', (req, res) => {
     const { params: { id }, headers: { authorization } } = req
 
-    const token = authorization.split(' ')[1]
-
+    
     try {
+        const token = authorization.split(' ')[1]
         const { sub } = jwt.verify(token, JWT_SECRET)
 
         if (id !== sub) throw Error('token sub does not match user id')
@@ -106,12 +106,12 @@ app.get('/logout', (req, res) => {
     res.redirect('/')
 })
 
-app.put('/api/postit_add', jsonBodyParser, (req, res) => {
+app.post('/api/postit', jsonBodyParser, (req, res) => {
 
     const { headers: { authorization } } = req
-    const token = authorization.split(' ')[1]
-
+    
     try {
+        const token = authorization.split(' ')[1]
 
         const { sub } = jwt.verify(token, JWT_SECRET)
  
@@ -126,31 +126,29 @@ app.put('/api/postit_add', jsonBodyParser, (req, res) => {
                     })
 
                 })
-                .catch(({ message }) => {
+                .catch(() => {
                     res.json({
                         status: 'KO',
-                        message
+                        message: 'failed to add postit'
                     })
                 })
 
     } catch ({ message }) {
-        // req.session.error = message
         res.json({
             status: 'KO',
-            message
+            message: 'token not valid'
         })
-        // res.redirect('/home')
     }
 })
 
 //delete postit
-app.delete('/api/postit_remove/:postit_id', jsonBodyParser, (req, res) => {
+app.delete('/api/postit/:postit_id', jsonBodyParser, (req, res) => {
 
     const { params: { postit_id }, headers: { authorization } } = req
 
-    const token = authorization.split(' ')[1]
-
+    
     try {
+        const token = authorization.split(' ')[1]
 
         const { sub } = jwt.verify(token, JWT_SECRET)
 
@@ -163,30 +161,29 @@ app.delete('/api/postit_remove/:postit_id', jsonBodyParser, (req, res) => {
                 })
 
             })
-            .catch(({ message }) => {
+            .catch(() => {
                 res.json({
                     status: 'KO',
-                    message
+                    message: 'failed to delete postit'
                 })
             })
 
     } catch ({ message }) {
-        // req.session.error = message
         res.json({
             status: 'KO',
-            message
+            message: 'token not valid'
         })
-        // res.redirect('/home')
     }
 })
 
-app.put('/api/postit_modify/:postit_id', jsonBodyParser, (req, res) => {
+//modify postit:
+app.put('/api/postit/:postit_id', jsonBodyParser, (req, res) => {
 
     const { params: { postit_id }, headers: { authorization } } = req
 
-    const token = authorization.split(' ')[1]
-
+    
     try {
+        const token = authorization.split(' ')[1]
 
         const { sub } = jwt.verify(token, JWT_SECRET)
         const { text } = req.body
@@ -199,20 +196,20 @@ app.put('/api/postit_modify/:postit_id', jsonBodyParser, (req, res) => {
                 })
 
             })
-            .catch(({ message }) => {
+            .catch(() => {
                 res.json({
                     status: 'KO',
-                    message
+                    message: 'failed to modify postit'
                 })
             })
 
     } catch ({ message }) {
-        // req.session.error = message
+
         res.json({
             status: 'KO',
-            message
+            message: 'token not valid'
         })
-        // res.redirect('/home')
+
     }
 })
 
