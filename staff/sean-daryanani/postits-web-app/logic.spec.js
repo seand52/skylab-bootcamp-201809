@@ -48,6 +48,19 @@ describe('logic', () => {
                 expect(() => logic.registerUser(undefined, surname, username, password)).to.throw(TypeError, 'undefined is not a string')
             })
 
+            it('should fail on undefined surname', () => {
+                expect(() => logic.registerUser(name, undefined, username, password)).to.throw(TypeError, 'undefined is not a string')
+            })
+
+            it('should fail on undefined username', () => {
+                expect(() => logic.registerUser(name, surname, undefined, password)).to.throw(TypeError, 'undefined is not a string')
+            })
+
+
+            it('should fail on undefined password', () => {
+                expect(() => logic.registerUser(name, surname, username, undefined)).to.throw(TypeError, 'undefined is not a string')
+            })
+
             // TODO other test cases
         })
 
@@ -82,6 +95,7 @@ describe('logic', () => {
                 expect(() => logic.authenticateUser(undefined, user.password)).to.throw(TypeError, 'undefined is not a string')
             })
 
+
             // TODO other test cases
         })
 
@@ -104,7 +118,7 @@ describe('logic', () => {
                         expect(_user).not.to.be.instanceof(User)
 
                         const { id, name, surname, username, password, postits } = _user
-                        debugger
+
                         expect(id).to.exist
                         expect(id).to.equal(user.id)
                         expect(name).to.equal(user.name)
