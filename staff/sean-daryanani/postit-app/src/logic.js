@@ -79,7 +79,7 @@ const logic = {
                 'Content-Type': 'application/json; charset=utf-8',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ postits: this._postits })
+            body: JSON.stringify({ text })
         })
             .then(res => res.json())
             .then(res => {
