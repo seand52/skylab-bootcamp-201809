@@ -86,6 +86,18 @@ const logic = {
             })
     },
 
+    listPostits(id) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+
+        return User.findById(id)
+            .then(user => {
+                if (!user) throw Error(`user with id ${id} not found`)
+            
+
+                return user.postits
+            })
+    },
+
     /**
      * Removes a postit
      * 
@@ -149,6 +161,8 @@ const logic = {
                 return user.save()
             })
     }
+
+    
 }
 
 module.exports = logic

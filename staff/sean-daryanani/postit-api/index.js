@@ -14,7 +14,7 @@ const app = express()
 
 const jsonBodyParser = bodyParser.json()
 
-app.post('/api/user', jsonBodyParser, (req, res) => {
+app.post('/api/users', jsonBodyParser, (req, res) => {
     const { name, surname, username, password } = req.body
 
     try {
@@ -69,7 +69,7 @@ app.post('/api/auth', jsonBodyParser, (req, res) => {
     }
 })
 
-app.get('/api/user/:id', (req, res) => {
+app.get('/api/users/:id', (req, res) => {
     const { params: { id }, headers: { authorization } } = req
 
     
@@ -100,29 +100,26 @@ app.get('/api/user/:id', (req, res) => {
     }
 })
 
-app.get('/logout', (req, res) => {
-    req.session.userId = null
 
-    res.redirect('/')
-})
 
-app.post('/api/postit', jsonBodyParser, (req, res) => {
+app.post('/api/users/:id/postits', jsonBodyParser, (req, res) => {
 
-    const { headers: { authorization } } = req
+    const { headers: { authorization }, params: {id}, body: {text} } = req
     
     try {
         const token = authorization.split(' ')[1]
 
         const { sub } = jwt.verify(token, JWT_SECRET)
- 
-            const { text } = req.body
+        
+        if (id!== sub) throw Error('token sub does not match user id')
 
-            logic.addPostit(sub, text)
+
+            logic.addPostit(id, text)
                 .then(() => {
 
                     res.json({
                         status: 'OK',
-                        text
+                        message: 'postit added'
                     })
 
                 })
@@ -141,10 +138,39 @@ app.post('/api/postit', jsonBodyParser, (req, res) => {
     }
 })
 
-//delete postit
-app.delete('/api/postit/:postit_id', jsonBodyParser, (req, res) => {
+app.get('/api/users/:id/postits', jsonBodyParser, (req, res) => {
+    const { headers: { authorization }, params: { id } } = req
 
-    const { params: { postit_id }, headers: { authorization } } = req
+    try {
+        const token = authorization.split(' ')[1]
+
+        const { sub } = jwt.verify(token, JWT_SECRET)
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        logic.listPostits(id)
+            .then(postits => res.json({
+                status: 'OK',
+                data: postits
+            }))
+            .catch(({ message }) =>
+                res.json({
+                    status: 'KO',
+                    message
+                })
+            )
+    } catch ({ message }) {
+        res.json({
+            status: 'KO',
+            message
+        })
+    }
+})
+
+//delete postit
+app.delete('/api/users/:id/postits/:postit_id', jsonBodyParser, (req, res) => {
+
+    const { params: { id, postit_id }, headers: { authorization } } = req
 
     
     try {
@@ -152,7 +178,9 @@ app.delete('/api/postit/:postit_id', jsonBodyParser, (req, res) => {
 
         const { sub } = jwt.verify(token, JWT_SECRET)
 
-        logic.removePostit(sub, postit_id)
+        if(id!==sub) throw Error('token sub does not match user id')
+
+        logic.removePostit(id, postit_id)
             .then(() => {
 
                 res.json({
@@ -177,17 +205,19 @@ app.delete('/api/postit/:postit_id', jsonBodyParser, (req, res) => {
 })
 
 //modify postit:
-app.put('/api/postit/:postit_id', jsonBodyParser, (req, res) => {
+app.put('/api/users/:id/postits/:postit_id', jsonBodyParser, (req, res) => {
 
-    const { params: { postit_id }, headers: { authorization } } = req
+    const { params: { id, postit_id }, headers: { authorization }, body: {text} } = req
 
     
     try {
         const token = authorization.split(' ')[1]
-
+        
         const { sub } = jwt.verify(token, JWT_SECRET)
-        const { text } = req.body
-        logic.modifyPostit(sub, postit_id, text)
+
+        if (id !== sub) throw Error('token sub does does not match user id')
+
+        logic.modifyPostit(id, postit_id, text)
             .then(() => {
 
                 res.json({
