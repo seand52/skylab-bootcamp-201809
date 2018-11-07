@@ -1,5 +1,4 @@
 const { User, Postit } = require('../data')
-const { AlreadyExistsError, NotFoundError, ValueError } = require('../errors')
 
 const logic = {
     registerUser(name, surname, username, password) {
@@ -8,18 +7,16 @@ const logic = {
         if (typeof username !== 'string') throw TypeError(`${username} is not a string`)
         if (typeof password !== 'string') throw TypeError(`${password} is not a string`)
 
-        if (!name.trim()) throw new ValueError('name is empty or blank')
-        if (!surname.trim()) throw new ValueError('surname is empty or blank')
-        if (!username.trim()) throw new ValueError('username is empty or blank')
-        if (!password.trim()) throw new ValueError('password is empty or blank')
+        if (!name.trim()) throw Error('name is empty or blank')
+        if (!surname.trim()) throw Error('surname is empty or blank')
+        if (!username.trim()) throw Error('username is empty or blank')
+        if (!password.trim()) throw Error('password is empty or blank')
 
         return User.findByUsername(username)
             .then(user => {
-                if (user) throw new AlreadyExistsError(`username ${username} already registered`)
+                if (user) throw Error(`username ${username} already registered`)
 
                 user = new User({ name, surname, username, password })
-
-
 
                 return user.save()
             })
@@ -29,8 +26,8 @@ const logic = {
         if (typeof username !== 'string') throw TypeError(`${username} is not a string`)
         if (typeof password !== 'string') throw TypeError(`${password} is not a string`)
 
-        if (!username.trim()) throw new ValueError('username is empty or blank')
-        if (!password.trim()) throw new ValueError('password is empty or blank')
+        if (!username.trim()) throw Error('username is empty or blank')
+        if (!password.trim()) throw Error('password is empty or blank')
 
         return User.findByUsername(username)
             .then(user => {
@@ -43,18 +40,17 @@ const logic = {
     retrieveUser(id) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
 
-        if (!id.trim().length) throw new ValueError('id is empty or blank')
+        if (!id.trim().length) throw Error('id is empty or blank')
 
         return User.findById(id)
             .then(user => {
-                if (!user) throw new NotFoundError(`user with id ${id} not found`)
+                if (!user) throw Error(`user with id ${id} not found`)
 
                 const _user = user.toObject()
 
                 _user.id = id
 
                 delete _user.password
-                delete _user.postits
 
                 return _user
             })
@@ -63,26 +59,24 @@ const logic = {
     /**
      * Adds a postit
      * 
-     * @param {string} id The user id
+     * @param {number} id The user id
      * @param {string} text The postit text
      * 
-     * @throws {TypeError} On non-string user id, or non-string postit text
-     * @throws {Error} On empty or blank user id or postit text
+     * @throws {TypeError} On non-numeric user id, or non-string postit text
+     * @throws {Error} On empty or blank postit text
      * 
      * @returns {Promise} Resolves on correct data, rejects on wrong user id
      */
     addPostit(id, text) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
 
-        if (!id.trim().length) throw new ValueError('id is empty or blank')
-
         if (typeof text !== 'string') throw TypeError(`${text} is not a string`)
 
-        if (!text.trim().length) throw new ValueError('text is empty or blank')
+        if (!text.trim().length) throw Error('text is empty or blank')
 
         return User.findById(id)
             .then(user => {
-                if (!user) throw new NotFoundError(`user with id ${id} not found`)
+                if (!user) throw Error(`user with id ${id} not found`)
 
                 const postit = new Postit({ text })
 
@@ -95,11 +89,10 @@ const logic = {
     listPostits(id) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
 
-        if (!id.trim().length) throw new ValueError('id is empty or blank')
-
         return User.findById(id)
             .then(user => {
-                if (!user) throw new NotFoundError(`user with id ${id} not found`)
+                if (!user) throw Error(`user with id ${id} not found`)
+            
 
                 return user.postits
             })
@@ -108,26 +101,20 @@ const logic = {
     /**
      * Removes a postit
      * 
-     * @param {string} id The user id
-     * @param {string} postitId The postit id
+     * @param {number} id The user id
+     * @param {number} postitId The postit id
      * 
-     * @throws {TypeError} On non-string user id, or non-string postit id
-     * @throws {Error} On empty or blank user id or postit text
+     * @throws {TypeError} On non-numeric user id, or non-numeric postit id
      * 
      * @returns {Promise} Resolves on correct data, rejects on wrong user id, or postit id
      */
     removePostit(id, postitId) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
-
-        if (!id.trim().length) throw new ValueError('id is empty or blank')
-
         if (typeof postitId !== 'string') throw TypeError(`${postitId} is not a string`)
-
-        if (!postitId.trim().length) throw new ValueError('postit id is empty or blank')
 
         return User.findById(id)
             .then(user => {
-                if (!user) throw new NotFoundError(`user with id ${id} not found`)
+                if (!user) throw Error(`user with id ${id} not found`)
 
                 const { postits } = user
 
@@ -143,7 +130,7 @@ const logic = {
 
                 const index = postits.findIndex(postit => postit.id === postitId)
 
-                if (index < 0) throw new NotFoundError(`postit with id ${postitId} not found in user with id ${id}`)
+                if (index < 0) throw Error(`postit with id ${postitId} not found in user with id ${id}`)
 
                 postits.splice(index, 1)
 
@@ -153,32 +140,29 @@ const logic = {
 
     modifyPostit(id, postitId, text) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
-
-        if (!id.trim().length) throw new ValueError('id is empty or blank')
-
         if (typeof postitId !== 'string') throw TypeError(`${postitId} is not a string`)
 
-        if (!postitId.trim().length) throw new ValueError('postit id is empty or blank')
+        if(typeof text !== 'string') throw TypeError(`${text} is not a string`)
 
-        if (typeof text !== 'string') throw TypeError(`${text} is not a string`)
-
-        if (!text.trim().length) throw new ValueError('text is empty or blank')
+        if (!text.trim().length) throw Error('text is empty or blank')
 
         return User.findById(id)
             .then(user => {
-                if (!user) throw new NotFoundError(`user with id ${id} not found`)
+                if (!user) throw Error(`user with id ${id} not found`)
 
                 const { postits } = user
 
                 const postit = postits.find(postit => postit.id === postitId)
 
-                if (!postit) throw new NotFoundError(`postit with id ${postitId} not found in user with id ${id}`)
+                if (!postit) throw Error(`postit with id ${postitId} not found in user with id ${id}`)
 
                 postit.text = text
 
                 return user.save()
             })
     }
+
+    
 }
 
 module.exports = logic
