@@ -10,6 +10,7 @@ class App extends Component {
         register: false, 
         login: false,
         userID: null,
+        token: null,
         error: null,
     }
 
@@ -24,9 +25,10 @@ class App extends Component {
     }
 
     handleLogout = () => {
-        this.setState({userID: null})
+        this.setState({userID: null, token: null})
 
         sessionStorage.removeItem('userID')
+        sessionStorage.removeItem('token')
     }
 
     handleHome = () => {
@@ -36,7 +38,7 @@ class App extends Component {
 
     registerSubmit = (name, surname, username, password) => {
         try {
-            logic.createUser(name, surname, username, password)
+            logic.registerUser(name, surname, username, password)
                 .then(() => this.setState({login: true, register: false, error: null}))
                 .catch (err => this.setState({error: err.message}))
         } catch(err) {
@@ -44,12 +46,19 @@ class App extends Component {
         }
     }
 
+    componentDidMount() {
+    const userID = sessionStorage.getItem('userId')  
+    const token = sessionStorage.getItem('token')
+
+    userID ? this.setState({userID, token}): this.setState({userID: null, token: null})
+    }
+
 
 
     loginSubmit = (username, password) => {
 
         try {
-            logic.validateUser(username, password) 
+            logic.login(username, password) 
                 .then(({id, token}) => {
                     sessionStorage.setItem('userId', id)
                     sessionStorage.setItem('token', token)
