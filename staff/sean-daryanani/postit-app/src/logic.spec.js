@@ -51,6 +51,7 @@ describe('logic', () => {
                     password = `123-${Math.random()}`
 
                     return logic.registerUser(name, surname, username, password)
+
                 })
 
                 it('should succeed on correct data', () =>
@@ -59,10 +60,11 @@ describe('logic', () => {
                 )
 
                 it('should fail on wrong username', () => {
+                    debugger
                     username = `dummy-${Math.random()}`
-
                     return logic.login(username, password)
                         .catch(err => {
+                            debugger
                             expect(err).not.to.be.undefined
                             expect(err.message).to.equal(`user with username "${username}" does not exist`)
                         })
@@ -128,8 +130,8 @@ describe('logic', () => {
                             return logic.login(username, password)
                                 .then(res => {
 
-                                    id = res.id
-                                    token = res.token
+                                    id = res.data.id
+                                    token = res.data.token
                                 })
                         })
                 })
@@ -162,8 +164,8 @@ describe('logic', () => {
                             return logic.login(username, password)
                                 .then(res => {
 
-                                    id = res.id
-                                    token = res.token
+                                    id = res.data.id
+                                    token = res.data.token
 
                                 })
                         })
@@ -207,8 +209,8 @@ describe('logic', () => {
                         .then(() => {
                             return logic.login(username, password)
                                 .then((res) => {
-                                    id = res.id
-                                    token = res.token
+                                    id = res.data.id
+                                    token = res.data.token
                                 })
                         })
                 })
@@ -244,8 +246,8 @@ describe('logic', () => {
                         .then(() => {
                             return logic.login(username, password)
                                 .then(res => {
-                                    id = res.id
-                                    token = res.token
+                                    id = res.data.id
+                                    token = res.data.token
                                 })
 
                         })
@@ -279,6 +281,33 @@ describe('logic', () => {
                                 expect(postit.text).to.equal(newText)
                             })
                     )
+                })
+            })
+        })
+
+        describe('update user profile', () => {
+            describe('should succeed on updating username', () =>{
+
+                let username, password, text, postitId, id, token
+
+                beforeEach(() => {
+                    const name = 'John', surname = 'Doe'
+
+                    username = `jd-${Math.random()}`
+                    password = `123-${Math.random()}`
+
+                    text = `hello ${Math.random()}`
+
+                    return logic.registerUser(name, surname, username, password)
+                        .then(() => {
+                            return logic.login(username, password)
+                                .then(res => {
+                                    debugger
+                                    id = res.data.id
+                                    token = res.data.token
+                                })
+
+                        })
                 })
             })
         })

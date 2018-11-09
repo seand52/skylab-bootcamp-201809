@@ -59,10 +59,10 @@ class App extends Component {
 
         try {
             logic.login(username, password) 
-                .then(({id, token}) => {
-                    sessionStorage.setItem('userId', id)
-                    sessionStorage.setItem('token', token)
-                    this.setState({ userID: id, token, login: false, register: false, error: null })})
+                .then((res) => {
+                    sessionStorage.setItem('userId', res.data.id)
+                    sessionStorage.setItem('token', res.data.token)
+                    this.setState({ userID: res.data.id, token: res.data.token, login: false, register: false, error: null })})
                     .catch(err => this.setState({ error: err.message }))
         }catch(err) {
             this.setState({error: err.message})

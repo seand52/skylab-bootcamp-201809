@@ -3,11 +3,15 @@ import logic from '../logic'
 import InputForm from './InputForm'
 import Post from './Post'
 import Popup from './Popup'
+import Profile from './Profile'
 
 class Home extends Component {
     state = {
         showPopup: false,
-        postits: []
+        postits: [],
+        showProfile: false,
+        userName: '',
+        userSurname: ''
     }
 
     componentDidMount() {
@@ -58,15 +62,29 @@ class Home extends Component {
         })
     }
 
+    showProfile = () => {
+        const { propUserID, token } = this.props
+        logic.retrieveUserInfo(propUserID, token)
+            .then(res => {
+
+                this.setState({userName: res.name, userSurname: res.surname, showProfile: !this.state.showProfile })}
+                )
+
+    }
+
     render() {
         return <div className="container">
             <h1>Post it App</h1>
-            <InputForm onSubmit={this.handleSubmit} />
-            <div className="test">
+            <button onClick={this.showProfile}>Profile</button>
+            {!this.state.showProfile ? <InputForm onSubmit={this.handleSubmit} />: null}
+
+            {!this.state.showProfile ? <div className="test">
                 {this.state.postits.map(postit => <Post key={postit.id} text={postit.text} id={postit.id} onDeletePost={this.handleDeletePost} editing={this.state.showPopup} popup={this.togglePopup} />)}
                 {this.state.postits.map(postit => (this.state.showPopup && postit.id === this.state.clickedID) ? <Popup onUpdate={this.handleUpdatePost} key={postit.id} id={postit.id} text={postit.text} /> : null)}
-            </div>
+            </div>: null}
+
             <button onClick={this.handleLogout}>Log out</button>
+            {this.state.showProfile ? <Profile username={this.state.userName} id={this.props.propUserID} name={this.state.userName} surname={this.state.userSurname} />:null}
         </div>
     }
 }

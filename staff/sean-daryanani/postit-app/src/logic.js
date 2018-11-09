@@ -2,11 +2,11 @@
 const data = require('./data')
 
 
-const { Postit, User } = data
-
 const logic = {
 
     _postits : [],
+    _token: sessionStorage.getItem('token') || null,
+    _id: sessionStorage.getItem('userId') || null,
 
     registerUser(name, surname, username, password) {
 
@@ -53,10 +53,39 @@ const logic = {
         })
             .then(res => res.json())
             .then(res => {
-                if (res.error) throw Error(res.error)
-                return res.data
+                const { id, token } = res.data
+
+                this._userId = id
+                this._token = token
+
+                sessionStorage.setItem('userId', id)
+                sessionStorage.setItem('token', token)
+                return res
 
             })
+    },
+
+    sendUpdatedInfo(id, name, surname, username, newPassword, password) {
+
+
+
+        return fetch(`http://localhost:5000/api/users/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+
+            },
+            body: JSON.stringify({ name, surname, username, newPassword, password })
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+                console.log(res)
+
+            })
+
+
     },
 
     createPostit(text, userID, token) {
@@ -176,7 +205,26 @@ const logic = {
         
     },
 
+    retrieveUserInfo(userID, token) {
+
+        return fetch(`http://localhost:5000/api/users/${userID}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                
+                if (res.error) throw Error(res.error)
+
+                const {data} = res
+
+                return data
+            })
+    }
+
 }
 
-export default logic
-// module.exports = logic
+// export default logic
+module.exports = logic
