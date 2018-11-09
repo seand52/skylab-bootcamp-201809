@@ -2,8 +2,7 @@ const fs = require('fs')
 const { User, Postit } = require('../data')
 const logic = require('.')
 const { AlreadyExistsError } = require('../errors')
-const { MongoClient } = require('mongodb')
-const { env: { MONGO_URL } } = process
+
 const { expect } = require('chai')
 
 // running test from CLI
@@ -11,25 +10,16 @@ const { expect } = require('chai')
 // debug -> $ mocha debug src/logic.spec.js --timeout 10000
 
 describe('logic', () => {
-    let client, users
-
     before(() => {
-        client = new MongoClient(MONGO_URL, { useNewUrlParser: true })
-
-        return client.connect()
-            .then(() => {
-                const db = client.db('postit-test')
-
-                users = db.collection('users')
-
-                User._collection = users
-            })
+        User._file = '../data/users.spec.json'
     })
 
-    afterEach(() => users.deleteMany())
+    beforeEach(() => fs.writeFileSync(User._file, JSON.stringify([])))
+
+    // afterEach(() => fs.writeFileSync(User._file, JSON.stringify([])))
 
     describe('user', () => {
-        describe('register', () => {
+        !false && describe('register', () => {
             let name, surname, username, password
 
             beforeEach(() => {
@@ -42,20 +32,17 @@ describe('logic', () => {
             it('should succeed on correct data', () =>
                 logic.registerUser(name, surname, username, password)
                     .then(() => {
-                        return users.find().toArray()
-                            .then(_users => {
-                                const [user] = _users
-                                expect(user.id).to.be.a('string')
-                                expect(user.name).to.equal(name)
-                                expect(user.surname).to.equal(surname)
-                                expect(user.username).to.equal(username)
-                                expect(user.password).to.equal(password)
-                            })
+                        const json = fs.readFileSync(User._file)
 
+                        const users = JSON.parse(json)
 
-                        
+                        const [user] = users
 
-                        
+                        expect(user.id).to.be.a('string')
+                        expect(user.name).to.equal(name)
+                        expect(user.surname).to.equal(surname)
+                        expect(user.username).to.equal(username)
+                        expect(user.password).to.equal(password)
                     })
             )
 
@@ -66,7 +53,7 @@ describe('logic', () => {
             // TODO other test cases
         })
 
-        false && describe('authenticate', () => {
+        !false && describe('authenticate', () => {
             let user
 
             beforeEach(() => {
@@ -100,7 +87,7 @@ describe('logic', () => {
             // TODO other test cases
         })
 
-        false && describe('retrieve', () => {
+        !false && describe('retrieve', () => {
             let user, postit
 
             beforeEach(() => {
@@ -128,7 +115,7 @@ describe('logic', () => {
             )
         })
 
-        false && describe('update', () => {
+        !false && describe('update', () => {
             let user
 
             beforeEach(() => {
@@ -257,7 +244,7 @@ describe('logic', () => {
     })
 
     describe('postits', () => {
-        false && describe('add', () => {
+        !false && describe('add', () => {
             let user, text
 
             beforeEach(() => {
@@ -294,7 +281,7 @@ describe('logic', () => {
             // TODO other test cases
         })
 
-        false && describe('list', () => {
+        !false && describe('list', () => {
             let user, postit, postit2
 
             beforeEach(() => {
@@ -343,7 +330,7 @@ describe('logic', () => {
             )
         })
 
-        false && describe('remove', () => {
+        !false && describe('remove', () => {
             let user, postit
 
             beforeEach(() => {
@@ -373,7 +360,7 @@ describe('logic', () => {
             )
         })
 
-        false && describe('modify', () => {
+        !false && describe('modify', () => {
             let user, postit, newText
 
             beforeEach(() => {

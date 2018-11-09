@@ -13,7 +13,8 @@ function jwtVerifier(req, res, next) {
         next()
     } catch ({ message }) {
         res.json({
-            error: message
+            status: 'KO',
+            message
         })
     }
 }
