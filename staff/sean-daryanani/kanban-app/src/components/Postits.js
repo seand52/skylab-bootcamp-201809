@@ -16,7 +16,7 @@ class Postits extends Component {
 
     handleSubmit = (text, status) => {
         try {
-            return logic.addPostit(text, status='TODO')
+            return logic.addPostit(text, status = 'TODO')
                 .then(() => logic.listPostits())
                 .then(postits => this.setState({ postits }))
         } catch ({ message }) {
@@ -58,7 +58,23 @@ class Postits extends Component {
             <InputForm onSubmit={this.handleSubmit} />
 
             <section>
-                {this.state.postits.map(postit => <Post key={postit.id} text={postit.text} id={postit.id} onDeletePost={this.handleRemovePostit} onUpdatePost={this.handleModifyPostit} />)}
+                <h1>To Do</h1>
+                {this.state.postits.filter(postit => postit.status === 'TODO').map(postit => <Post key={postit.id} text={postit.text} id={postit.id} onDeletePost={this.handleRemovePostit} onUpdatePost={this.handleModifyPostit} />)}
+            </section>
+
+            <section>
+                <h1>Doing</h1>
+                {this.state.postits.filter(postit => postit.status === 'DOING').map(postit => <Post key={postit.id} text={postit.text} id={postit.id} onDeletePost={this.handleRemovePostit} onUpdatePost={this.handleModifyPostit} />)}
+            </section>
+
+            <section>
+                <h1>Review</h1>
+                {this.state.postits.filter(postit => postit.status === 'REVIEW').map(postit => <Post key={postit.id} text={postit.text} id={postit.id} onDeletePost={this.handleRemovePostit} onUpdatePost={this.handleModifyPostit} />)}
+            </section>
+
+            <section>
+                <h1>Done</h1>
+                {this.state.postits.filter(postit => postit.status === 'DONE').map(postit => <Post key={postit.id} text={postit.text} id={postit.id} onDeletePost={this.handleRemovePostit} onUpdatePost={this.handleModifyPostit} />)}
             </section>
         </div>
     }
