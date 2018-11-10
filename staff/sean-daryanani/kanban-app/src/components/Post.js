@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import logic from '../logic'
+import Dropwdown from './Dropdown';
 
 class Post extends Component {
     state = {
@@ -18,13 +19,6 @@ class Post extends Component {
         this.props.onUpdatePost(this.props.id, this.state.text)
     }
 
-    dropDownChange =(event) => {
-        event.preventDefault()
-
-        const val = event.target.value
-
-        this.setState({status: val}, () =>  this.props.onUpdatePost(this.props.id, this.state.text, val))        
-    }
 
     componentDidMount() {
         return logic.listPostits()
@@ -38,34 +32,15 @@ class Post extends Component {
             })
     }
 
-    render() {
-        let todo = false
-        let doing = false
-        let review = false
-        let done = false
+    handleStatus = () => {
 
-        switch(this.state.status) {
-            case 'TODO':
-                todo = true
-                break
-            case 'DOING':
-                doing=true
-                break
-            case 'REVIEW':
-                review=true
-                break
-            case 'DONE':
-                done=true
-                break
-        }
+    }
+
+
+    render() {
         return <article className="post">
             <textarea defaultValue={this.state.text} onChange={this.handleChange} onBlur={this.handleBlur} />
-            <select  onChange={this.dropDownChange}>
-                <option selected= {todo ? 'selected': null} value="TODO">To do</option>
-                <option selected= {doing ? 'selected': null} value="DOING">Doing</option>
-                <option selected= {review ? 'selected': null} value="REVIEW">Review</option>
-                <option selected= {done ? 'selected': null} value="DONE">Done</option>
-            </select>
+            <Dropwdown getStatus={this.handleStatus} onUpdatePost={this.props.onUpdatePost} text={this.state.text} id={this.props.id}/>
             <button onClick={() => this.props.onDeletePost(this.props.id)}><i className="far fa-trash-alt"></i></button>
         </article>
     }
