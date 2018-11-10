@@ -19,9 +19,9 @@ class InputForm extends Component {
 
     render() {
         return <form onSubmit={this.handleSubmit}>
-            <input value={this.state.text} placeholder="Write text here..." onChange={this.handleInput} />
-
-            <button type="submit"><i className="fas fa-plus"></i></button>
+            <label className="field a-field a-field_a1 page__field">
+                <input type="text" value={this.state.text} onChange={this.handleInput} className="field__input" placeholder="What is your goal?"/>
+            </label>
         </form>
     }
 }

@@ -36,13 +36,37 @@ class Register extends Component {
     }
 
     render() {
-        return <form onSubmit={this.handleSubmit}>
-            <input type="text" placeholder="Name" onChange={this.handleNameChange} />
-            <input type="text" placeholder="Surname" onChange={this.handleSurnameChange} />
-            <input type="text" placeholder="Username" onChange={this.handleUsernameChange} />
-            <input type="password" placeholder="Password" onChange={this.handlePasswordChange} />
-            <button type="submit">Register</button> <a href="#" onClick={this.props.onGoBack}>back</a>
-        </form>
+        return <section className="register-page">
+            <div className="register-wrapper">
+                <form className="register-form" onSubmit={this.handleSubmit}>
+                    <label className="field a-field a-field_a1 page__field">
+                        <input type="text" onChange={this.handleNameChange} className="field__input" placeholder="e.g. John" required />
+                        <span className="field__label-wrap">
+                            <span className="field__label">First name</span>
+                        </span>
+                    </label>
+                    <label className="field a-field a-field_a1 page__field">
+                        <input type="text" onChange={this.handleSurnameChange} className="field__input" placeholder="e.g. Doe" required />
+                        <span className="field__label-wrap">
+                            <span className="field__label">Last name</span>
+                        </span>
+                    </label>
+                    <label className="field a-field a-field_a1 page__field">
+                        <input onChange={this.handleUsernameChange} type="text" className="field__input" placeholder="e.g. jd" required />
+                        <span className="field__label-wrap">
+                            <span className="field__label">Username</span>
+                        </span>
+                    </label>
+                    <label className="field a-field a-field_a1 page__field">
+                        <input onChange={this.handlePasswordChange} type="password" className="field__input" placeholder="e.g. 123" required />
+                        <span className="field__label-wrap">
+                            <span className="field__label">Password</span>
+                        </span>
+                    </label>
+                    <button className="register__button draw-border" type="submit">Register</button> <a href="#" onClick={this.props.onGoBack}>Back to home page</a>
+                </form>
+            </div>
+        </section>
     }
 }
 

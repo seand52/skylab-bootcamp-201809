@@ -4,6 +4,7 @@ import Login from './components/Login'
 import Postits from './components/Postits'
 import Error from './components/Error'
 import Landing from './components/Landing'
+import Navbar from './components/Navbar'
 import logic from './logic'
 import { Route, withRouter, Redirect } from 'react-router-dom'
 
@@ -56,9 +57,10 @@ class App extends Component {
             {error && <Error message={error} />}
 
             <Route path="/postits" render={() => logic.loggedIn ? <div>
-                <section><button onClick={this.handleLogoutClick}>Logout</button></section>
+                <Navbar logout={this.handleLogoutClick}/>
                 <Postits />
             </div> : <Redirect to="/" />} />
+            <Route path="/profile" component={Profile}/>
 
         </div>
     }

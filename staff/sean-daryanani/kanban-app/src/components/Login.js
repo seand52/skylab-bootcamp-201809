@@ -24,13 +24,28 @@ class Login extends Component {
     }
 
     render() {
-        return <form onSubmit={this.handleSubmit}>
-            <input type="text" placeholder="Username" onChange={this.handleUsernameChange} />
-            <input type="password" placeholder="Password" onChange={this.handlePasswordChange} />
-            {/* <button type="submit">Login</button> <a href="/#/">back</a> */}
-            <button type="submit">Login</button> <a href="#" onClick={this.props.onGoBack}>back</a>
-        </form>
+        return <section className="login-page">
+        <div className="login-wrapper">
+            <form className="login-form" onSubmit={this.handleSubmit}>
+                <label className="field a-field a-field_a1 page__field">
+                    <input type="text" onChange={this.handleUsernameChange} className="field__input" placeholder="e.g. jd" required />
+                    <span className="field__label-wrap">
+                        <span className="field__label">Username</span>
+                    </span>
+                </label>
+                <label className="field a-field a-field_a1 page__field">
+                    <input type="text" onChange={this.handlePasswordChange} className="field__input" placeholder="e.g. 123" required />
+                    <span className="field__label-wrap">
+                        <span className="field__label">Password</span>
+                    </span>
+                </label>
+                <button className="login__button draw-border" type="submit">Login</button> <a href="#" onClick={this.props.onGoBack}>Back to home page</a>
+            </form>
+        </div>
+    </section>    
+ 
     }
 }
 
 export default Login
+

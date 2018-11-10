@@ -39,9 +39,13 @@ class Post extends Component {
 
     render() {
         return <article className="postit" draggable='true' className="post" draggable onDragStart={this.props.onDragStart}>
+            <p className="postit__drag">Click to drag  <button className="postit__delete" onClick={() => this.props.onDeletePost(this.props.id)}><i class="fas fa-times"></i></button></p>
+           
+            <div className="textarea-div">
             <textarea className='postit__input' defaultValue={this.state.text} onChange={this.handleChange} onBlur={this.handleBlur} />
+            </div>
             <Dropwdown defaultStatus={this.props.defaultStatus} getStatus={this.handleStatus} onUpdatePost={this.props.onUpdatePost} text={this.state.text} id={this.props.id} />
-            <button onClick={() => this.props.onDeletePost(this.props.id)}><i className="far fa-trash-alt"></i></button>
+
         </article>
     }
 }
