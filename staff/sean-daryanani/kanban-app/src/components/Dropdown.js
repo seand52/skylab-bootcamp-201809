@@ -4,7 +4,7 @@ import logic from '../logic'
 class Dropwdown extends Component {
 
     state = {
-        status: 'TODO'
+        status: this.props.defaultStatus
     }
 
     dropDownChange =(event) => {
@@ -16,30 +16,30 @@ class Dropwdown extends Component {
     }
 
     render() {
-        let todo = false
-        let doing = false
-        let review = false
-        let done = false
+        // let todo = false
+        // let doing = false
+        // let review = false
+        // let done = false
 
-        switch (this.state.status) {
-            case 'TODO':
-                todo = true
-                break
-            case 'DOING':
-                doing = true
-                break
-            case 'REVIEW':
-                review = true
-                break
-            case 'DONE':
-                done = true
-                break
-        }
-        return <select onChange={this.dropDownChange}>
-            <option selected={todo ? 'selected' : null} value="TODO">To do</option>
-            <option selected={doing ? 'selected' : null} value="DOING">Doing</option>
-            <option selected={review ? 'selected' : null} value="REVIEW">Review</option>
-            <option selected={done ? 'selected' : null} value="DONE">Done</option>
+        // switch (this.state.status) {
+        //     case 'TODO':
+        //         todo = true
+        //         break
+        //     case 'DOING':
+        //         doing = true
+        //         break
+        //     case 'REVIEW':
+        //         review = true
+        //         break
+        //     case 'DONE':
+        //         done = true
+        //         break
+        // }
+        return <select className="custom-select" defaultValue={this.state.status} onChange={this.dropDownChange}>
+            <option  value="TODO">To do</option>
+            <option  value="DOING">Doing</option>
+            <option  value="REVIEW">Review</option>
+            <option  value="DONE">Done</option>
         </select>
     }
 }

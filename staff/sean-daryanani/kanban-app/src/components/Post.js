@@ -16,7 +16,7 @@ class Post extends Component {
     }
 
     handleBlur = () => {
-        this.props.onUpdatePost(this.props.id, this.state.text)
+        this.props.onUpdatePost(this.props.id, this.state.text, this.props.defaultStatus)
     }
 
 
@@ -25,9 +25,9 @@ class Post extends Component {
             .then(res => {
                 const postit = res.find(item => item.id === this.props.id)
 
-                const {status} = postit
+                const { status } = postit
 
-                this.setState({status})
+                this.setState({ status })
 
             })
     }
@@ -38,9 +38,9 @@ class Post extends Component {
 
 
     render() {
-        return <article className="post">
-            <textarea defaultValue={this.state.text} onChange={this.handleChange} onBlur={this.handleBlur} />
-            <Dropwdown getStatus={this.handleStatus} onUpdatePost={this.props.onUpdatePost} text={this.state.text} id={this.props.id}/>
+        return <article className="postit" draggable='true' className="post" draggable onDragStart={this.props.onDragStart}>
+            <textarea className='postit__input' defaultValue={this.state.text} onChange={this.handleChange} onBlur={this.handleBlur} />
+            <Dropwdown defaultStatus={this.props.defaultStatus} getStatus={this.handleStatus} onUpdatePost={this.props.onUpdatePost} text={this.state.text} id={this.props.id} />
             <button onClick={() => this.props.onDeletePost(this.props.id)}><i className="far fa-trash-alt"></i></button>
         </article>
     }

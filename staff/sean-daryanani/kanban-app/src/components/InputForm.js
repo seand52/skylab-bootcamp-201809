@@ -12,7 +12,7 @@ class InputForm extends Component {
     handleSubmit = event => {
         event.preventDefault()
 
-        this.props.onSubmit(this.state.text)
+        this.props.onSubmit(this.state.text, this.props.status)
 
         this.setState({ text: '' })
     }
