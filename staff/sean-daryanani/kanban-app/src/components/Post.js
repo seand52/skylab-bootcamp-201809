@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 import logic from '../logic'
 import Dropwdown from './Dropdown';
+import Error from './Error'
 
 class Post extends Component {
     state = {
         text: this.props.text,
-        status: ''
+        status: '',
+        blankPostit:this.props.blankError
     }
 
 
@@ -39,13 +41,14 @@ class Post extends Component {
 
     render() {
         return <article className="postit" draggable='true' className="post" draggable onDragStart={this.props.onDragStart}>
-            <p className="postit__drag">Click to drag  <button className="postit__delete" onClick={() => this.props.onDeletePost(this.props.id)}><i class="fas fa-times"></i></button></p>
-           
-            <div className="textarea-div">
+            <button className="postit__delete" onClick={() => this.props.onDeletePost(this.props.id)}><i class="fas fa-times"></i></button>
+            <div>
             <textarea className='postit__input' defaultValue={this.state.text} onChange={this.handleChange} onBlur={this.handleBlur} />
             </div>
+            <div>
             <Dropwdown defaultStatus={this.props.defaultStatus} getStatus={this.handleStatus} onUpdatePost={this.props.onUpdatePost} text={this.state.text} id={this.props.id} />
-
+            </div>
+           
         </article>
     }
 }

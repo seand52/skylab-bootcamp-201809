@@ -53,6 +53,8 @@ const logic = {
 
                 sessionStorage.setItem('userId', id)
                 sessionStorage.setItem('token', token)
+
+                return res
             })
     },
 
@@ -150,7 +152,27 @@ const logic = {
             .then(res => {
                 if (res.error) throw Error(res.error)
             })
-    }
+    },
+
+    sendUpdatedInfo(name, surname, username, newPassword, password) {
+
+        return fetch(`http://localhost:5000/api/users/${this._userId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+    
+            },
+            body: JSON.stringify({ name, surname, username, newPassword, password })
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+    
+            })
+    
+    
+        }
 }
 
 // export default logic

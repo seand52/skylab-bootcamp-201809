@@ -35,7 +35,7 @@ class Dropwdown extends Component {
         //         done = true
         //         break
         // }
-        return <select className="custom-select" defaultValue={this.state.status} onChange={this.dropDownChange}>
+        return <select  className="select" defaultValue={this.state.status} onChange={this.dropDownChange}>
             <option  value="TODO">To do</option>
             <option  value="DOING">Doing</option>
             <option  value="REVIEW">Review</option>

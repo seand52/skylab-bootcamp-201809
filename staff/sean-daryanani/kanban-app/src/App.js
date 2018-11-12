@@ -5,7 +5,9 @@ import Postits from './components/Postits'
 import Error from './components/Error'
 import Landing from './components/Landing'
 import Navbar from './components/Navbar'
+import Profile from './components/Profile'
 import logic from './logic'
+
 import { Route, withRouter, Redirect } from 'react-router-dom'
 
 logic.url = 'http://localhost:5000/api'
@@ -32,7 +34,9 @@ class App extends Component {
     handleLogin = (username, password) => {
         try {
             logic.login(username, password)
-                .then(() =>  this.props.history.push('/postits'))
+                .then(res => {
+                console.log(res)                    
+                    this.props.history.push('/postits')})
                 .catch(err => this.setState({ error: err.message }))
         } catch (err) {
             this.setState({ error: err.message })
@@ -57,10 +61,13 @@ class App extends Component {
             {error && <Error message={error} />}
 
             <Route path="/postits" render={() => logic.loggedIn ? <div>
-                <Navbar logout={this.handleLogoutClick}/>
+                <Navbar logout={this.handleLogoutClick} />
                 <Postits />
             </div> : <Redirect to="/" />} />
-            <Route path="/profile" component={Profile}/>
+            <Route path="/profile" render={() => logic.loggedIn ? 
+            <div>
+                <Profile logout={this.handleLogoutClick} />
+            </div> : <Redirect to="/" />} />
 
         </div>
     }

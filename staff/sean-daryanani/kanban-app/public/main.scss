@@ -1,6 +1,8 @@
 //IMPORTS
 @import 'variables';
-
+* {
+  font-family: 'Roboto Mono', monospace;
+}
 //LANDING PAGE
 .landing-page {
     display: flex;
@@ -34,12 +36,12 @@
     @include btn-border-drawing(#58afd1, #fab7b6, 4px, bottom, right);
   }
 
-  .landing-form__button {
+  .landing-form__button{
     background: none;
     border: none;
     cursor: pointer;
     line-height: 1.5;
-    font: 700 1.2rem 'Roboto Slab', sans-serif;
+    font: 700 1.2rem;
     padding: 1em 2em;
     letter-spacing: 0.05rem;
     width: 30%;
@@ -50,7 +52,7 @@
 
 //REGISER PAGE
 
-.register-page, .login-page {
+.register-page, .login-page, .profile-page {
     width: 100%;
     height: 100vh;
     background-color: #fab7b6
@@ -60,7 +62,7 @@
     // margin: 250px auto;
 }
 
-.register-form, .login-form {
+.register-form, .login-form, .profile-form {
     padding-top: 250px;
     display: flex;
     flex-direction: column;
@@ -68,7 +70,7 @@
     align-items: center;
 }
 
-.register-form__input, .login-form__input {
+.register-form__input, .login-form__input, profile-form__input {
     margin: 10px 0;
     border-radius: 5px;
     width: 10%
@@ -286,12 +288,12 @@ LEVEL 4. SETTINGS
     @include btn-border-drawing( rgb(190, 165, 236), #0f7688, 4px, bottom, right);
   }
 
-  .register__button, .login__button {
+  .register__button, .login__button, profile__button {
     background: none;
     border: none;
     cursor: pointer;
     line-height: 1.5;
-    font: 700 1.2rem 'Roboto Slab', sans-serif;
+    font: 700 1.2rem;
     padding: 1em 2em;
     letter-spacing: 0.05rem;
     width: 150px;
@@ -330,6 +332,7 @@ LEVEL 4. SETTINGS
   }
 
   .post {
+    box-sizing: border-box;
     background-color: rgb(195, 168, 250);
     border-radius: 10px;
     height: 100px;
@@ -363,6 +366,7 @@ LEVEL 4. SETTINGS
     text-align: right;
     position: absolute;
     right: 0;
+    cursor: pointer;
 }
 
 
@@ -382,12 +386,14 @@ select {
   .select {
     position: relative;
     display: block;
-    width: 20em;
+    width: 100%;
     height: 3em;
     line-height: 3;
     background: #2c3e50;
     overflow: hidden;
     border-radius: .25em;
+    position: absolute;
+    bottom: 0;
   }
   select {
     width: 100%;
@@ -439,4 +445,28 @@ select {
 
 .navbar ul li a {
     text-decoration: none;
+}
+
+.profile-page {
+  width: 100%;
+  height: 100vh;
+  background-color: #bde1dc;
+}
+
+.profile__title {
+  text-align: center;
+}
+
+.profile__button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  line-height: 1.5;
+  font: 700 1.2rem;
+  padding: 1em 2em;
+  letter-spacing: 0.05rem;
+  width: 10%;
+  margin: 20px auto;
+  
+  &:focus { outline: 2px dotted #55d7dc; }
 }

@@ -1,8 +1,4 @@
 @charset "UTF-8";
-* {
-  font-family: "Roboto Mono", monospace;
-}
-
 .landing-page {
   display: flex;
   width: 100%;
@@ -75,7 +71,7 @@
   border: none;
   cursor: pointer;
   line-height: 1.5;
-  font: 700 1.2rem;
+  font: 700 1.2rem "Roboto Slab", sans-serif;
   padding: 1em 2em;
   letter-spacing: 0.05rem;
   width: 30%;
@@ -339,7 +335,7 @@ LEVEL 4. SETTINGS
   border: none;
   cursor: pointer;
   line-height: 1.5;
-  font: 700 1.2rem;
+  font: 700 1.2rem "Roboto Slab", sans-serif;
   padding: 1em 2em;
   letter-spacing: 0.05rem;
   width: 150px;
@@ -368,6 +364,10 @@ LEVEL 4. SETTINGS
   flex: 0 0 250px;
 }
 
+.postit__drag {
+  margin: 0;
+}
+
 .title {
   text-align: center;
 }
@@ -378,11 +378,9 @@ LEVEL 4. SETTINGS
 
 .post {
   box-sizing: border-box;
-  background-color: #c3a8fa;
+  background-color: #faa8ba;
   border-radius: 10px;
-  height: 100px;
   width: 100%;
-  margin: 30px 0;
   position: relative;
 }
 
@@ -410,7 +408,6 @@ LEVEL 4. SETTINGS
   text-align: right;
   position: absolute;
   right: 0;
-  cursor: pointer;
 }
 
 select {
@@ -429,14 +426,12 @@ select {
 .select {
   position: relative;
   display: block;
-  width: 100%;
+  width: 20em;
   height: 3em;
   line-height: 3;
   background: #2c3e50;
   overflow: hidden;
   border-radius: 0.25em;
-  position: absolute;
-  bottom: 0;
 }
 
 select {
@@ -508,7 +503,7 @@ select::-ms-expand {
   border: none;
   cursor: pointer;
   line-height: 1.5;
-  font: 700 1.2rem;
+  font: 700 1.2rem "Roboto Slab", sans-serif;
   padding: 1em 2em;
   letter-spacing: 0.05rem;
   width: 10%;
