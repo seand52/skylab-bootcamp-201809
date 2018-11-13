@@ -21,7 +21,6 @@ const logic = {
 
                 return user.save()
             })
-            .then(() => undefined)
     },
 
     authenticateUser(username, password) {
@@ -37,7 +36,6 @@ const logic = {
 
                 return user.id
             })
-
     },
 
     retrieveUser(id) {
@@ -45,7 +43,7 @@ const logic = {
 
         if (!id.trim().length) throw new ValueError('id is empty or blank')
 
-        return User.findById(id, { '_id': 0, password: 0, postits: 0, __v: 0 })
+       return User.findById(id, { '_id': 0, password: 0, postits: 0, __v: 0 })
             // .then(user => {
             //     if (!user) throw new NotFoundError(`user with id ${id} not found`)
 
@@ -138,11 +136,14 @@ const logic = {
 
                 if (!user) throw new NotFoundError(`user with id ${id} not found`)
 
-                const postit = new Postit({ text, status, user: user.id })
+                const postit = new Postit({ text, status })
 
-                return postit.save()
+                postit.id= postit._id.toString()
+                delete postit._id
+                user.postits.push(postit)
+
+                return user.save()
             })
-            .then(() => undefined)
     },
 
     listPostits(id) {
@@ -151,20 +152,17 @@ const logic = {
         if (!id.trim().length) throw new ValueError('id is empty or blank')
 
         return User.findById(id)
-            .lean()
             .then(user => {
-
+                
                 if (!user) throw new NotFoundError(`user with id ${id} not found`)
 
-                return Postit.find({ user: user._id })
-                    .lean()
-                    .then(postits => postits.map(postit => {
-                        postit.id = postit._id.toString()
-                        delete postit._id
-                        postit.user = postit.user.toString()
+                return user.postits.map(postit => {
+                    postit.id = postit._id.toString()
+                    delete postit._id
 
-                        return postit
-                    }))
+                    return postit
+
+                })
             })
     },
 
@@ -180,7 +178,6 @@ const logic = {
      * @returns {Promise} Resolves on correct data, rejects on wrong user id, or postit id
      */
     removePostit(id, postitId) {
-
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
 
         if (!id.trim().length) throw new ValueError('id is empty or blank')
@@ -189,10 +186,19 @@ const logic = {
 
         if (!postitId.trim().length) throw new ValueError('postit id is empty or blank')
 
-        return Postit.findById(postitId)
-            .then(postit=> {
-                if (!postit) throw new NotFoundError(`postit with id ${postitId} not found`)
-                return postit.remove()
+        return User.findById(id)
+            .then(user => {
+                if (!user) throw new NotFoundError(`user with id ${id} not found`)
+
+                const { postits } = user
+
+                const index = postits.findIndex(postit => postit.id === postitId)
+
+                if (index < 0) throw new NotFoundError(`postit with id ${postitId} not found in user with id ${id}`)
+
+                postits.splice(index, 1)
+
+                return user.save()
             })
     },
 
@@ -218,19 +224,18 @@ const logic = {
             .then(user => {
 
                 if (!user) throw new NotFoundError(`user with id ${id} not found`)
-                return Postit.find({user: user._id}) 
-                    .then(postits => {
-                        const postit = postits.find(postit => postit._id.toString() === postitId)
 
-                        if (!postit) throw new NotFoundError(`postit with id ${postitId} not found in user with id ${id}`)
-        
-                        postit.text = text
-                        postit.status = status
-        
-                        return postit.save()
-                    })                
+                const { postits } = user
+
+                const postit = postits.find(postit => postit.id === postitId)
+
+                if (!postit) throw new NotFoundError(`postit with id ${postitId} not found in user with id ${id}`)
+
+                postit.text = text
+                postit.status = status
+
+                return user.save()
             })
-            .then(() => undefined)
     }
 }
 

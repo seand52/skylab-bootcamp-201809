@@ -17,7 +17,7 @@ describe('logic', () => {
 
     before(() => mongoose.connect('mongodb://localhost:27017/postit-test', { useNewUrlParser: true }))
 
-    beforeEach(() => Promise.all([User.deleteMany(), Postit.deleteMany()]))
+    beforeEach(() => User.deleteMany())
 
     describe('user', () => {
         describe('register', () => {
@@ -174,9 +174,11 @@ describe('logic', () => {
                 let user, user2
 
                 beforeEach(() => {
+                user = new User({ name: 'John', surname: 'Doe', username: 'jd', password: '123' })
+
                 user2 = new User({ name: 'John2', surname: 'Doe2', username: 'jd2', password: '123' })
 
-                return user2.save()
+                return User.insertMany([user, user2])
                     
                 })
 
@@ -218,16 +220,22 @@ describe('logic', () => {
 
             it('should succeed on correct data', () =>
                 logic.addPostit(user.id, text, status)
-                    .then(() => Postit.find())
-                    .then(_postits => {
+                    .then(() => User.find())
+                    .then(_users => {
 
-                        const [_postit] = _postits
+                        const [_user] = _users
 
-                        expect(_postit.text).to.equal(text)
+                        expect(_user.id).to.equal(user.id)
 
-                        expect(_postit.status).to.equal(status)
+                        const { postits } = _user
 
-                        expect(_postit.user.toString()).to.equal(user.id)
+                        expect(postits.length).to.equal(1)
+
+                        const [postit] = postits
+
+                        expect(postit.text).to.equal(text)
+
+                        expect(postit.status).to.equal(status)
                     })
             )
 
@@ -238,44 +246,43 @@ describe('logic', () => {
             let user, postit, postit2
 
             beforeEach(() => {
-                user = new User({ name: 'John', surname: 'Doe', username: 'jd', password: '123'})
+                postit = new Postit({ text: 'hello text', status:'TODO' })
+                postit2 = new Postit({ text: 'hello text 2', status:'TODO' })
 
-                postit = new Postit({ text: 'hello text', status:'TODO', user: user.id })
-
-                postit2 = new Postit({ text: 'hello text 2', status:'TODO', user: user.id })
+                user = new User({ name: 'John', surname: 'Doe', username: 'jd', password: '123', postits: [postit, postit2] })
 
                 return user.save()
-                    .then(() => postit.save())
-                    .then(() => postit2.save())
             })
 
             it('should succeed on correct data', () =>
                 logic.listPostits(user.id)
                     .then(postits => {
-                        return Postit.find()
-                            .then(_postits => {
+                        return User.find()
+                            .then(_users => {
+                                expect(_users.length).to.equal(1)
+
+                                const [_user] = _users
+
+                                expect(_user.id).to.equal(user.id)
+
+                                const { postits: _postits } = _user
+
                                 expect(_postits.length).to.equal(2)
 
                                 expect(postits.length).to.equal(_postits.length)
 
                                 const [_postit, _postit2] = _postits
 
-                                expect(_postits[0].id).to.equal(postit.id)
+                                expect(_postit.id).to.equal(postit.id)
+                                expect(_postit.status).to.equal(postit.status)
                                 expect(_postit.text).to.equal(postit.text)
-
+                                expect(_postit).not.to.be.instanceof(Postit)
+                                expect(_postit2).not.to.be.instanceof(Postit)
                                 expect(_postit2.id).to.equal(postit2.id)
+                                expect(_postit2.status).to.equal(postit2.status)
                                 expect(_postit2.text).to.equal(postit2.text)
 
-                                const [__postit, __postit2] = postits
 
-                                expect(__postit).not.to.be.instanceof(Postit)
-                                expect(__postit2).not.to.be.instanceof(Postit)
-
-                                expect(_postit.id).to.equal(__postit.id)
-                                expect(_postit.text).to.equal(__postit.text)
-
-                                expect(_postit2.id).to.equal(__postit2.id)
-                                expect(_postit2.text).to.equal(__postit2.text)
                             
                             })
                     })
@@ -285,13 +292,11 @@ describe('logic', () => {
         describe('remove', () => {
             let user, postit
 
-            beforeEach(() => {               
-                user = new User({ name: 'John', surname: 'Doe', username: 'jd', password: '123'})
+            beforeEach(() => {
+                postit = new Postit({ text: 'hello text', status: 'TODO' })
+                user = new User({ name: 'John', surname: 'Doe', username: 'jd', password: '123', postits: [postit] })
 
-                postit = new Postit({ text: 'hello text', status: 'TODO', user: user.id })
-
-                return user.save() 
-                    .then(() => postit.save())
+                return user.save()
             })
 
             it('should succeed on correct data', () =>
@@ -304,32 +309,28 @@ describe('logic', () => {
 
                         expect(_user.id).to.equal(user.id)
 
-                        return Postit.find()
-                            .then(_postits => {
-                                expect(_postits.length).to.equal(0)
-                            })
-                       
+                        const { postits } = _user
+
+                        expect(postits.length).to.equal(0)
                     })
             )
         })
 
         describe('modify', () => {
-            let user, postit, newText, newstatus
+            let user, postit, newText, status
 
             beforeEach(() => {
-                user = new User({ name: 'John', surname: 'Doe', username: 'jd', password: '123' })
-
-                postit = new Postit({ text: 'hello text', status: 'TODO', user: user.id })
+                postit = new Postit({ text: 'hello text' })
+                user = new User({ name: 'John', surname: 'Doe', username: 'jd', password: '123', postits: [postit] })
 
                 newText = `new-text-${Math.random()}`
-                newstatus = 'DOING'
+                status = 'DOING'
 
                 return user.save()
-                    .then(() => postit.save())
             })
 
             it('should succeed on correct data', () =>
-                logic.modifyPostit(user.id, postit.id, newText, newstatus)
+                logic.modifyPostit(user.id, postit.id, newText, status)
                     .then(() => User.find())
                     .then(_users => {
                         expect(_users.length).to.equal(1)
@@ -337,17 +338,16 @@ describe('logic', () => {
                         const [_user] = _users
 
                         expect(_user.id).to.equal(user.id)
-                        
-                        return Postit.find()
-                            .then(postits => {
-                                expect(postits.length).to.equal(1)
 
-                                const [postit] = postits
-        
-                                expect(postit.text).to.equal(newText)
-        
-                                expect(postit.status).to.equal(newstatus)
-                            })                        
+                        const { postits } = _user
+
+                        expect(postits.length).to.equal(1)
+
+                        const [postit] = postits
+
+                        expect(postit.text).to.equal(newText)
+
+                        expect(postit.status).to.equal(status)
                     })
             )
         })
