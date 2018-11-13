@@ -60,6 +60,20 @@ router.get('/users/:id', [bearerTokenParser, jwtVerifier], (req, res) => {
     }, res)
 })
 
+router.get('/users/:id/buddies', [bearerTokenParser, jwtVerifier], (req, res) => {
+    routeHandler(() => {
+        const { sub, params: { id } } = req
+ 
+        if (id !== sub) throw Error('token sub does not match user id')
+ 
+        return logic.retrieveFriends(id)
+            .then(buddies => res.json({
+
+                data: buddies
+            }))
+    }, res)
+ })
+
 router.patch('/users/:id', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
         const { params: { id }, sub, body: { name, surname, username, newPassword, password } } = req
@@ -86,6 +100,21 @@ router.post('/users/:id/postits', [bearerTokenParser, jwtVerifier, jsonBodyParse
         return logic.addPostit(id, text, status)
             .then(() => res.json({
                 message: 'postit added'
+            }))
+
+    }, res)
+})
+
+router.post('/users/:id/friends/:username', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+
+        const { sub, params: { id, username } } = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.addFriend(id, username)
+            .then(() => res.json({
+                message: 'friend added'
             }))
 
     }, res)
@@ -126,6 +155,20 @@ router.delete('/users/:id/postits/:postitId', [bearerTokenParser, jwtVerifier, j
         return logic.removePostit(id, postitId)
             .then(() => res.json({
                 message: 'postit removed'
+            }))
+    }, res)
+
+})
+
+router.post('/users/:id/postits/:postitId/friends/:username', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+        const { sub, params: { id, postitId, username } } = req
+        debugger
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.assignPostit(id, postitId, username)
+            .then(() => res.json({
+                message: 'postit assigned'
             }))
     }, res)
 

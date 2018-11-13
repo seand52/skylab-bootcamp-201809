@@ -9,7 +9,7 @@ const { User } = require('./data')
 
 const { env: { PORT, MONGO_URL } } = process
 
-mongoose.connect(MONGO_URL, {useNewUrlParser: true})
+mongoose.connect(MONGO_URL, { useNewUrlParser: true, useCreateIndex: true })
     .then(() =>{
         const { argv: [, , port = PORT || 8080] } = process
 
