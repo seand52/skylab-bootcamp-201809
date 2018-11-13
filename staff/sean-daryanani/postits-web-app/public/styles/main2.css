@@ -1,0 +1,217 @@
+.body {
+  background: #2c3e50;
+  background: -webkit-linear-gradient(to right, #3498db, #2c3e50);
+  background: linear-gradient(to right, #3498db, #2c3e50);
+}
+
+.landing__buttons, .home__buttons {
+  text-decoration: none;
+  font: menu;
+  display: inline-block;
+  padding: 2px 8px;
+  background: #a1a1f0;
+  color: ButtonText;
+  border-style: solid;
+  border-width: 2px;
+  border-color: ButtonHighlight ButtonShadow ButtonShadow ButtonHighlight;
+  width: 30%;
+  height: 25px;
+  margin-top: 10px;
+  color: white;
+  text-align: center;
+}
+
+.landing__title, .home__title {
+  color: white;
+  font-size: 1.5rem;
+}
+
+.container {
+  width: 50%;
+  text-align: center;
+  margin: 200px auto 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.register-wrapper, .login-wrapper, .home-wrapper {
+  width: 50%;
+  margin: 200px auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-form input {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.register-form input {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.register-button, .login-button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: #b16db1;
+  cursor: pointer;
+}
+
+.back-link {
+  text-decoration: none;
+  color: white;
+}
+
+.top-area {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.top-area p {
+  color: white;
+  font-size: 2rem;
+  width: 100%;
+  text-align: center;
+}
+
+.postits__buttons {
+  text-decoration: none;
+  font: menu;
+  display: inline-block;
+  padding: 2px 8px;
+  background: #a1a1f0;
+  color: ButtonText;
+  border-style: solid;
+  border-width: 2px;
+  border-color: ButtonHighlight ButtonShadow ButtonShadow ButtonHighlight;
+  width: 10%;
+  height: 39px;
+  margin-top: 10px;
+  color: white;
+  text-align: center;
+}
+
+.postits__buttons--logout {
+  text-decoration: none;
+  padding: 5px;
+  color: white;
+}
+
+.postits-create-wrapper {
+  text-align: center;
+}
+
+.postits__form input {
+  margin-top: 20px;
+  width: 70%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.postit-wrapper {
+  width: 50%;
+  margin: 50px auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.postit-list {
+  list-style: none;
+  width: 100%;
+}
+.postit-list li {
+  display: flex;
+  text-decoration: none;
+  color: #000;
+  background: #ffc;
+  display: block;
+  height: 10em;
+  width: 10em;
+  padding: 1em;
+  position: relative;
+  margin-top: 10px;
+}
+
+.input-text {
+  border: none;
+  background: #ffc;
+  position: absolute;
+  top: 0;
+  right: 68px;
+
+}
+
+.save-text {
+  border: none;
+  background: #ffc;
+  position: absolute;
+  bottom: -170px;
+  right: 68px;
+
+}
+.postit-list form {
+  width: 20px;
+  position: absolute;
+  top: 0;
+  right: 5px;
+}
+.postit-list button {
+  border: none;
+  background-color: #ffc;
+}
+
+.postit-grid {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.error {
+  color: red;
+}
+
+/*# sourceMappingURL=main2.css.map */
