@@ -163,7 +163,7 @@ router.delete('/users/:id/postits/:postitId', [bearerTokenParser, jwtVerifier, j
 router.post('/users/:id/postits/:postitId/friends/:username', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
         const { sub, params: { id, postitId, username } } = req
-        debugger
+
         if (id !== sub) throw Error('token sub does not match user id')
 
         return logic.assignPostit(id, postitId, username)

@@ -71,6 +71,45 @@ const logic = {
         sessionStorage.removeItem('token')
     },
 
+    addFriends(id, username) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+
+        if (!id.trim()) throw Error('id is empty or blank')
+
+        if (typeof username !== 'string') throw TypeError(`${username} is not a string`)
+
+        if (!username.trim()) throw Error('username is empty or blank')
+
+        return fetch(`${this.url}/users/${id}/friends/${username}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+            },
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.error) throw Error(res.error)
+        })
+    },
+
+    retrieveFriends(id) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (!id.trim()) throw Error('id is empty or blank')
+
+        return fetch(`${this.url}/users/${id}/buddies`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+        .then(res=>res.json())
+        .then(res => {
+            if (res.error) throw Error(res.error)
+            return res.data
+        })
+    },
+
     addPostit(text, status) {
 
         if (typeof text !== 'string') throw TypeError(`${text} is not a string`)
@@ -95,6 +134,25 @@ const logic = {
             })
     },
 
+    retrieveUser(id) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+
+        if (!id.trim()) throw Error('id is empty or blank')
+        debugger
+        return fetch(`${this.url}/users/${id}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+
+                return res.username
+            })
+
+    },
+
     listPostits() {
         return fetch(`${this.url}/users/${this._userId}/postits`, {
             method: 'GET',
@@ -105,6 +163,13 @@ const logic = {
             .then(res => res.json())
             .then(res => {
                 if (res.error) throw Error(res.error)
+
+                let y = res.data.map(item => {
+                    if(item.user=== this._userId) {
+                    return item.isAssigned=false
+                }
+                return item.isAssigned=true
+                })
 
                 return res.data
             })
@@ -161,18 +226,45 @@ const logic = {
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
                 'Authorization': `Bearer ${this._token}`
-    
+
             },
             body: JSON.stringify({ name, surname, username, newPassword, password })
         })
             .then(res => res.json())
             .then(res => {
                 if (res.error) throw Error(res.error)
-    
+
             })
-    
-    
-        }
+
+
+    },
+
+    assignPostit(userId, postitId, username) {
+        if (typeof userId !== 'string') throw new TypeError(`${userId} is not a string`)
+
+        if (!userId.trim().length) throw Error('userId is empty or blank')
+
+        if (typeof postitId !== 'string') throw new TypeError(`${postitId} is not a string`)
+
+        if (!postitId.trim().length) throw Error('postitId is empty or blank')
+
+        if (typeof username !== 'string') throw new TypeError(`${username} is not a string`)
+
+        if (!username.trim().length) throw Error('username is empty or blank')
+
+        return fetch(`${this.url}/users/${userId}/postits/${postitId}/friends/${username}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+            },
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+            })
+
+    }
 }
 
 // export default logic

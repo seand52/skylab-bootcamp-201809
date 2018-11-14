@@ -4,15 +4,36 @@ import logic from '../logic'
 class Dropwdown extends Component {
 
     state = {
-        status: this.props.defaultStatus
+        status: this.props.defaultStatus,
+        friends: this.props.friends
     }
 
     dropDownChange =(event) => {
         event.preventDefault()
 
-        const val = event.target.value
+        const id = sessionStorage.getItem('userId')
 
-        this.setState({status: val}, () =>  this.props.onUpdatePost(this.props.id, this.props.text, val))        
+        const username = event.target.value
+
+        const postitId = this.props.postitId
+
+        return logic.assignPostit(id, postitId, username)
+            .then(() => logic.retrieveFriends(id))
+            .then(res => {
+                const friendArray = [...res]
+                this.setState({friends: friendArray})
+            })
+
+    }
+
+    componentDidMount () {
+        const id = sessionStorage.getItem('userId')
+
+        return logic.retrieveFriends(id) 
+            .then(res =>{
+                const friendArray = [...res]
+                this.setState({friends: friendArray})
+            })
     }
 
     render() {
@@ -35,11 +56,13 @@ class Dropwdown extends Component {
         //         done = true
         //         break
         // }
-        return <select  className="select" defaultValue={this.state.status} onChange={this.dropDownChange}>
-            <option  value="TODO">To do</option>
+        return <select className="select" onChange={this.dropDownChange}>
+        <option selected>Select a friend</option>
+        {this.state.friends.map((item, index) => <option key={index} value={item}>{item}</option>)}
+            {/* <option  value="TODO">To do</option>
             <option  value="DOING">Doing</option>
             <option  value="REVIEW">Review</option>
-            <option  value="DONE">Done</option>
+            <option  value="DONE">Done</option> */}
         </select>
     }
 }

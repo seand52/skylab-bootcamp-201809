@@ -125,7 +125,7 @@ describe('logic', () => {
 
             it('should succeed on valid id', async () => {
                 const friends = await logic.retrieveFriends(user4.id)
-                debugger
+
                 expect(friends.length).to.equal(3)
 
                 // const { id, name, surname, username, password, postits } = _user
@@ -141,7 +141,6 @@ describe('logic', () => {
                 user1 = new User({ name: 'John', surname: 'Doe', username: 'jd', password: '123', friends: [] })
                 user2 = new User({ name: 'Pepito', surname: 'Pepito', username: 'u', password: 'p', friends:[] })
 
-                friendId = user2.id
 
                 return user1.save()
                     .then(() => user2.save())
@@ -158,6 +157,39 @@ describe('logic', () => {
                 const {friends} = _user
 
                 expect(friends[0].toString()).to.equal(user2.id)                
+            }
+            )
+        })
+
+        describe('remove friend', () => {
+            let user1, user2
+
+            beforeEach(() => {
+                user1 = new User({ name: 'John', surname: 'Doe', username: 'jd', password: '123', friends: [] })
+                user2 = new User({ name: 'Pepito', surname: 'Pepito', username: 'u', password: 'p', friends:[] })
+                
+                return (async () => {
+
+                    await user1.save()
+                    await user2.save()
+                    await logic.addFriend(user1.id, user2.username) 
+ 
+                })()    
+    
+                   
+            })
+
+            it('should add friend on correct username', async () => {
+                
+                await logic.removeFriend(user1.id, user2.username)
+
+                // const _users = await User.find({username: user1.username})
+
+                // const [_user] = _users
+
+                // const {friends} = _user
+
+                // expect(friends[0].toString()).to.equal(user2.id)                
             }
             )
         })

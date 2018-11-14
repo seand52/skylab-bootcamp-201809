@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import { Route, withRouter, Redirect } from 'react-router-dom'
 
 class Navbar extends Component {
@@ -17,6 +17,11 @@ class Navbar extends Component {
         event.preventDefault()
         this.props.history.push('./postits')
     }
+
+    goToFriends = (event) => {
+        event.preventDefault()
+        this.props.history.push('./friends')
+    }
     render() {
         return <div>
             <nav className="navbar">
@@ -24,6 +29,7 @@ class Navbar extends Component {
                     <ul>
                         <li><a onClick={this.goToHome} href="#">Home</a></li>
                         <li><a onClick={this.goToProfile} href="#">Profile</a></li>
+                        <li><a onClick={this.goToFriends} href="#">Friends</a></li>
                         <li><a href="#" onClick={this.logout}>Logout</a></li>
                     </ul>
                 </div>

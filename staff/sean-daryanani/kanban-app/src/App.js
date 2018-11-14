@@ -7,8 +7,9 @@ import Landing from './components/Landing'
 import Navbar from './components/Navbar'
 import Profile from './components/Profile'
 import logic from './logic'
-
+import Friends from './components/Friends';
 import { Route, withRouter, Redirect } from 'react-router-dom'
+
 
 logic.url = 'http://localhost:5000/api'
 
@@ -68,6 +69,12 @@ class App extends Component {
             <div>
                 <Profile logout={this.handleLogoutClick} />
             </div> : <Redirect to="/" />} />
+
+            <Route path="/friends" render={() => logic.loggedIn ? 
+            <div>
+                <Friends />
+            </div> : <Redirect to="/" />} />
+
 
         </div>
     }

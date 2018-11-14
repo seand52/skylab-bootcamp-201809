@@ -69,14 +69,14 @@ const logic = {
             let promises = []
 
 
-            for (var i=0; i<user.friends.length; i++) {
+            for (var i = 0; i < user.friends.length; i++) {
                 promises.push(User.findById(user.friends[i]))
             }
             return Promise.all(promises)
                 .then(res => {
                     return res.map(item => item.username)
                 })
-  
+
         })()
     },
 
@@ -104,6 +104,30 @@ const logic = {
             await user.save()
         })()
     },
+
+    // removeFriend(userId, username) {
+    //     if (typeof username !== 'string') throw TypeError(`${username} is not a string`)
+
+    //     if (!username.trim().length) throw new ValueError('username is empty or blank')
+
+    //     return (async () => {
+
+
+    //         // const user = await User.findById(userId)
+    //         // const friend = await User.findOne({ username })
+
+    //         await User.update({ id: userId }, { "$pull": { "friends": { "username": username } }})
+    //         const user = await User.findById(userId)
+    //         debugger
+            
+    //         console.log(index)
+
+    //         // await User.update(
+    //         //     { id: userId },
+    //         //     { $pull: { friends:  [friend.id]  } }
+    //         // )
+    //     })()
+    // },
 
     updateUser(id, name, surname, username, newPassword, password) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
@@ -175,7 +199,6 @@ const logic = {
         return (async () => {
             let user = await User.findById(id)
 
-
             if (!user) throw new NotFoundError(`user with id ${id} not found`)
 
             const postit = new Postit({ text, status, user: user.id })
@@ -195,9 +218,12 @@ const logic = {
 
             if (!user) throw new NotFoundError(`user with id ${id} not found`)
 
-            let postits1 = await Postit.find({ user: user._id }).lean()
-            let postits2 = await Postit.find({ assignedTo: user._id }).lean()
-            let postits = [...postits1, ...postits2]
+            // let postits1 = await Postit.find({ user: user._id }).lean()
+            // let postits2 = await Postit.find({ assignedTo: user._id }).lean()
+            // let postits = [...postits1, ...postits2]
+
+            let postits = await Postit.find({ $or: [{ user: user._id }, { assignedTo: user._id }] }).lean()
+
 
 
             return postits.map(postit => {
@@ -264,13 +290,17 @@ const logic = {
 
         return (async () => {
             const user = await User.findById(id)
+
             if (!user) throw new NotFoundError(`user with id ${id} not found`)
-            const postits = await Postit.find({ user: user._id })
+
+            const postits = await Postit.find({ $or: [{ user: user._id }, { assignedTo: user._id }] })
+
             const postit = postits.find(postit => postit._id.toString() === postitId)
 
             if (!postit) throw new NotFoundError(`postit with id ${postitId} not found in user with id ${id}`)
 
             postit.text = text
+
             postit.status = status
 
             await postit.save()

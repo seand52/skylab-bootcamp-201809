@@ -1,4 +1,8 @@
 @charset "UTF-8";
+* {
+  font-family: "Roboto Mono", monospace;
+}
+
 .landing-page {
   display: flex;
   width: 100%;
@@ -71,7 +75,7 @@
   border: none;
   cursor: pointer;
   line-height: 1.5;
-  font: 700 1.2rem "Roboto Slab", sans-serif;
+  font: 700 1.2rem;
   padding: 1em 2em;
   letter-spacing: 0.05rem;
   width: 30%;
@@ -335,7 +339,7 @@ LEVEL 4. SETTINGS
   border: none;
   cursor: pointer;
   line-height: 1.5;
-  font: 700 1.2rem "Roboto Slab", sans-serif;
+  font: 700 1.2rem;
   padding: 1em 2em;
   letter-spacing: 0.05rem;
   width: 150px;
@@ -347,6 +351,7 @@ LEVEL 4. SETTINGS
 
 .postits-display {
   display: flex;
+  width: 50%;
 }
 
 .postits-container {
@@ -364,10 +369,6 @@ LEVEL 4. SETTINGS
   flex: 0 0 250px;
 }
 
-.postit__drag {
-  margin: 0;
-}
-
 .title {
   text-align: center;
 }
@@ -378,13 +379,35 @@ LEVEL 4. SETTINGS
 
 .post {
   box-sizing: border-box;
-  background-color: #faa8ba;
+  background-color: #c3a8fa;
   border-radius: 10px;
+  height: 100px;
   width: 100%;
+  margin: 30px 0;
+  position: relative;
+}
+
+.post-assigned {
+  box-sizing: border-box;
+  background-color: #32d8b4;
+  border-radius: 10px;
+  height: 100px;
+  width: 100%;
+  margin: 30px 0;
   position: relative;
 }
 
 .post textarea {
+  background: transparent;
+  border: none;
+  width: 100%;
+  height: 30px;
+  resize: none;
+  top: 20px;
+  position: relative;
+}
+
+.post-assigned textarea {
   background: transparent;
   border: none;
   width: 100%;
@@ -408,6 +431,7 @@ LEVEL 4. SETTINGS
   text-align: right;
   position: absolute;
   right: 0;
+  cursor: pointer;
 }
 
 select {
@@ -426,12 +450,14 @@ select {
 .select {
   position: relative;
   display: block;
-  width: 20em;
+  width: 100%;
   height: 3em;
   line-height: 3;
   background: #2c3e50;
   overflow: hidden;
   border-radius: 0.25em;
+  position: absolute;
+  bottom: 0;
 }
 
 select {
@@ -503,7 +529,7 @@ select::-ms-expand {
   border: none;
   cursor: pointer;
   line-height: 1.5;
-  font: 700 1.2rem "Roboto Slab", sans-serif;
+  font: 700 1.2rem;
   padding: 1em 2em;
   letter-spacing: 0.05rem;
   width: 10%;
