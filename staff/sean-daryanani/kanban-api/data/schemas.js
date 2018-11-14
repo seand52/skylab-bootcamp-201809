@@ -44,6 +44,9 @@ const User = new Schema({
     friends: {
         type: [ObjectId],
         ref: 'User'
+    },
+    imagePath: {
+        type: String,
     }
 })
 

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import logic from '../logic';
 import Navbar from './Navbar';
+import FileSelector from './Fileselector';
 
 class Profile extends Component {
     state = {
@@ -62,7 +63,7 @@ class Profile extends Component {
         return <div className="profile-page">
             <Navbar />
             <h1 className="profile__title">Profile Page</h1>
-
+            <FileSelector/>
             <form>
                 <div className="profile-wrapper">
                     <form className="profile-form" onSubmit={this.handleSubmit}>

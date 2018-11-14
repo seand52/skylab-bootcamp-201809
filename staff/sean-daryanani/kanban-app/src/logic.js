@@ -87,10 +87,10 @@ const logic = {
                 'Authorization': `Bearer ${this._token}`
             },
         })
-        .then(res => res.json())
-        .then(res => {
-            if (res.error) throw Error(res.error)
-        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+            })
     },
 
     retrieveFriends(id) {
@@ -103,11 +103,11 @@ const logic = {
                 'Authorization': `Bearer ${this._token}`
             }
         })
-        .then(res=>res.json())
-        .then(res => {
-            if (res.error) throw Error(res.error)
-            return res.data
-        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+                return res.data
+            })
     },
 
     addPostit(text, status) {
@@ -165,10 +165,10 @@ const logic = {
                 if (res.error) throw Error(res.error)
 
                 let y = res.data.map(item => {
-                    if(item.user=== this._userId) {
-                    return item.isAssigned=false
-                }
-                return item.isAssigned=true
+                    if (item.user === this._userId) {
+                        return item.isAssigned = false
+                    }
+                    return item.isAssigned = true
                 })
 
                 return res.data
@@ -264,7 +264,40 @@ const logic = {
                 if (res.error) throw Error(res.error)
             })
 
-    }
+    },
+
+    uploadPhoto(file) {
+        return fetch(`${this.url}/users/fileUpload/${this._userId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+            },
+            body: JSON.stringify({file})
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+            })
+    },
+
+
+    getImage(id) {
+
+        return fetch(`${this.url}/users/fileUpload/${id}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`,
+
+            }
+        })
+        .then(res => res.json())
+        .then(res => {
+            return res.data
+        })
+
+
+    },
 }
 
 // export default logic

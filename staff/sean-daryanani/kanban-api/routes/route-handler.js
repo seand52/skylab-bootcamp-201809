@@ -21,6 +21,7 @@ function routeHandler(callback, res) {
                 })
             })
     } catch (err) {
+        debugger
         const { error: message } = err
         
         if (err instanceof TypeError || err instanceof ValueError) {

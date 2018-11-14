@@ -5,12 +5,44 @@ const jwt = require('jsonwebtoken')
 const bearerTokenParser = require('../utils/bearer-token-parser')
 const jwtVerifier = require('./jwt-verifier')
 const routeHandler = require('./route-handler')
-
+const multer = require('multer')
 const jsonBodyParser = bodyParser.json()
+const fs = require('file-system')
 
 const router = express.Router()
 
 const { env: { JWT_SECRET } } = process
+
+
+let storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+
+        const path = __dirname + `/../data/users/${req.params.id}`
+
+        if (!(fs.existsSync(path))) {
+
+            fs.mkdirSync(path)
+        }
+
+        cb(null, path)
+    },
+
+    filename: (req, file, cb) => {
+        cb(null, 'profile-image')
+    }
+
+});
+var upload = multer({ storage: storage });
+
+// const upload = multer({
+//     dest: 'data/users', // this saves your file into a directory called "uploads"
+//     filename: Date.now()
+//   }); 
+
+//   const storage = multer.diskStorage({
+//     destination: 'data/users',
+//     filename: Date.now()
+//   });
 
 router.post('/users', jsonBodyParser, (req, res) => {
     routeHandler(() => {
@@ -63,16 +95,16 @@ router.get('/users/:id', [bearerTokenParser, jwtVerifier], (req, res) => {
 router.get('/users/:id/buddies', [bearerTokenParser, jwtVerifier], (req, res) => {
     routeHandler(() => {
         const { sub, params: { id } } = req
- 
+
         if (id !== sub) throw Error('token sub does not match user id')
- 
+
         return logic.retrieveFriends(id)
             .then(buddies => res.json({
 
                 data: buddies
             }))
     }, res)
- })
+})
 
 router.patch('/users/:id', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
@@ -173,5 +205,50 @@ router.post('/users/:id/postits/:postitId/friends/:username', [bearerTokenParser
     }, res)
 
 })
+
+
+
+router.post('/users/fileUpload/:id', [bearerTokenParser, jwtVerifier, upload.single('image')], (req, res, next) => {
+    routeHandler(async () => {
+        const { sub, params: { id, postitId, username } } = req
+        console.log(req)
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        // const ext = req.file.originalname.split('.')[1]
+
+        // if (ext !== 'png') throw Error('this file type is not supported')
+        res.json({
+            message: 'ok'
+        })
+    }, res)
+
+});
+
+router.get('/users/fileUpload/:id', [bearerTokenParser, jwtVerifier], (req, res) => {
+
+    routeHandler(async () => {
+
+        const { sub, params: { id, postitId, username } } = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        const path = __dirname + `/../data/users/${req.params.id}/profile-image`
+
+        let bitmap = fs.readFileSync(path);
+
+        let data = new Buffer(bitmap).toString('base64')
+
+        data = `data:image/png;base64,${data}`
+
+        res.json({
+            data: data,
+            message: 'ok'
+        })
+
+    }, res)
+})
+
+
+
 
 module.exports = router

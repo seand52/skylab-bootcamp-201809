@@ -37,32 +37,9 @@ class Dropwdown extends Component {
     }
 
     render() {
-        // let todo = false
-        // let doing = false
-        // let review = false
-        // let done = false
-
-        // switch (this.state.status) {
-        //     case 'TODO':
-        //         todo = true
-        //         break
-        //     case 'DOING':
-        //         doing = true
-        //         break
-        //     case 'REVIEW':
-        //         review = true
-        //         break
-        //     case 'DONE':
-        //         done = true
-        //         break
-        // }
         return <select className="select" onChange={this.dropDownChange}>
         <option selected>Select a friend</option>
         {this.state.friends.map((item, index) => <option key={index} value={item}>{item}</option>)}
-            {/* <option  value="TODO">To do</option>
-            <option  value="DOING">Doing</option>
-            <option  value="REVIEW">Review</option>
-            <option  value="DONE">Done</option> */}
         </select>
     }
 }

@@ -35,7 +35,7 @@ const logic = {
             let user = await User.findOne({ username })
 
             if (!user || user.password !== password) throw new AuthError('invalid username or password')
-
+            debugger
             return user.id
         })()
     },
@@ -116,10 +116,10 @@ const logic = {
     //         // const user = await User.findById(userId)
     //         // const friend = await User.findOne({ username })
 
-    //         await User.update({ id: userId }, { "$pull": { "friends": { "username": username } }})
+    //         await User.update({ id: userId }, { $pull: { friends: { "username": username } }})
     //         const user = await User.findById(userId)
     //         debugger
-            
+
     //         console.log(index)
 
     //         // await User.update(
@@ -334,6 +334,14 @@ const logic = {
             await postit.save()
 
         })()
+    },
+
+    insertPicture(filepath, callback) {
+
+        User.insertOne({ 'imagePath': filepath }, (err, result) => {
+
+            callback(result)
+        })
     }
 }
 
