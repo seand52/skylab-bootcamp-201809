@@ -1,5 +1,5 @@
 const { User, Postit } = require('../data')
-const { AlreadyExistsError, AuthError, NotFoundError } = require('../errors')
+const { AlreadyExistsError, AuthError, NotAllowedError, NotFoundError } = require('../errors')
 const validate = require('../utils/validate')
 
 const logic = {
@@ -80,6 +80,49 @@ const logic = {
         })()
     },
 
+    addCollaborator(id, collaboratorUsername) {
+        validate([
+            { key: 'id', value: id, type: String },
+            { key: 'collaboratorUsername', value: collaboratorUsername, type: String }
+        ])
+
+        return (async () => {
+            const user = await User.findById(id)
+
+            if (!user) throw new NotFoundError(`user with id ${id} not found`)
+
+            const collaborator = await User.findOne({ username: collaboratorUsername })
+
+            if (!collaborator) throw new NotFoundError(`user with username ${collaboratorUsername} not found`)
+
+            if (user.id === collaborator.id) throw new NotAllowedError('user cannot add himself as a collaborator')
+
+            user.collaborators.forEach(_collaboratorId => {
+                if (_collaboratorId === collaborator.id) throw new AlreadyExistsError(`user with id ${id} arleady has collaborator with id ${_collaboratorId}`)
+            })
+
+            user.collaborators.push(collaborator._id)
+
+            await user.save()
+        })()
+    },
+
+    listCollaborators(id) {
+        validate([
+            { key: 'id', value: id, type: String }
+        ])
+
+        return (async () => {
+            const user = await User.findById(id)
+
+            if (!user) throw new NotFoundError(`user with id ${id} not found`)
+
+            const collaborators = await Promise.all(user.collaborators.map(async collaboratorId => await User.findById(collaboratorId)))
+
+            return collaborators.map(({ id, username }) => ({ id, username }))
+        })()
+    },
+
     /**
      * Adds a postit
      * 
@@ -127,6 +170,9 @@ const logic = {
                 delete postit._id
 
                 postit.user = postit.user.toString()
+
+                if (postit.assignedTo)
+                    postit.assignedTo = postit.assignedTo.toString()
 
                 return postit
             })
@@ -204,6 +250,28 @@ const logic = {
             if (!postit) throw new NotFoundError(`postit with id ${postitId} not found`)
 
             postit.status = status
+
+            await postit.save()
+        })()
+    },
+
+    assignPostit(id, postitId, collaboratorId) {
+        validate([
+            { key: 'id', value: id, type: String },
+            { key: 'postitId', value: postitId, type: String },
+            { key: 'collaboratorId', value: collaboratorId, type: String }
+        ])
+
+        return (async () => {
+            const user = await User.findById(id)
+
+            if (!user) throw new NotFoundError(`user with id ${id} not found`)
+
+            const postit = await Postit.findOne({ user: user._id, _id: postitId })
+
+            if (!postit) throw new NotFoundError(`postit with id ${postitId} not found`)
+
+            postit.assignedTo = collaboratorId
 
             await postit.save()
         })()

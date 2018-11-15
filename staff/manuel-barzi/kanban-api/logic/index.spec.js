@@ -235,7 +235,55 @@ describe('logic', () => {
                 })
             })
         })
+
+        describe('add collaborator', () => {
+            let user, user2
+
+            beforeEach(() => (user = new User({ name: 'John', surname: 'Doe', username: 'jd', password: '123' })).save()
+                .then(() => (user2 = new User({ name: 'Pepe', surname: 'Grillo', username: 'pg', password: '123' })).save()))
+
+            it('should update on correct data and password', async () => {
+                const res = await logic.addCollaborator(user.id, user2.username)
+
+                expect(res).to.be.undefined
+
+                const _user = await User.findById(user.id)
+
+                expect(_user.id).to.equal(user.id)
+
+                expect(_user.collaborators.length).to.equal(1)
+
+                const [collaboratorId] = _user.collaborators
+
+                expect(collaboratorId.toString()).to.equal(user2.id)
+            })
+        })
+
+        describe('list collaborators', () => {
+            let user, user2
+
+            beforeEach(() => (user2 = new User({ name: 'Pepe', surname: 'Grillo', username: 'pg', password: '123' })).save()
+                .then(() => (user = new User({ name: 'John', surname: 'Doe', username: 'jd', password: '123', collaborators: [user2.id] })).save()))
+
+            it('should update on correct data and password', async () => {
+                const collaborators = await logic.listCollaborators(user.id)
+
+                expect(collaborators.length).to.equal(1)
+
+                const [collaborator] = collaborators
+
+                const { _id, id, username, name, surname, password } = collaborator
+
+                expect(_id).to.be.undefined
+                expect(id).to.equal(user2.id)
+                expect(username).to.equal(user2.username)
+                expect(name).to.be.undefined
+                expect(surname).to.be.undefined
+                expect(password).to.be.undefined
+            })
+        })
     })
+
 
     describe('postits', () => {
         describe('add', () => {
@@ -384,7 +432,38 @@ describe('logic', () => {
                 expect(_postit.status).to.equal(newStatus)
             })
         })
+
+        describe('assign', () => {
+            let user, postit, user2
+
+            beforeEach(async () => {
+                user = new User({ name: 'John', surname: 'Doe', username: 'jd', password: '123' })
+                postit = new Postit({ text: 'hello text', user: user.id })
+                user2 = new User({ name: 'Pepito', surname: 'Grillo', username: 'pg', password: '123' })
+
+                await Promise.all([user.save(), postit.save(), user2.save()])
+            })
+
+            it('should succeed on correct data', async () => {
+                const res = await logic.assignPostit(user.id, postit.id, user2.id)
+
+                expect(res).to.be.undefined
+
+                const postits = await Postit.find()
+
+                expect(postits.length).to.equal(1)
+
+                const [_postit] = postits
+
+                expect(_postit.id).to.equal(postit.id)
+                expect(_postit.user.toString()).to.equal(user.id)
+                expect(_postit.text).to.equal(postit.text)
+                expect(_postit.assignedTo.toString()).to.equal(user2.id)
+            })
+        })
     })
+
+    afterEach(() => Promise.all([User.deleteMany(), Postit.deleteMany()]))
 
     after(() => mongoose.disconnect())
 })

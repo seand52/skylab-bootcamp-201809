@@ -46,8 +46,6 @@ const logic = {
             .then(res => {
                 if (res.error) throw Error(res.error)
 
-                debugger
-
                 const { id, token } = res.data
 
                 this._userId = id
@@ -69,6 +67,39 @@ const logic = {
 
         sessionStorage.removeItem('userId')
         sessionStorage.removeItem('token')
+    },
+
+    addCollaborator(collaboratorUsername) {
+        if (typeof collaboratorUsername !== 'string') throw TypeError(`${collaboratorUsername} is not a string`)
+
+        if (!collaboratorUsername.trim()) throw Error('collaboratorUsername is empty or blank')
+
+        return fetch(`${this.url}/users/${this._userId}/collaborators`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+            },
+            body: JSON.stringify({ collaboratorUsername })
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+            })
+    },
+
+    listCollaborators() {
+        return fetch(`${this.url}/users/${this._userId}/collaborators`, {
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+
+                return res.data
+            })
     },
 
     addPostit(text) {
@@ -161,6 +192,29 @@ const logic = {
                 'Authorization': `Bearer ${this._token}`
             },
             body: JSON.stringify({ status })
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+            })
+    },
+
+    assignPostit(id, collaboratorId) {
+        if (typeof id !== 'string') throw new TypeError(`${id} is not a string`)
+
+        if (!id.trim().length) throw Error('id is empty or blank')
+
+        if (typeof collaboratorId !== 'string') throw TypeError(`${collaboratorId} is not a string`)
+
+        if (!collaboratorId.trim()) throw Error('collaboratorId is empty or blank')
+
+        return fetch(`${this.url}/users/${this._userId}/postits/${id}/collaborator`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+            },
+            body: JSON.stringify({ collaboratorId })
         })
             .then(res => res.json())
             .then(res => {

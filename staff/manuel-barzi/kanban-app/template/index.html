@@ -36,36 +36,119 @@
       <div>
         <section><button>Logout</button></section>
         <div>
-          <h1 class="text-center">Post-It App <i class="fas fa-sticky-note"></i></h1>
+          <h1 class="text-center">Kanban App <i class="fas fa-sticky-note"></i></h1>
           <form class="text-center"><input placeholder="Write text here..." value=""><button type="submit"><i class="fas fa-plus"></i></button></form>
           <div class="container-fluid">
             <div class="row">
               <section class="col-sm-12 col-md-6 col-lg-3">
                 <h2>TODO</h2>
-                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select><option value="TODO">TODO</option><option value="DOING">DOING</option><option value="REVIEW">REVIEW</option><option value="DONE">DONE</option></select><button><i class="fas fa-share-alt"></i></button></article>
-                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select><option value="TODO">TODO</option><option value="DOING">DOING</option><option value="REVIEW">REVIEW</option><option value="DONE">DONE</option></select><button><i class="fas fa-share-alt"></i></button></article>
-                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select><option value="TODO">TODO</option><option value="DOING">DOING</option><option value="REVIEW">REVIEW</option><option value="DONE">DONE</option></select><button><i class="fas fa-share-alt"></i></button></article>
+                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select>
+                    <option value="TODO">TODO</option>
+                    <option value="DOING">DOING</option>
+                    <option value="REVIEW">REVIEW</option>
+                    <option value="DONE">DONE</option>
+                  </select><button data-toggle="modal" data-target="#chooseCollaboratorModal"><i class="fas fa-share-alt"></i></button></article>
+                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select>
+                    <option value="TODO">TODO</option>
+                    <option value="DOING">DOING</option>
+                    <option value="REVIEW">REVIEW</option>
+                    <option value="DONE">DONE</option>
+                  </select><button><i class="fas fa-share-alt"></i></button></article>
+                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select>
+                    <option value="TODO">TODO</option>
+                    <option value="DOING">DOING</option>
+                    <option value="REVIEW">REVIEW</option>
+                    <option value="DONE">DONE</option>
+                  </select><button><i class="fas fa-share-alt"></i></button></article>
               </section>
               <section class="col-sm-12 col-md-6 col-lg-3">
                 <h2>DOING</h2>
-                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select><option value="TODO">TODO</option><option value="DOING">DOING</option><option value="REVIEW">REVIEW</option><option value="DONE">DONE</option></select><button><i class="fas fa-share-alt"></i></button></article>
-                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select><option value="TODO">TODO</option><option value="DOING">DOING</option><option value="REVIEW">REVIEW</option><option value="DONE">DONE</option></select><button><i class="fas fa-share-alt"></i></button></article>
-                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select><option value="TODO">TODO</option><option value="DOING">DOING</option><option value="REVIEW">REVIEW</option><option value="DONE">DONE</option></select><button><i class="fas fa-share-alt"></i></button></article>
+                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select>
+                    <option value="TODO">TODO</option>
+                    <option value="DOING">DOING</option>
+                    <option value="REVIEW">REVIEW</option>
+                    <option value="DONE">DONE</option>
+                  </select><button><i class="fas fa-share-alt"></i></button></article>
+                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select>
+                    <option value="TODO">TODO</option>
+                    <option value="DOING">DOING</option>
+                    <option value="REVIEW">REVIEW</option>
+                    <option value="DONE">DONE</option>
+                  </select><button><i class="fas fa-share-alt"></i></button></article>
+                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select>
+                    <option value="TODO">TODO</option>
+                    <option value="DOING">DOING</option>
+                    <option value="REVIEW">REVIEW</option>
+                    <option value="DONE">DONE</option>
+                  </select><button><i class="fas fa-share-alt"></i></button></article>
               </section>
               <section class="col-sm-12 col-md-6 col-lg-3">
                 <h2>REVIEW</h2>
-                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select><option value="TODO">TODO</option><option value="DOING">DOING</option><option value="REVIEW">REVIEW</option><option value="DONE">DONE</option></select><button><i class="fas fa-share-alt"></i></button></article>
-                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select><option value="TODO">TODO</option><option value="DOING">DOING</option><option value="REVIEW">REVIEW</option><option value="DONE">DONE</option></select><button><i class="fas fa-share-alt"></i></button></article>
-                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select><option value="TODO">TODO</option><option value="DOING">DOING</option><option value="REVIEW">REVIEW</option><option value="DONE">DONE</option></select><button><i class="fas fa-share-alt"></i></button></article>
+                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select>
+                    <option value="TODO">TODO</option>
+                    <option value="DOING">DOING</option>
+                    <option value="REVIEW">REVIEW</option>
+                    <option value="DONE">DONE</option>
+                  </select><button><i class="fas fa-share-alt"></i></button></article>
+                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select>
+                    <option value="TODO">TODO</option>
+                    <option value="DOING">DOING</option>
+                    <option value="REVIEW">REVIEW</option>
+                    <option value="DONE">DONE</option>
+                  </select><button><i class="fas fa-share-alt"></i></button></article>
+                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select>
+                    <option value="TODO">TODO</option>
+                    <option value="DOING">DOING</option>
+                    <option value="REVIEW">REVIEW</option>
+                    <option value="DONE">DONE</option>
+                  </select><button><i class="fas fa-share-alt"></i></button></article>
               </section>
               <section class="col-sm-12 col-md-6 col-lg-3">
                 <h2>DONE</h2>
-                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select><option value="TODO">TODO</option><option value="DOING">DOING</option><option value="REVIEW">REVIEW</option><option value="DONE">DONE</option></select><button><i class="fas fa-share-alt"></i></button></article>
-                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select><option value="TODO">TODO</option><option value="DOING">DOING</option><option value="REVIEW">REVIEW</option><option value="DONE">DONE</option></select><button><i class="fas fa-share-alt"></i></button></article>
-                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select><option value="TODO">TODO</option><option value="DOING">DOING</option><option value="REVIEW">REVIEW</option><option value="DONE">DONE</option></select><button><i class="fas fa-share-alt"></i></button></article>
+                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select>
+                    <option value="TODO">TODO</option>
+                    <option value="DOING">DOING</option>
+                    <option value="REVIEW">REVIEW</option>
+                    <option value="DONE">DONE</option>
+                  </select><button><i class="fas fa-share-alt"></i></button></article>
+                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select>
+                    <option value="TODO">TODO</option>
+                    <option value="DOING">DOING</option>
+                    <option value="REVIEW">REVIEW</option>
+                    <option value="DONE">DONE</option>
+                  </select><button><i class="fas fa-share-alt"></i></button></article>
+                <article class="post"><textarea>hola mundo</textarea><button><i class="far fa-trash-alt"></i></button><select>
+                    <option value="TODO">TODO</option>
+                    <option value="DOING">DOING</option>
+                    <option value="REVIEW">REVIEW</option>
+                    <option value="DONE">DONE</option>
+                  </select><button><i class="fas fa-share-alt"></i></button></article>
               </section>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="chooseCollaboratorModal" tabindex="-1" role="dialog" aria-labelledby="chooseCollaboratorModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="chooseCollaboratorModalLabel">Choose a collaborator</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <select>
+            <option value="123">Pepito</option>
+            <option value="124">John</option>
+            <option value="125">Mary</option>
+            <option value="126">Sarah</option>
+            <option value="127">Charles</option>
+          </select>
         </div>
       </div>
     </div>
