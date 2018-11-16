@@ -1,6 +1,8 @@
 const { User, Postit } = require('../data')
 const { AlreadyExistsError, AuthError, NotAllowedError, NotFoundError } = require('../errors')
 const validate = require('../utils/validate')
+const fs = require('fs')
+const path = require('path')
 
 const logic = {
     registerUser(name, surname, username, password) {
@@ -123,6 +125,111 @@ const logic = {
         })()
     },
 
+    // TODO review! fails because of "Uncaught Error [ERR_STREAM_DESTROYED]: Cannot call write after a stream was destroyed"
+    _saveUserPhoto(id, file, filename) {
+        const folder = `data/users/${id}`
+
+        return new Promise((resolve, reject) => {
+            const pathToFile = path.join(folder, filename)
+
+            debugger
+
+            const ws = fs.createWriteStream(pathToFile)
+
+            fs.access(folder, fs.constants.F_OK, err => {
+                if (err)
+                    fs.mkdir(folder, err => {
+                        if (err) return reject(err)
+
+                        file.pipe(ws)
+
+                        file.on('end', () => {
+                            debugger
+
+                            ws.close()
+
+                            resolve()
+                        })
+
+                        file.on('error', err => {
+                            debugger
+                        })
+                    })
+                else
+                    fs.readdir(folder, (err, files) => {
+                        debugger
+                        if (err) return reject(err)
+
+                        const deletes = files.map(file => new Promise((resolve, reject) => {
+                            debugger
+                            fs.unlink(path.join(folder, file), err => {
+                                if (err) return reject(err)
+
+                                resolve()
+                            })
+                        }))
+
+                        Promise.all(deletes)
+                            .then(() => {
+                                file.pipe(ws)
+
+                                file.on('end', () => resolve())
+                            })
+                    })
+            })
+        })
+    },
+
+    saveUserPhoto(id, file, filename) {
+        const folder = `data/users/${id}`
+
+        return new Promise((resolve, reject) => {
+            try {
+                if (!fs.existsSync(folder)) {
+                    fs.mkdirSync(folder)
+                } else {
+                    const files = fs.readdirSync(folder)
+
+                    files.forEach(file => fs.unlinkSync(path.join(folder, file)))
+                }
+
+                const pathToFile = path.join(folder, filename)
+
+                const ws = fs.createWriteStream(pathToFile)
+
+                file.pipe(ws)
+
+                resolve()
+            } catch (err) {
+                reject(err)
+            }
+        })
+    },
+
+    retrieveUserPhoto(id) {
+        const folder = `data/users/${id}`
+
+        return new Promise((resolve, reject) => {
+            try {
+                let file
+
+                if (!fs.existsSync(folder)) {
+                    file = 'data/users/default/profile.png'
+                } else {
+                    const files = fs.readdirSync(folder)
+
+                    file = `data/users/${id}/${files[0]}`
+                }
+
+                const rs = fs.createReadStream(file)
+
+                resolve(rs)
+            } catch (err) {
+                reject(err)
+            }
+        })
+    },
+
     /**
      * Adds a postit
      * 
@@ -161,7 +268,7 @@ const logic = {
 
             if (!user) throw new NotFoundError(`user with id ${id} not found`)
 
-            const postits = await Postit.find({ user: user._id })
+            const postits = await Postit.find({ $or: [{ user: user._id }, { assignedTo: user._id }] })
                 .lean()
 
             postits.forEach(postit => {
