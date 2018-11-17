@@ -208,19 +208,38 @@ router.post('/users/:id/postits/:postitId/friends/:username', [bearerTokenParser
 
 
 
+// router.post('/users/fileUpload/:id', [bearerTokenParser, jwtVerifier, upload.single('image')], (req, res, next) => {
+//     routeHandler(async () => {
+//         const { sub, params: { id, postitId, username } } = req
+//         console.log(req)
+//         if (id !== sub) throw Error('token sub does not match user id')
+
+//         // const ext = req.file.originalname.split('.')[1]
+
+//         // if (ext !== 'png') throw Error('this file type is not supported')
+//         res.json({
+//             message: 'ok'
+//         })
+//     }, res)
+
+// });
+
+
 router.post('/users/fileUpload/:id', [bearerTokenParser, jwtVerifier, upload.single('image')], (req, res, next) => {
-    routeHandler(async () => {
-        const { sub, params: { id, postitId, username } } = req
-        console.log(req)
-        if (id !== sub) throw Error('token sub does not match user id')
 
-        // const ext = req.file.originalname.split('.')[1]
+    const { sub, params: { id }, file: { mimetype, path } } = req
 
-        // if (ext !== 'png') throw Error('this file type is not supported')
-        res.json({
-            message: 'ok'
-        })
-    }, res)
+    if (id !== sub) throw Error('token sub does not match user id')    
+
+    const bitmap = fs.readFileSync(path)
+
+    const buffer = new Buffer(bitmap).toString('base64')
+
+    const image = `data:${mimetype};base64,${buffer}`
+
+    res.json({
+        data: image
+    })
 
 });
 
