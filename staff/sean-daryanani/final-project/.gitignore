@@ -1,7 +1,7 @@
 .DS_Store
-mockups/images/**/*.png
-mockups/images/**/*.jpg
-mockups/images/**/*.jpeg
-mockups/images/**/*.gif
-mockups/images/**/*.bmp
-mockups/images/**/*.svg
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.gif
+**/*.bmp
+**/*.svg
