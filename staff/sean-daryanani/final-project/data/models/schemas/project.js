@@ -19,7 +19,6 @@ const Project = new Schema({
     created: {
         type: Date,
         default: Date.now,
-        required: true
     },
 
     onGoing: {
@@ -28,7 +27,7 @@ const Project = new Schema({
 
     },
 
-    requiredExperience: {
+    beginnerFriendly: {
         type: String,
         required: true
     },
@@ -36,6 +35,11 @@ const Project = new Schema({
     maxMembers: {
         type: String,
         required: true
+    },
+
+    currentMembers: {
+        type: Number,
+        default: 1
     },
 
     collaborators: [{
