@@ -3,8 +3,34 @@ const { AlreadyExistsError, AuthError, NotAllowedError, NotFoundError, ValueErro
 const validate = require('../utils/validate')
 const fs = require('fs')
 const path = require('path')
+const cloudinary = require('cloudinary')
+cloudinary.config({
+    cloud_name: 'dql7wn1ej',
+    api_key: '853219916242289',
+    api_secret: 'xHAmRRBTudticrVV4h0K1sXPVpg'
+})
 
 const logic = {
+
+    /**
+     * Upload an image to cloudinary 
+     * @param {string} base64Image 
+     */
+    _saveImage(base64Image) {
+        return Promise.resolve().then(() => {
+            if (typeof base64Image !== 'string') throw new LogicError('base64Image is not a string')
+
+            return new Promise((resolve, reject) => {
+                return cloudinary.v2.uploader.upload(base64Image, function (err, data) {
+                    if (err) return reject(err)
+
+                    resolve(data.url)
+                })
+            })
+        })
+    },
+
+
     /**
      * Register User
      * @param {string} name 
@@ -225,7 +251,7 @@ const logic = {
 
             if (!user) throw new NotFoundError(`user with id ${id} not found`)
 
-            projects = await Project.find({ owner: user._id }).lean()
+            let projects = await Project.find({ owner: user._id }).lean()
 
 
             projects.forEach(project => {
@@ -242,6 +268,62 @@ const logic = {
 
         })()
     },
+
+
+    listProjectsRelatedToUser(id) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (!id.trim()) throw new ValueError('id is empty or blank')
+
+        return (async () => {
+
+            const user = await User.findById(id).lean()
+
+            let savedProjects = user.savedProjects.map(item => item)
+
+            if (!user) throw new NotFoundError(`user with id ${id} not found`)
+
+            const projects = await Project.find({
+                $or:
+                    [
+                        {_id: {$in: savedProjects}},
+                        { owner: user._id },
+                        { collaborators: user._id }
+                    ]
+            }).lean()    
+
+            projects.forEach(project => {
+                project.id = project._id.toString()
+
+                delete project._id
+
+                project.owner = project.owner.toString()
+
+                return project
+            })
+
+            return projects
+
+        })()
+
+
+    },
+
+    saveProject(id, projectId) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+
+        if (!id.trim()) throw new ValueError('id is empty or blank')
+        if (!projectId.trim()) throw new ValueError('projectId is empty or blank')
+
+        return(async() => {
+
+            const project = await Project.findById(projectId)
+
+            await User.updateOne({ _id: id }, { $push: { savedProjects: project._id } })
+
+        })()
+    },
+
     /**
      * 
      * @param {string} projectId 
@@ -262,6 +344,11 @@ const logic = {
         })()
     },
 
+    /**
+     * Allow user to request to be a collaborator in a project
+     * @param {string} id 
+     * @param {string} projectId 
+     */
     requestCollaboration(id, projectId) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
@@ -278,7 +365,7 @@ const logic = {
         })()
     },
 
-    acceptCollaboration(id, collabId, projectId) {
+    handleCollaboration(id, collabId, projectId, decision) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
 
@@ -293,43 +380,130 @@ const logic = {
 
             if (id !== project.owner.toString()) throw Error('not the owner of the project')
 
-            await Project.updateOne(
-                { _id: projectId },
-                {
-                    $pull: { pendingCollaborators: collab.id },
-                    $push: { collaborators: collab.id } 
-                }
-            )
+            if (decision === 'accept') {
+                await Project.updateOne(
+                    { _id: projectId },
+                    {
+                        $pull: { pendingCollaborators: collab.id },
+                        $push: { collaborators: collab.id }
+                    }
+                )
+            } else {
+
+                await Project.updateOne(
+                    { _id: projectId },
+                    {
+                        $pull: { pendingCollaborators: collab.id },
+                    }
+                )
+            }
 
 
         })()
     },
 
-    rejectCollaboration(id, collabId, projectId) {
+    addMeeting(id, projectId, date, location) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
 
-        if (!id.trim()) throw new ValueError('id is empty or blank')
-        if (!projectId.trim()) throw new ValueError('projectId is empty or blank')
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
 
         return (async () => {
 
             const project = await Project.findById(projectId)
 
-            const collab = await User.findById(collabId)
+            if (!project) throw new NotFoundError(`project with id ${id} not found`)
 
-            if (id !== project.owner.toString()) throw Error('not the owner of the project')
+            const meeting = new Meeting({ project: project.id, date, location })
 
-            await Project.updateOne(
-                { _id: projectId },
-                {
-                    $pull: { pendingCollaborators: collab.id },
-                }
-            )
+            await meeting.save()
+
+        })()
+    },
+
+    deleteMeeting(meetingId) {
+        // if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
+
+        // if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
+
+        return (async () => {
+
+            const meeting = await Meeting.findById(meetingId)
+
+            if (!meeting) throw new NotFoundError(`meeting with id ${id} not found`)
+
+            await meeting.remove()
+
+        })()
+    },
+
+    listProjectMeetings(projectId) {
+        // if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+
+        // if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+
+        return (async () => {
+
+            const meetings = await Meeting.find({project: projectId}).lean()
+
+            meetings.forEach(meeting => {
+                meeting.id = meeting._id.toString()
+
+                delete meeting._id
+
+                return meeting
+            })
+
+            return meetings
+
+            
+
+        })()
+    },
+
+    attendMeeting(id, meetingId) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
+
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
+
+        return (async() => {
+
+
+            const user = await User.findById(id)
+
+            await Meeting.updateOne({ _id: meetingId }, { $push: { attending: user.id } })
 
 
         })()
     }
+
+
+
+    // insertPhoto(id, photo) {
+    //     if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+    //     if (typeof photo !== 'string') throw TypeError(`${photo} is not a string`)
+
+    //     return (async () => {
+
+    //         const imageCloudinary = await this._saveImage(photo)
+    //         debugger
+    //         const user = await User.findById(id)
+
+    //         if (!user) throw new NotFoundError(`user with id ${id} not found`)
+
+    //         user.photos.push(imageCloudinary)
+
+    //         await user.save()
+    //     })()
+
+    // }
 
 }
 

@@ -51,6 +51,11 @@ const User = new Schema({
     city: {
         type: 'String',
         default: 'City is empty'
+    },
+
+    profileImage: {
+        type: 'string',
+        default: 'https://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg'
     }
     
 })

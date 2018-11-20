@@ -121,6 +121,7 @@ router.post('/users/:id/projects', [bearerTokenParser, jwtVerifier, jsonBodyPars
     }, res)
 })
 
+//List own projects
 router.get('/users/projects/:id', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
         const { params: { id }, sub } = req
@@ -136,6 +137,7 @@ router.get('/users/projects/:id', [bearerTokenParser, jwtVerifier, jsonBodyParse
 
 })
 
+//List info of a specific project
 router.get('/users/:id/project/:projectid', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
         const { params: { id, projectid }, sub } = req
@@ -150,6 +152,40 @@ router.get('/users/:id/project/:projectid', [bearerTokenParser, jwtVerifier, jso
     }, res)
 
 })
+
+router.post('/users/:id/projects/:projectid/collaborator', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+
+        const { sub, params: { id, projectid}, body: { collaboratorId } } = req
+
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.requestCollaboration(collaboratorId, projectid)
+            .then(() => res.json({
+                message: 'collaborator added to pending list'
+            }))
+
+    }, res)
+})
+
+router.patch('/users/:id/projects/:projectid/collaborator', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+
+        const { sub, params: { id, projectid}, body: { decision, collaboratorId } } = req
+
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.handleCollaboration(id, collaboratorId, projectid, decision)
+            .then(() => res.json({
+                message: 'collaborator handled'
+            }))
+
+    }, res)
+})
+
+
 
 
 module.exports = router

@@ -4,6 +4,7 @@ const Meeting = new Schema({
     project: {
         type: ObjectId,
         ref: 'Project',
+        required: true
     },
 
     date: {

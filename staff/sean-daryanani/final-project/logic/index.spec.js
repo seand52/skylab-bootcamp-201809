@@ -356,6 +356,25 @@ describe('logic', () => {
 
             })
 
+            // it('should insert a photo into a profile)', async () => {
+
+            //     const { profileImage } = user
+
+            //     expect(profileImage).to.equal('https://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg')
+
+            //     const newPhoto = 'iVBORw0KGgoAAAANSUhEUgAAAQMAAADCCAMAAAB6zFdcAAAA4VBMVEX///8DWoC0tLQAVX3q7vEASnbwklexsbHW1tbJv7oFTnmPoqmswMx8nrIDXIH9mVK0hmALUobwkFL1vJ33xqzg4OCwtru2s7D0kE/ykVQAUXkARHAAQW4AU3sAOWgAMmPL2eH0+Prk7fFNc5DU4eeLrL4AMmW+0tybscHd6e7uhET/+/kgXIBwlKv63MnviEh2l602d5ZKf5ymwM4kaItghJ+0z9pAZoeTucksVXo+a4qhuMZoiaF0oLa2yNJKgZ3QtqF+mrb0sYvxmGLMvrZ+qbzyp334zbbynmrtfzj859x4D9NwAAAIxUlEQVR4nO2ca2ObOBaGYYkys9pYu+N2Oy0CDLYJtoNjJzF247jubLpNJv3/P2jQpOUigS0IELuc91sIEvCgy3ukgxUFBAKBQCAQCAQCgUAgEAgEAoFAIFBlunybq1+PTCdlGbyZvc9Udzb7/d0vR6X/lmbQPc3Wh/e/v/vHUQkYVMJgNpnMZpNZixl0n7r3j5eXb/58mrWVQXfy5uL5wOWXp3Yy6J5eRkcuHiatZDC7TBy6eJi1kMHTferYZfdDCxl8Sx27uJ+1jsHsC3fwcdI6Bk8P3MHLFjK45w62kMEE2sHp7JQ7+LZ9DIR54aF988LphPMHsxb6g9PJY7IZfGmjTzz98PR4ESHotjNeCEPnh28XIYaLb4/vJ+2MG8NHnnQf3rx9e/9l9r6t6wesKcyYoj9byQDWE4+fwQvW1v+dq///87hUmsEf/8nVv45Mv5Zl8L/fcoWPS+isLIOOpv4k0oABMFCBARMwAAZMwAAYMAEDYMAEDIABEzAABkzAABgwAQNgwAQMgAETMAAGTMfDgNRW8/EwoKiumo+GAfp6ZdF6qj4SBoQuFMULMKrjokfCQDW27Jre3Ed65QPDkTDAi+/f3w1Hi8qveyQM6Ci67ker6sqPg4G+Gv64rONX3hmOgwHqxM3AaOl4cOtFzSDArWRA6Ofoqks964SXYXktBggXOLkXN4Op6BZJscpEvQoDDd26U+mhjaBFdFHbNMVi+tf5iyi8AgOCjcBWxqusVp0p6ya+qGiXCQ0cZ7sytNId4hUYWOYdMzw3luRNYxL9PoGjieA0Yxz+Z9yhtCyExhlgazp+ruBKcpZL+CM3g1vPff6ffWWVfCsNMzDRIGrYfSzTG4juR/5IUcVuT69iQj4t1SGaZEBU6rv9uIY7Q6YU6jg/CmR0H1O34wqHc1xmbGyQAcHW9dBJ1HASSCyLaCl/JPwbucl7cjzfKt4UG'
+
+
+            //     await logic.insertPhoto(user.id, newPhoto)
+
+            //     const _users= User.find()
+
+            //     const [_user] = _users
+
+            //     expect(_user.profileImage).to.equal(newPhoto)
+
+            // })
+
 
 
         })
@@ -402,6 +421,39 @@ describe('logic', () => {
                 // TODO other test cases
             })
 
+            describe('save a project ', () => {
+                let user, user2, project
+
+                beforeEach(async () => {
+
+                    user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
+
+                    user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '123' })
+
+                    project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id })
+
+                    await user.save()
+                    await user2.save()
+                    await project.save()
+                })
+
+                it('should succeed on correct data', async () => {
+
+                    await logic.saveProject(user.id, project.id)
+
+                    const _user = await User.findById(user.id)
+
+                    expect(_user.savedProjects.length).to.equal(1)
+
+                    expect(_user.savedProjects[0].toString()).to.equal(project.id)
+
+
+
+                })
+
+                // TODO other test cases
+            })
+
             describe('list projects', () => {
                 let user, project, project2
 
@@ -417,7 +469,7 @@ describe('logic', () => {
                     await project2.save()
                 })
 
-                it('should succeed on listing all projects of owner', async () => {
+                it('should succeed on listing all projects where user is owner', async () => {
                     const projects = await logic.listOwnProjects(user.id)
                     expect(projects).not.to.be.undefined
 
@@ -459,6 +511,92 @@ describe('logic', () => {
                     expect(_project2.description).to.equal(__project2.description)
                     expect(_project2.beginnerFriendly).to.equal(__project2.beginnerFriendly)
                     expect(_project2.maxMembers).to.equal(__project2.maxMembers)
+
+
+                })
+
+                it('should succeed on listing all projects given a user ID including collab, owner, saved', async () => {
+
+                    let user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '123' })
+
+                    let project3 = new Project({ name: 'test4', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id })
+
+                    let project4 = new Project({ name: 'test4', description: 'testdescription2', skills: ['react2', 'mongoose2', 'javascript2'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id, collaborators: [user.id] })
+
+                    let project5 = new Project({ name: 'test4', description: 'testdescription2', skills: ['react2', 'mongoose2', 'javascript2'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id })
+
+                    await user2.save()
+                    await project3.save()
+                    await project4.save()
+                    await project5.save()
+                    await logic.saveProject(user.id, project3.id)
+
+                    const projects = await logic.listProjectsRelatedToUser(user.id)
+
+                    expect(projects).not.to.be.undefined
+
+                    expect(projects.length).to.equal(4)
+
+                    const _projects = await Project.find()
+
+                    expect(projects.length).to.not.equal(_projects.length)
+
+                    const [_project, _project2, _project3, _project4] = _projects
+
+                    expect(_project.id).to.equal(project.id)
+                    expect(_project.name).to.equal(project.name)
+                    expect(_project.description).to.equal(project.description)
+                    expect(_project.beginnerFriendly).to.equal(project.beginnerFriendly)
+                    expect(_project.maxMembers).to.equal(project.maxMembers)
+                    expect(_project.owner.toString()).to.equal(project.owner.toString())
+
+                    expect(_project2.id).to.equal(project2.id)
+                    expect(_project2.name).to.equal(project2.name)
+                    expect(_project2.description).to.equal(project2.description)
+                    expect(_project2.beginnerFriendly).to.equal(project2.beginnerFriendly)
+                    expect(_project2.maxMembers).to.equal(project2.maxMembers)
+                    expect(_project2.owner.toString()).to.equal(project2.owner.toString())
+
+                    expect(_project3.id).to.equal(project3.id)
+                    expect(_project3.name).to.equal(project3.name)
+                    expect(_project3.description).to.equal(project3.description)
+                    expect(_project3.beginnerFriendly).to.equal(project3.beginnerFriendly)
+                    expect(_project3.maxMembers).to.equal(project3.maxMembers)
+
+                    expect(_project4.id).to.equal(project4.id)
+                    expect(_project4.name).to.equal(project4.name)
+                    expect(_project4.description).to.equal(project4.description)
+                    expect(_project4.beginnerFriendly).to.equal(project4.beginnerFriendly)
+                    expect(_project4.maxMembers).to.equal(project4.maxMembers)
+
+                    const [__project, __project2, __project3, __project4] = projects
+
+                    expect(__project).not.to.be.instanceof(Project)
+                    expect(__project2).not.to.be.instanceof(Project)
+
+                    expect(_project.id).to.equal(__project.id)
+                    expect(_project.name).to.equal(__project.name)
+                    expect(_project.description).to.equal(__project.description)
+                    expect(_project.beginnerFriendly).to.equal(__project.beginnerFriendly)
+                    expect(_project.maxMembers).to.equal(__project.maxMembers)
+
+                    expect(_project2.id).to.equal(__project2.id)
+                    expect(_project2.name).to.equal(__project2.name)
+                    expect(_project2.description).to.equal(__project2.description)
+                    expect(_project2.beginnerFriendly).to.equal(__project2.beginnerFriendly)
+                    expect(_project2.maxMembers).to.equal(__project2.maxMembers)
+
+                    expect(_project3.id).to.equal(__project3.id)
+                    expect(_project3.name).to.equal(__project3.name)
+                    expect(_project3.description).to.equal(__project3.description)
+                    expect(_project3.beginnerFriendly).to.equal(__project3.beginnerFriendly)
+                    expect(_project3.maxMembers).to.equal(__project3.maxMembers)
+
+                    expect(_project4.id).to.equal(__project4.id)
+                    expect(_project4.name).to.equal(__project4.name)
+                    expect(_project4.description).to.equal(__project4.description)
+                    expect(_project4.beginnerFriendly).to.equal(__project4.beginnerFriendly)
+                    expect(_project4.maxMembers).to.equal(__project4.maxMembers)
 
 
                 })
@@ -527,11 +665,14 @@ describe('logic', () => {
                 })
 
                 it('should add collaborators into collaborator array when accepted', async () => {
+
+                    const decision = 'accept'
+
                     expect(project.owner.toString()).to.equal(user.id.toString())
 
                     await logic.requestCollaboration(user2.id, project.id)
 
-                    await logic.acceptCollaboration(user.id, user2.id, project.id)
+                    await logic.handleCollaboration(user.id, user2.id, project.id, decision)
 
                     const _projects = await Project.find()
 
@@ -542,16 +683,19 @@ describe('logic', () => {
                     expect(_project.collaborators.length).to.equal(1)
 
                     expect(_project.collaborators[0].toString()).to.equal(user2.id)
-                    
+
 
                 })
 
                 it('should remove collaborators from pending collaborators when rejected', async () => {
+
+                    const decision = 'reject'
+
                     expect(project.owner.toString()).to.equal(user.id.toString())
 
                     await logic.requestCollaboration(user2.id, project.id)
 
-                    await logic.rejectCollaboration(user.id, user2.id, project.id)
+                    await logic.handleCollaboration(user.id, user2.id, project.id, 'reject')
 
                     const _projects = await Project.find()
 
@@ -560,7 +704,7 @@ describe('logic', () => {
                     expect(_project.pendingCollaborators.length).to.equal(0)
 
                     expect(_project.collaborators.length).to.equal(0)
-                    
+
 
                 })
 
@@ -569,6 +713,154 @@ describe('logic', () => {
 
         })
 
+
+
+
+    })
+
+    describe('meetings', () => {
+        describe('add a new meeting ', () => {
+            let user, project
+
+            beforeEach(async () => {
+                user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
+
+                project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+
+
+                await user.save()
+                await project.save()
+            })
+
+            it('should succeed on correct data', async () => {
+                const date = Date.now()
+
+                await logic.addMeeting(user.id, project.id, date, 'barcelona')
+
+                const meetings = await Meeting.find()
+
+                expect(meetings.length).to.equal(1)
+
+                const [_meeting] = meetings
+
+                expect(_meeting.project.toString()).to.equal(project.id)
+
+
+                expect(_meeting.location).to.equal('barcelona')
+
+
+            })
+
+            it('should succeed on deleting event', async () => {
+                const date = Date.now()
+
+                await logic.addMeeting(user.id, project.id, date, 'barcelona')
+
+                const meetings = await Meeting.find()
+
+                expect(meetings.length).to.equal(1)
+
+                const [_meeting] = meetings
+
+                expect(_meeting.project.toString()).to.equal(project.id)
+
+
+                expect(_meeting.location).to.equal('barcelona')
+
+                await logic.deleteMeeting(_meeting.id)
+
+                const _meetings = await Meeting.find()
+
+                expect(_meetings.length).to.equal(0)
+
+
+
+            })
+
+            describe('list meetings ', () => {
+                let project2, meeting1, meeting2, meeting3
+
+                beforeEach(async () => {
+
+                    project2 = new Project({ name: 'test12', description: 'testdescription12', skills: ['react12', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+
+                    meeting1 = new Meeting({ project: project.id, date: Date.now(), location: 'barcelona' })
+
+                    meeting2 = new Meeting({ project: project.id, date: Date.now(), location: 'madrid' })
+
+                    meeting3 = new Meeting({ project: project2.id, date: Date.now(), location: 'bilbao' })
+
+
+
+
+                    await user.save()
+                    await project.save()
+                    await meeting1.save()
+                    await meeting2.save()
+                    await meeting3.save()
+                })
+
+                it('should succeed on listing all relevant meetings for a given project', async () => {
+
+                    const meetings = await logic.listProjectMeetings(project.id)
+
+                    expect(meetings.length).to.equal(2)
+
+                    const [_meeting, _meeting2] = meetings
+
+                    expect(_meeting.project.toString()).to.equal(project.id)
+
+
+                    expect(_meeting.location).to.equal('barcelona')
+
+                    expect(_meeting2.project.toString()).to.equal(project.id)
+
+
+                    expect(_meeting2.location).to.equal('madrid')
+
+
+                })
+
+            })
+
+            describe('attend meeting ', () => {
+                let user2, meeting1, meeting2, meeting3
+
+                beforeEach(async () => {
+
+                    user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
+
+                    project2 =  new Project({ name: 'test12', description: 'testdescription12', skills: ['react12', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, collaborators:[user2.id] })
+
+                    meeting1 = new Meeting({ project: project.id, date: Date.now(), location: 'barcelona' })
+
+                    meeting2 = new Meeting({ project: project.id, date: Date.now(), location: 'madrid' })
+
+                    await user2.save()
+                    await project2.save()
+                    await meeting1.save()
+                    await meeting2.save()
+                })
+
+                it('should succeed on correct data', async () => {
+
+                    await logic.attendMeeting(user2.id, meeting1.id)
+
+                    const meeting = await Meeting.findById(meeting1.id)
+
+                    expect(meeting.attending.length).to.equal(1)
+
+                    expect(meeting.attending[0].toString()).to.equal(user2.id)
+
+
+                })
+
+            })
+
+
+
+            // TODO other test cases
+        })
 
     })
 
