@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-const mongoose = require('mongoose')
+const {mongoose} = require('data')
 const express = require('express')
 const package = require('./package.json')
 const router = require('./routes')
@@ -23,3 +23,4 @@ mongoose.connect(MONGO_URL, { useNewUrlParser: true, useCreateIndex: true })
         app.listen(port, () => console.log(`${package.name} ${package.version} up and running on port ${port}`))
     })
     .catch(console.error)
+

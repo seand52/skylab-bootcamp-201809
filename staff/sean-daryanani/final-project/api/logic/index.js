@@ -1,4 +1,4 @@
-const { User, Project, Meeting } = require('../data')
+const { models: { User, Project, Meeting } } = require('data')
 const { AlreadyExistsError, AuthError, NotAllowedError, NotFoundError, ValueError } = require('../errors')
 const validate = require('../utils/validate')
 const fs = require('fs')
@@ -269,27 +269,19 @@ const logic = {
         })()
     },
 
-
-    listProjectsRelatedToUser(id) {
+    /**
+     * List all projects where the user is a collaborator
+     * @param {string} id 
+     * @returns {Promise <Object>}
+     */
+    listCollaboratingProjects(id) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (!id.trim()) throw new ValueError('id is empty or blank')
 
         return (async () => {
-
             const user = await User.findById(id).lean()
 
-            let savedProjects = user.savedProjects.map(item => item)
-
-            if (!user) throw new NotFoundError(`user with id ${id} not found`)
-
-            const projects = await Project.find({
-                $or:
-                    [
-                        {_id: {$in: savedProjects}},
-                        { owner: user._id },
-                        { collaborators: user._id }
-                    ]
-            }).lean()    
+            let projects = await Project.find({ collaborators: user._id })
 
             projects.forEach(project => {
                 project.id = project._id.toString()
@@ -304,10 +296,13 @@ const logic = {
             return projects
 
         })()
-
-
     },
 
+    /**
+     * 
+     * @param {string} id 
+     * @param {string} projectId 
+     */
     saveProject(id, projectId) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
@@ -315,11 +310,30 @@ const logic = {
         if (!id.trim()) throw new ValueError('id is empty or blank')
         if (!projectId.trim()) throw new ValueError('projectId is empty or blank')
 
-        return(async() => {
+        return (async () => {
 
             const project = await Project.findById(projectId)
 
             await User.updateOne({ _id: id }, { $push: { savedProjects: project._id } })
+
+        })()
+    },
+
+    /**
+     * 
+     * @param {string} id 
+     * @returns {Promise <Array>}
+     */
+    listSavedProjects(id) {
+
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (!id.trim()) throw new ValueError('id is empty or blank')
+
+        return (async () => {
+
+            const user = await User.findById(id).populate('savedProjects').exec()
+
+            return user.savedProjects
 
         })()
     },
@@ -365,6 +379,13 @@ const logic = {
         })()
     },
 
+    /**
+     * 
+     * @param {string} id 
+     * @param {string} collabId 
+     * @param {string} projectId 
+     * @param {string} decision 
+     */
     handleCollaboration(id, collabId, projectId, decision) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
@@ -401,7 +422,13 @@ const logic = {
 
         })()
     },
-
+    /**
+     * 
+     * @param {string} id 
+     * @param {string} projectId 
+     * @param {string} date 
+     * @param {string} location 
+     */
     addMeeting(id, projectId, date, location) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
@@ -413,7 +440,7 @@ const logic = {
 
             const project = await Project.findById(projectId)
 
-            if (!project) throw new NotFoundError(`project with id ${id} not found`)
+            if (!project) throw new NotFoundError(`project with id ${projectId} not found`)
 
             const meeting = new Meeting({ project: project.id, date, location })
 
@@ -421,7 +448,10 @@ const logic = {
 
         })()
     },
-
+    /**
+     * 
+     * @param {string} meetingId 
+     */
     deleteMeeting(meetingId) {
         // if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
@@ -440,6 +470,11 @@ const logic = {
         })()
     },
 
+    /**
+     * 
+     * @param {string} projectId 
+     * @returns {Promise <Object>}
+     */
     listProjectMeetings(projectId) {
         // if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
@@ -449,7 +484,7 @@ const logic = {
 
         return (async () => {
 
-            const meetings = await Meeting.find({project: projectId}).lean()
+            const meetings = await Meeting.find({ project: projectId }).lean()
 
             meetings.forEach(meeting => {
                 meeting.id = meeting._id.toString()
@@ -461,11 +496,16 @@ const logic = {
 
             return meetings
 
-            
+
 
         })()
     },
 
+    /**
+     * 
+     * @param {string} id 
+     * @param {string} meetingId 
+     */
     attendMeeting(id, meetingId) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
@@ -473,8 +513,7 @@ const logic = {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
 
-        return (async() => {
-
+        return (async () => {
 
             const user = await User.findById(id)
 
@@ -482,6 +521,84 @@ const logic = {
 
 
         })()
+    },
+
+    /**
+     * 
+     * @param {string} query 
+     * @returns {Promise <Object>}
+     */
+    searchProjects(query) {
+
+        validate([{ key: 'query', value: query, type: String, optional: true }])
+
+        return (async () => {
+            if (query) {
+                let newQuery = query.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "")
+
+                const projects = await Project.find({ skills: { $in: [newQuery] } })
+
+                projects.forEach(project => {
+                    project.id = project._id.toString()
+
+                    delete project._id
+
+                    project.owner = project.owner.toString()
+
+                    return project
+                })
+
+                return projects
+
+            }
+        })()
+    },
+
+    /**
+     * 
+     * @param {array} array 
+     * @returns {Promise <Object>}
+     */
+    filterProjects(array) {
+
+        if (!(array instanceof Array)) throw TypeError(`${id} is not a string`)
+
+        return (async () => {
+            if (array) {
+                const projects = await Project.find({ skills: { $all: array } })
+
+                projects.forEach(project => {
+                    project.id = project._id.toString()
+
+                    delete project._id
+
+                    project.owner = project.owner.toString()
+
+                    return project
+                })
+
+                return projects
+            } else {
+
+                const projects = await Project.find()
+
+                projects.forEach(project => {
+                    project.id = project._id.toString()
+
+                    delete project._id
+
+                    project.owner = project.owner.toString()
+
+                    return project
+                })
+
+                return projects
+
+            }
+
+
+        })()
+
     }
 
 

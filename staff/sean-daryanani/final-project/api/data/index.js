@@ -4,10 +4,7 @@ const Project = require('./models/schemas/project')
 const Meeting = require('./models/schemas/meeting')
 
 module.exports = {
-    mongoose,
-    models: {
-        User: mongoose.model('User', User),
-        Project: mongoose.model('Project', Project),
-        Meeting: mongoose.model('Event', Meeting)
-    }
+    User: mongoose.model('User', User),
+    Project: mongoose.model('Project', Project),
+    Meeting: mongoose.model('Event', Meeting)
 }

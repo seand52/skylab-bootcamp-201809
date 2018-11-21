@@ -129,12 +129,62 @@ router.get('/users/projects/:id', [bearerTokenParser, jwtVerifier, jsonBodyParse
         if (id !== sub) throw Error('token sub does not match user id')
 
         return logic.listOwnProjects(id)
-            .then(project => res.json({
-                data: project
+            .then(projects => res.json({
+                data: projects
             })
             )
     }, res)
 
+})
+
+//List collaborating projects
+router.get('/users/:id/collaborating', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+        const { params: { id }, sub } = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.listCollaboratingProjects(id)
+            .then(projects => res.json({
+                data: projects
+            })
+            )
+    }, res)
+
+})
+
+//Save project
+router.post('/users/:id/projects/:projectid/save', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+
+        const { sub, params: { id, projectid } } = req
+
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.saveProject(id, projectid)
+            .then(() => res.json({
+                message: 'project saved'
+            }))
+
+    }, res)
+})
+
+//List saved projects
+router.get('/users/:id/projects/save', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+
+        const { sub, params: { id } } = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.listSavedProjects(id)
+            .then(projects => res.json({
+                data: projects
+            })
+            )
+
+    }, res)
 })
 
 //List info of a specific project
@@ -156,7 +206,7 @@ router.get('/users/:id/project/:projectid', [bearerTokenParser, jwtVerifier, jso
 router.post('/users/:id/projects/:projectid/collaborator', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
 
-        const { sub, params: { id, projectid}, body: { collaboratorId } } = req
+        const { sub, params: { id, projectid }, body: { collaboratorId } } = req
 
 
         if (id !== sub) throw Error('token sub does not match user id')
@@ -172,7 +222,7 @@ router.post('/users/:id/projects/:projectid/collaborator', [bearerTokenParser, j
 router.patch('/users/:id/projects/:projectid/collaborator', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
 
-        const { sub, params: { id, projectid}, body: { decision, collaboratorId } } = req
+        const { sub, params: { id, projectid }, body: { decision, collaboratorId } } = req
 
 
         if (id !== sub) throw Error('token sub does not match user id')
@@ -185,7 +235,79 @@ router.patch('/users/:id/projects/:projectid/collaborator', [bearerTokenParser, 
     }, res)
 })
 
+router.post('/users/:id/projects/:projectid/meetings', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+
+        const { sub, params: { id, projectid }, body: { date, location } } = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.addMeeting(id, projectid, date, location)
+            .then(() => res.json({
+                message: 'meeting has been added'
+            }))
+
+    }, res)
+})
+
+router.delete('/users/:id/projects/meetings/:meetingid', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+
+        const { sub, params: { id, meetingid } } = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.deleteMeeting(meetingid)
+            .then(() => res.json({
+                message: 'meeting has been deleted'
+            }))
+
+    }, res)
+})
+
+router.get('/users/:id/projects/:projectid/meetings', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+        const { params: { id, projectid }, sub } = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.listProjectMeetings(projectid)
+            .then(projects => res.json({
+                data: projects
+            })
+            )
+    }, res)
+
+})
 
 
+router.put('/users/:id/projects/:meetingid/meetings', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+        const { params: { id, meetingid }, sub } = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.attendMeeting(id, meetingid)
+            .then(() => res.json({
+                message: 'added to meeting'
+            }))
+    }, res)
+
+})
+
+router.get('/users/:id/projects/query', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+        const { params: { id }, sub} = req
+        debugger
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.filterProjects(req.body.array)
+            .then(projects => res.json({
+                data: projects
+            })
+            )
+    }, res)
+
+})
 
 module.exports = router

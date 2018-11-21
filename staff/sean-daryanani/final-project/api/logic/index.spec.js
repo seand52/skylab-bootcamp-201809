@@ -1,9 +1,9 @@
-const mongoose = require('mongoose')
-const { User, Project, Meeting } = require('../data')
+const { mongoose, models: { User, Project, Meeting } } = require('data')
 const logic = require('.')
 const { AlreadyExistsError, ValueError } = require('../errors')
 const { expect } = require('chai')
 const MONGO_URL = 'mongodb://localhost:27017/socialdev-test'
+
 
 describe('logic', () => {
     before(() => mongoose.connect(MONGO_URL, { useNewUrlParser: true, useCreateIndex: true }))
@@ -451,6 +451,30 @@ describe('logic', () => {
 
                 })
 
+
+                it('should succeed on listing saved projects', async () => {
+                    project2 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id })
+                    project3 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id })
+
+                    await project2.save()
+                    await project3.save()
+                    const {name, description, skills, beginnerFriendly, maxMembers, owner} = project
+
+                    await logic.saveProject(user.id, project.id)
+                    await logic.saveProject(user.id, project3.id)
+
+                    const projects = await logic.listSavedProjects(user.id)
+
+                    expect(projects.length).to.equal(2)
+
+                    expect(projects.name).to.equal
+
+
+
+
+
+                })
+
                 // TODO other test cases
             })
 
@@ -515,93 +539,87 @@ describe('logic', () => {
 
                 })
 
-                it('should succeed on listing all projects given a user ID including collab, owner, saved', async () => {
+                it('should succeed on listing all projects where user a collaborator', async () => {
+                    const user2= new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '123' })
 
-                    let user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '123' })
+                    let project3 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id, collaborators:[user.id] })
 
-                    let project3 = new Project({ name: 'test4', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id })
+                    let project4 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id, collaborators:[user.id] })
 
-                    let project4 = new Project({ name: 'test4', description: 'testdescription2', skills: ['react2', 'mongoose2', 'javascript2'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id, collaborators: [user.id] })
-
-                    let project5 = new Project({ name: 'test4', description: 'testdescription2', skills: ['react2', 'mongoose2', 'javascript2'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id })
+                    let project5 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id, collaborators:[user.id] })
 
                     await user2.save()
                     await project3.save()
                     await project4.save()
                     await project5.save()
-                    await logic.saveProject(user.id, project3.id)
 
-                    const projects = await logic.listProjectsRelatedToUser(user.id)
+                    const projects = await logic.listCollaboratingProjects(user.id)
 
                     expect(projects).not.to.be.undefined
 
-                    expect(projects.length).to.equal(4)
+                    expect(projects.length).to.equal(3)
 
-                    const _projects = await Project.find()
+                    const _projects = await Project.find({collaborators: user._id})
 
-                    expect(projects.length).to.not.equal(_projects.length)
+                    expect(_projects.length).to.equal(3)
 
-                    const [_project, _project2, _project3, _project4] = _projects
+                    expect(projects.length).to.equal(_projects.length)
 
-                    expect(_project.id).to.equal(project.id)
-                    expect(_project.name).to.equal(project.name)
-                    expect(_project.description).to.equal(project.description)
-                    expect(_project.beginnerFriendly).to.equal(project.beginnerFriendly)
-                    expect(_project.maxMembers).to.equal(project.maxMembers)
-                    expect(_project.owner.toString()).to.equal(project.owner.toString())
+                    const [_project1, _project2, _project3] = _projects
 
-                    expect(_project2.id).to.equal(project2.id)
-                    expect(_project2.name).to.equal(project2.name)
-                    expect(_project2.description).to.equal(project2.description)
-                    expect(_project2.beginnerFriendly).to.equal(project2.beginnerFriendly)
-                    expect(_project2.maxMembers).to.equal(project2.maxMembers)
-                    expect(_project2.owner.toString()).to.equal(project2.owner.toString())
-
-                    expect(_project3.id).to.equal(project3.id)
-                    expect(_project3.name).to.equal(project3.name)
-                    expect(_project3.description).to.equal(project3.description)
-                    expect(_project3.beginnerFriendly).to.equal(project3.beginnerFriendly)
-                    expect(_project3.maxMembers).to.equal(project3.maxMembers)
-
-                    expect(_project4.id).to.equal(project4.id)
-                    expect(_project4.name).to.equal(project4.name)
-                    expect(_project4.description).to.equal(project4.description)
-                    expect(_project4.beginnerFriendly).to.equal(project4.beginnerFriendly)
-                    expect(_project4.maxMembers).to.equal(project4.maxMembers)
-
-                    const [__project, __project2, __project3, __project4] = projects
-
-                    expect(__project).not.to.be.instanceof(Project)
-                    expect(__project2).not.to.be.instanceof(Project)
-
-                    expect(_project.id).to.equal(__project.id)
-                    expect(_project.name).to.equal(__project.name)
-                    expect(_project.description).to.equal(__project.description)
-                    expect(_project.beginnerFriendly).to.equal(__project.beginnerFriendly)
-                    expect(_project.maxMembers).to.equal(__project.maxMembers)
-
-                    expect(_project2.id).to.equal(__project2.id)
-                    expect(_project2.name).to.equal(__project2.name)
-                    expect(_project2.description).to.equal(__project2.description)
-                    expect(_project2.beginnerFriendly).to.equal(__project2.beginnerFriendly)
-                    expect(_project2.maxMembers).to.equal(__project2.maxMembers)
-
-                    expect(_project3.id).to.equal(__project3.id)
-                    expect(_project3.name).to.equal(__project3.name)
-                    expect(_project3.description).to.equal(__project3.description)
-                    expect(_project3.beginnerFriendly).to.equal(__project3.beginnerFriendly)
-                    expect(_project3.maxMembers).to.equal(__project3.maxMembers)
-
-                    expect(_project4.id).to.equal(__project4.id)
-                    expect(_project4.name).to.equal(__project4.name)
-                    expect(_project4.description).to.equal(__project4.description)
-                    expect(_project4.beginnerFriendly).to.equal(__project4.beginnerFriendly)
-                    expect(_project4.maxMembers).to.equal(__project4.maxMembers)
+                    expect(_project1.collaborators[0].toString()).to.equal(user.id)
+                    expect(_project2.collaborators[0].toString()).to.equal(user.id)
+                    expect(_project3.collaborators[0].toString()).to.equal(user.id)
 
 
                 })
 
-                // TODO other test cases
+            })
+
+            describe('query projects', () => {
+                let user, project, project2, project3, project4, project5
+                beforeEach(async() => {
+                    user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
+
+                    project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react', 'mongoose', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+
+                    project2 = new Project({ name: 'test2', description: 'testdescription2', skills: ['mongoose', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+
+                    project3 = new Project({ name: 'test3', description: 'testdescription3', skills: ['react', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+
+                    project4 = new Project({ name: 'test4', description: 'testdescription4', skills: ['mongoose', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+
+                    project5 = new Project({ name: 'test5', description: 'testdescription5', skills: ['react', 'mongoose', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+
+                    await user.save()
+                    await project.save()
+                    await project2.save()
+                    await project3.save()
+                    await project4.save()
+                    await project5.save()
+                })
+
+                it('should successfuly query for projects based on a skill', async() => {
+
+                    const query = 'r ea [ ]c +t '
+
+                    const projects = await logic.searchProjects(query)
+
+                    expect(projects.length).to.equal(3)
+
+                    const [_project1, _project2, _project3] = projects
+                })
+
+                it('should successfuly filter results based on skills', async() => {
+
+                    const arr = ['react', 'mongoose']
+
+                    const projects = await logic.filterProjects(arr)
+
+                    expect(projects.length).to.equal(2)
+
+                    const [_project1, _project2, _project3] = projects
+                })
             })
 
             describe('retrieve project info', () => {
