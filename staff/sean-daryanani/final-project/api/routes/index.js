@@ -295,10 +295,25 @@ router.put('/users/:id/projects/:meetingid/meetings', [bearerTokenParser, jwtVer
 
 })
 
+router.get('/users/:id/meetings', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+        const { params: { id }, sub } = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.userUpcomingMeetings(id)
+            .then(meetings => res.json({
+                data: meetings
+            })
+            )
+    }, res)
+
+})
+
 router.get('/users/:id/projects/query', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
         const { params: { id }, sub} = req
-        debugger
+
         if (id !== sub) throw Error('token sub does not match user id')
 
         return logic.filterProjects(req.body.array)

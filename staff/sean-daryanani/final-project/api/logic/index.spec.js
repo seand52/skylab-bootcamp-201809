@@ -746,6 +746,7 @@ describe('logic', () => {
                 project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
 
 
+
                 await user.save()
                 await project.save()
             })
@@ -874,10 +875,48 @@ describe('logic', () => {
                 })
 
             })
-
-
-
             // TODO other test cases
+        })
+
+        describe('list upcoming meetings for a user ', () => {
+            let user, user2, project, project2, meeting1, meeting2, meeting3
+
+            beforeEach(async () => {
+
+                user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '1232' })
+
+                user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
+
+                project = new Project({ name: 'test12', description: 'testdescription12', skills: ['react12', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+
+                project2 =  new Project({ name: 'test12', description: 'testdescription12', skills: ['react12', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id})
+
+                meeting1 = new Meeting({ project: project.id, date: Date.now(), location: 'barcelona', attending:[user2.id] })
+                meeting2 = new Meeting({ project: project.id, date: Date.now(), location: 'madrid', attending:[user.id] })
+                meeting3 = new Meeting({ project: project.id, date: Date.now(), location: 'bilbao', attending:[user2.id] })
+
+                await user.save()
+                await user2.save()
+                await project.save()
+                await project2.save()
+                await meeting1.save()
+                await meeting2.save()
+                await meeting3.save()
+            })
+
+            it('should succeed on correct data', async () => {
+
+                const meetings = await logic.userUpcomingMeetings(user2.id)
+
+                expect(meetings.length).to.equal(2)
+
+                const [_meeting1, _meeting2] = meetings
+
+                expect(_meeting1.location).to.equal('barcelona')
+                expect(_meeting2.location).to.equal('bilbao')
+
+            })
+
         })
 
     })

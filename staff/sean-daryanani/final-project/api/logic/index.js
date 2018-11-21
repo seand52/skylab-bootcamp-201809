@@ -437,12 +437,13 @@ const logic = {
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
 
         return (async () => {
+            const user = await User.findById(id)
 
             const project = await Project.findById(projectId)
 
             if (!project) throw new NotFoundError(`project with id ${projectId} not found`)
 
-            const meeting = new Meeting({ project: project.id, date, location })
+            const meeting = new Meeting({ project: project.id, date, location, attending: [user._id] })
 
             await meeting.save()
 
@@ -487,6 +488,7 @@ const logic = {
             const meetings = await Meeting.find({ project: projectId }).lean()
 
             meetings.forEach(meeting => {
+
                 meeting.id = meeting._id.toString()
 
                 delete meeting._id
@@ -495,8 +497,6 @@ const logic = {
             })
 
             return meetings
-
-
 
         })()
     },
@@ -518,6 +518,31 @@ const logic = {
             const user = await User.findById(id)
 
             await Meeting.updateOne({ _id: meetingId }, { $push: { attending: user.id } })
+
+
+        })()
+    },
+
+    userUpcomingMeetings(id) {
+
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+
+        return (async () => {
+
+            const user = await User.findById(id)
+
+            const meetings = await Meeting.find({attending : {$in: [user.id]}})
+
+            meetings.forEach(meeting => {
+                meeting.id = meeting._id.toString()
+
+                delete meeting._id
+
+                return meeting
+            })
+
+            return meetings
 
 
         })()
@@ -599,28 +624,29 @@ const logic = {
 
         })()
 
-    }
+    },
 
 
 
-    // insertPhoto(id, photo) {
-    //     if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
-    //     if (typeof photo !== 'string') throw TypeError(`${photo} is not a string`)
+    insertPhoto(id, photo) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (typeof photo !== 'string') throw TypeError(`${photo} is not a string`)
 
-    //     return (async () => {
+        return (async () => {
 
-    //         const imageCloudinary = await this._saveImage(photo)
-    //         debugger
-    //         const user = await User.findById(id)
+            const imageCloudinary = await this._saveImage(photo)
+            debugger
+            const user = await User.findById(id)
 
-    //         if (!user) throw new NotFoundError(`user with id ${id} not found`)
+            if (!user) throw new NotFoundError(`user with id ${id} not found`)
 
-    //         user.photos.push(imageCloudinary)
+            user.photos.push(imageCloudinary)
 
-    //         await user.save()
-    //     })()
+            await user.save()
+        })()
 
-    // }
+    },
+
 
 }
 
