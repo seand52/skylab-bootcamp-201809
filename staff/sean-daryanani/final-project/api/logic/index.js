@@ -532,7 +532,7 @@ const logic = {
 
             const user = await User.findById(id)
 
-            const meetings = await Meeting.find({attending : {$in: [user.id]}})
+            const meetings = await Meeting.find({ attending: { $in: [user.id] } })
 
             meetings.forEach(meeting => {
                 meeting.id = meeting._id.toString()
@@ -628,23 +628,57 @@ const logic = {
 
 
 
-    insertPhoto(id, photo) {
-        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
-        if (typeof photo !== 'string') throw TypeError(`${photo} is not a string`)
-
+    insertProfileImage(userId, file) {
+        validate([
+            { key: 'userId', value: userId, type: String },
+ 
+        ])
+ 
         return (async () => {
+            let user = await User.findById(userId)
+ 
+            if (!user) throw new NotFoundError(`user does not exist`) 
+ 
+            const result = await new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream((result, error) => {
+                    if (error) return reject(error)
+ 
+                    resolve(result)
+                })
+ 
+                file.pipe(stream)
+            })
+ 
+            await User.updateOne({ _id: userId }, {profileImage: result.url})
 
-            const imageCloudinary = await this._saveImage(photo)
-            debugger
-            const user = await User.findById(id)
-
-            if (!user) throw new NotFoundError(`user with id ${id} not found`)
-
-            user.photos.push(imageCloudinary)
-
-            await user.save()
         })()
+    },
 
+    insertProjectImage(projectId, file) {
+        validate([
+            { key: 'projectId', value: projectId, type: String },
+ 
+        ])
+ 
+        return (async () => {
+            let project = await Project.findById(projectId)
+ 
+            if (!project) throw new NotFoundError(`project does not exist`) 
+ 
+            const result = await new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream((result, error) => {
+                    if (error) return reject(error)
+ 
+                    resolve(result)
+                })
+ 
+                file.pipe(stream)
+            })
+ 
+            await Project.updateOne({ _id: projectId }, {projectImage: result.url})
+            const projects = await Project.find()
+            debugger
+        })()
     },
 
 

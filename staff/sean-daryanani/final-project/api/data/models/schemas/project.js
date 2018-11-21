@@ -56,7 +56,13 @@ const Project = new Schema({
     pendingCollaborators: [{
         type: ObjectId,
         ref: 'User'
-    }]
+    }],
+
+
+    projectImage: {
+        type: 'string',
+        default: 'https://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg'
+    }
 })
 
 module.exports = Project

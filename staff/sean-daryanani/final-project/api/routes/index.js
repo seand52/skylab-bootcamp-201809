@@ -325,4 +325,19 @@ router.get('/users/:id/projects/query', [bearerTokenParser, jwtVerifier, jsonBod
 
 })
 
+// router.post('/users/:id/photo', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+//     routeHandler(() => {
+
+//         const { sub, params: { id, projectid }, body: { file } } = req
+
+//         if (id !== sub) throw Error('token sub does not match user id')
+
+//         return logic.addMeeting(id, projectid, date, location)
+//             .then(() => res.json({
+//                 message: 'meeting has been added'
+//             }))
+
+//     }, res)
+// })
+
 module.exports = router

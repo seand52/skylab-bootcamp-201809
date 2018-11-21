@@ -1,5 +1,6 @@
 const { mongoose, models: { User, Project, Meeting } } = require('data')
 const logic = require('.')
+const fs = require('fs')
 const { AlreadyExistsError, ValueError } = require('../errors')
 const { expect } = require('chai')
 const MONGO_URL = 'mongodb://localhost:27017/socialdev-test'
@@ -458,7 +459,7 @@ describe('logic', () => {
 
                     await project2.save()
                     await project3.save()
-                    const {name, description, skills, beginnerFriendly, maxMembers, owner} = project
+                    const { name, description, skills, beginnerFriendly, maxMembers, owner } = project
 
                     await logic.saveProject(user.id, project.id)
                     await logic.saveProject(user.id, project3.id)
@@ -540,13 +541,13 @@ describe('logic', () => {
                 })
 
                 it('should succeed on listing all projects where user a collaborator', async () => {
-                    const user2= new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '123' })
+                    const user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '123' })
 
-                    let project3 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id, collaborators:[user.id] })
+                    let project3 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id, collaborators: [user.id] })
 
-                    let project4 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id, collaborators:[user.id] })
+                    let project4 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id, collaborators: [user.id] })
 
-                    let project5 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id, collaborators:[user.id] })
+                    let project5 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id, collaborators: [user.id] })
 
                     await user2.save()
                     await project3.save()
@@ -559,7 +560,7 @@ describe('logic', () => {
 
                     expect(projects.length).to.equal(3)
 
-                    const _projects = await Project.find({collaborators: user._id})
+                    const _projects = await Project.find({ collaborators: user._id })
 
                     expect(_projects.length).to.equal(3)
 
@@ -578,7 +579,7 @@ describe('logic', () => {
 
             describe('query projects', () => {
                 let user, project, project2, project3, project4, project5
-                beforeEach(async() => {
+                beforeEach(async () => {
                     user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
 
                     project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react', 'mongoose', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
@@ -599,7 +600,7 @@ describe('logic', () => {
                     await project5.save()
                 })
 
-                it('should successfuly query for projects based on a skill', async() => {
+                it('should successfuly query for projects based on a skill', async () => {
 
                     const query = 'r ea [ ]c +t '
 
@@ -610,7 +611,7 @@ describe('logic', () => {
                     const [_project1, _project2, _project3] = projects
                 })
 
-                it('should successfuly filter results based on skills', async() => {
+                it('should successfuly filter results based on skills', async () => {
 
                     const arr = ['react', 'mongoose']
 
@@ -849,7 +850,7 @@ describe('logic', () => {
 
                     user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
 
-                    project2 =  new Project({ name: 'test12', description: 'testdescription12', skills: ['react12', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, collaborators:[user2.id] })
+                    project2 = new Project({ name: 'test12', description: 'testdescription12', skills: ['react12', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, collaborators: [user2.id] })
 
                     meeting1 = new Meeting({ project: project.id, date: Date.now(), location: 'barcelona' })
 
@@ -889,11 +890,11 @@ describe('logic', () => {
 
                 project = new Project({ name: 'test12', description: 'testdescription12', skills: ['react12', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
 
-                project2 =  new Project({ name: 'test12', description: 'testdescription12', skills: ['react12', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id})
+                project2 = new Project({ name: 'test12', description: 'testdescription12', skills: ['react12', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id })
 
-                meeting1 = new Meeting({ project: project.id, date: Date.now(), location: 'barcelona', attending:[user2.id] })
-                meeting2 = new Meeting({ project: project.id, date: Date.now(), location: 'madrid', attending:[user.id] })
-                meeting3 = new Meeting({ project: project.id, date: Date.now(), location: 'bilbao', attending:[user2.id] })
+                meeting1 = new Meeting({ project: project.id, date: Date.now(), location: 'barcelona', attending: [user2.id] })
+                meeting2 = new Meeting({ project: project.id, date: Date.now(), location: 'madrid', attending: [user.id] })
+                meeting3 = new Meeting({ project: project.id, date: Date.now(), location: 'bilbao', attending: [user2.id] })
 
                 await user.save()
                 await user2.save()
@@ -918,7 +919,48 @@ describe('logic', () => {
             })
 
         })
+        describe('photo ', () => {
+            let user, user2, project, project2, meeting1, meeting2, meeting3
 
+            beforeEach(async () => {
+
+                user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '1232' })
+
+                await user.save()
+            })
+
+            it('should succeed on correct data', async () => {
+                let image = './data/images/download.png'
+
+                var file = fs.createReadStream(image)
+
+       
+                await logic.insertProfileImage(user.id, file )
+
+                const _user = await User.findById(user.id)
+
+                expect(_user.insertProfileImage).not.to.equal('https://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg')
+
+            })
+
+            it('should succeed on correct data', async () => {
+                const project = new Project({ name: 'test12', description: 'testdescription12', skills: ['react12', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+
+                await project.save()
+                let image = './data/images/download.png'
+
+                var file = fs.createReadStream(image)
+
+       
+                await logic.insertProjectImage(project.id, file )
+
+                const _user = await User.findById(user.id)
+
+                // expect(_user.insertProfileImage).not.to.equal('https://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg')
+
+            })
+
+        })
     })
 
     afterEach(() => Promise.all([User.deleteMany(), Project.deleteMany(), Meeting.deleteMany()]))
