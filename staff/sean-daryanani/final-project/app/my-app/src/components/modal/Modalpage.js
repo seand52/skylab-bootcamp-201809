@@ -18,9 +18,9 @@ const skills = [
 class Modalpage extends Component {
     state = {
         modal: false,
-        city: this.props.user.city,
-        githubProfile: '',
-        bio: '',
+        city: this.props.user ? this.props.user.city : '',
+        githubProfile: this.props.user ? this.props.user.githubProfile : '',
+        bio: this.props.user ? this.props.user.bio : '',
         skills: []
     }
 
@@ -36,7 +36,7 @@ class Modalpage extends Component {
         event.preventDefault()
 
         const { city, githubProfile, bio } = this.props.user
-        
+
         this.setState({ city, githubProfile, bio }, () => {
 
             const skillsArray = []
@@ -50,6 +50,14 @@ class Modalpage extends Component {
 
         })
 
+    }
+
+    componentWillReceiveProps(props) {
+        if (props.user) {
+            const { city, githubProfile, bio } = props.user
+
+            this.setState({ city, githubProfile, bio })
+        }
     }
 
 
@@ -72,24 +80,24 @@ class Modalpage extends Component {
         this.setState({ bio })
     }
 
-    componentDidUpdate() {
-        console.log('did mount')
-        const {city, github, bio} = this.props.user
-        this.setState({city, github, bio})
-    }
+    // componentDidUpdate() {
+    //     console.log('did mount')
+    //     const {city, github, bio} = this.props.user
+    //     this.setState({city, github, bio})
+    // }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        const {city, github, bio} = this.props.user
-        this.setState({city, github, bio})
-        return true
-    }
+    // shouldComponentUpdate(nextProps, nextState) {
+    //     const {city, github, bio} = this.props.user
+    //     this.setState({city, github, bio})
+    //     return true
+    // }
 
-    componentDidMount() {
-        console.log('did mount')
-        const {city, github, bio} = this.props.user
-        debugger    
-        this.setState({city, github, bio})
-    }
+    // componentDidMount() {
+    //     console.log('did mount')
+    //     // const {city, github, bio} = this.props.user
+    //     // debugger    
+    //     // this.setState({city, github, bio})
+    // }
 
     componentWillMount = () => {
         console.log('will mount')
@@ -111,7 +119,8 @@ class Modalpage extends Component {
     }
 
     render() {
-        const { city, githubProfile, bio } = this.props.user
+        const { state: { city, githubProfile, bio } } = this
+
         return (
             <Container>
                 <Button onClick={this.toggle}>Modal</Button>

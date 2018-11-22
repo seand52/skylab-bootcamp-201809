@@ -11,13 +11,12 @@ import Modalpage from '../modal/Modalpage'
 class Profile extends Component {
 
     state = {
-        user: false,
+        user: null,
         ownProjects: false,
         collabProjects: false
     }
 
     componentDidMount() {
-        console.log('hi')
         Promise.all([logic.retrieveUserProfile(), logic.listCollaboratingProjects(), logic.listOwnProjects()])
             .then(res => {
                 this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2] })
