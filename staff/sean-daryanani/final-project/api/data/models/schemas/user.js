@@ -43,10 +43,12 @@ const User = new Schema({
         type: String
     }],
 
-    savedProjects: [{
-        type: ObjectId,
-        ref: 'Project'
-    }],
+    savedProjects: [
+        {
+            type: ObjectId,
+            ref: 'Project'
+        }
+    ],
 
     city: {
         type: 'String',
@@ -57,7 +59,7 @@ const User = new Schema({
         type: 'string',
         default: 'https://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg'
     }
-    
+
 })
 
 module.exports = User

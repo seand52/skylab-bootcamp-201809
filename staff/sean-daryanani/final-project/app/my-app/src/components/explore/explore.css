@@ -1,0 +1,24 @@
+.explore-container {
+  display: flex;
+}
+
+.filters {
+  flex: 0.3;
+  background-color: #eecccc;
+  height: 100vh;
+}
+
+.search-area {
+  flex: 0.7;
+  background-color: #c8c8ee;
+  height: 100vh;
+}
+
+.filter-skills {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+/*# sourceMappingURL=explore.css.map */

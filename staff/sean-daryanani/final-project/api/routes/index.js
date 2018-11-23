@@ -310,13 +310,29 @@ router.get('/users/:id/meetings', [bearerTokenParser, jwtVerifier, jsonBodyParse
 
 })
 
-router.get('/users/:id/projects/query', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+router.get('/users/:id/projects/search/:query', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+
     routeHandler(() => {
-        const { params: { id }, sub} = req
+        const { params: { id, query }, sub } = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+        return logic.searchProjects(query)
+            .then(projects => res.json({
+                data: projects
+            })
+            )
+    }, res)
+
+})
+
+router.get('/users/:id/projects/filter/:query', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+
+        const { params: { id, query }, sub } = req
 
         if (id !== sub) throw Error('token sub does not match user id')
 
-        return logic.filterProjects(req.body.array)
+        return logic.filterProjects(query)
             .then(projects => res.json({
                 data: projects
             })

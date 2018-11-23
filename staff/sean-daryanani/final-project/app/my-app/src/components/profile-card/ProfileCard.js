@@ -1,9 +1,8 @@
-import React, { Component } from 'react'
+import React from 'react'
 import './profile-card.css'
-import logic from '../../logic'
 
 const ProfileCard = props => {
-    const { user } = props
+    const { user, myProjects, collabProjects } = props
 
     if (user) {
         const { name, joinDate, city, githubProfile, skills, profileImage } = user
@@ -15,18 +14,18 @@ const ProfileCard = props => {
                         <p>Name: {name}</p>
                         <p>Joined: {joinDate}</p>
                         <p>Location: {city}</p>
-                        <span>Github:</span> <a href="#">{githubProfile}</a>
+                        <span>Github:</span> <a href="https://github.com">{githubProfile}</a>
                     </div>
                     <div className='profile-img-container'>
-                        <img src={profileImage} width='150' />
+                        <img src={profileImage} width='150' alt='project' />
                     </div>
                 </div>
                 <div className='bottom-area'>
                     <button type="button" className="btn btn-primary">
-                        Projects started <span className="badge badge-light">{props.myProjects.length ? 'number' : 0}</span>
+                        Projects started <span className="badge badge-light">{myProjects? myProjects.length : 0}</span>
                     </button>
                     <button type="button" className="btn btn-primary">
-                        Collaborations <span className="badge badge-light">{props.myProjects.length ? 'number' : 0}</span>
+                        Collaborations <span className="badge badge-light">{collabProjects? collabProjects.length : 0}</span>
                     </button>
                     <button type="button" className="btn btn-primary">
                         Interests <span className="badge badge-light">{skills && skills.length}</span>

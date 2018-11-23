@@ -83,42 +83,11 @@ const logic = {
             .then(res => {
                 if (res.error) throw Error(res.error)
                 res.data.joinDate = new Date(res.data.joinDate)
-                res.data.joinDate = res.data.joinDate.getDate()+'-' + (res.data.joinDate.getMonth()+1) + '-'+res.data.joinDate.getFullYear()
+                res.data.joinDate = res.data.joinDate.getDate() + '-' + (res.data.joinDate.getMonth() + 1) + '-' + res.data.joinDate.getFullYear()
                 return res.data
             })
     },
 
-    listOwnProjects() {
-
-        return fetch(`${this.url}/users/projects/${this._userId}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${this._token}`
-            }
-        })
-            .then(res => res.json())
-            .then(res => {
-                if (res.error) throw Error(res.error)
-                
-                return res.data
-            })
-    },
-
-    listCollaboratingProjects() {
-
-        return fetch(`${this.url}/users/${this._userId}/collaborating`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${this._token}`
-            }
-        })
-            .then(res => res.json())
-            .then(res => {
-                if (res.error) throw Error(res.error)
-                
-                return res.data
-            })
-    },
 
     updateProfile(city, githubProfile, bio, skills) {
         if (typeof city !== 'string') throw TypeError(`${city} is not a string`)
@@ -129,7 +98,7 @@ const logic = {
         if (!city.trim()) throw Error('city is empty or blank')
         if (!githubProfile.trim()) throw Error('githubProfile is empty or blank')
         if (!bio.trim()) throw Error('bio is empty or blank')
-        
+
 
         return fetch(`${this.url}/user-profile/${this._userId}`, {
             method: 'PATCH',
@@ -147,6 +116,120 @@ const logic = {
                 console.log('ok')
             })
     },
+
+
+    listOwnProjects() {
+
+        return fetch(`${this.url}/users/projects/${this._userId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+
+                return res.data
+            })
+    },
+
+    listCollaboratingProjects() {
+
+        return fetch(`${this.url}/users/${this._userId}/collaborating`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+
+                return res.data
+            })
+    },
+
+    listSavedProjects() {
+        return fetch(`${this.url}/users/${this._userId}/projects/save`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+
+                return res.data
+            })
+    },
+
+    addNewProject(name, description, skills, beginnerFriendly, maxMembers) {
+
+        return fetch(`${this.url}/users/${this._userId}/projects`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+
+            },
+            body: JSON.stringify({ name, description, skills, beginnerFriendly, maxMembers })
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+            })
+    },
+
+    searchProjects(query) {
+
+        return fetch(`${this.url}/users/${this._userId}/projects/search/${query}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+
+                return res.data
+            })
+    },
+
+    filterProjects(query) {
+
+        return fetch(`${this.url}/users/${this._userId}/projects/filter/${query}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+
+                return res.data
+            })
+
+    },
+
+    retrieveProjectInfo(projectid) {
+        
+        return fetch(`${this.url}/users/${this._userId}/project/${projectid}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+
+                return res.data
+            })
+    }
 }
 
 // export default logic

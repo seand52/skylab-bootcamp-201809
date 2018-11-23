@@ -1,0 +1,20 @@
+.newproject-container {
+    display: flex;
+}
+
+.home-collaborations-display, .home-myprojects-display, .home-savedprojects-display  {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+}
+
+.create-project-form {
+    width: 40%;
+    margin: 30px auto;
+}
+
+.rules {
+
+}

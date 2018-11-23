@@ -30,16 +30,12 @@ class Profile extends Component {
             .then(res => {
                 this.setState({ user: res })
             })
-
-
-
-
     }
 
 
     render() {
 
-        console.log('render')
+
         const { user, ownProjects, collabProjects } = this.state
 
 
@@ -52,8 +48,8 @@ class Profile extends Component {
             <Modalpage user={user} updateProfile={this.sendProfileUpdate} />
 
             <section className="main-area">
-
-                <ProjectCard myProjects={ownProjects} />
+                {ownProjects && ownProjects.map((project, index) => <ProjectCard key={index} project={project} /> )}
+                
 
                 <div className="right-section">
 

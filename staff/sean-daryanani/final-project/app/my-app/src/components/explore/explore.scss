@@ -1,0 +1,31 @@
+.explore-container {
+    display: flex;
+
+
+
+}
+
+.filters {
+    flex: 0.3;
+    background-color: rgb(238, 204, 204);
+
+}
+
+.search-area {
+    flex: 0.7;
+    background-color: rgb(200, 200, 238);
+
+}
+
+.filter-skills {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+
+.search-results {
+    display: flex;
+    
+}

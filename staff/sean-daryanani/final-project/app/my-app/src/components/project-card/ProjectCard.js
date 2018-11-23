@@ -1,30 +1,38 @@
 import React from 'react'
-import { Button, Card, CardBody, CardImage, CardTitle, CardText, Col } from 'mdbreact';
+import { Button, Card, CardBody, CardImage, CardTitle, CardText, Col, Badge } from 'mdbreact';
+import {withRouter, Link} from 'react-router-dom'
+
 
 const ProjectCard = props => {
+    const { project } = props
 
-    return (
+    if (project) {
+        return (
 
-        <Col>
-            <Card style={{ width: "16rem" }}>
-                <CardImage
-                    className="img-fluid"
-                    src="https://mdbootstrap.com/img/Photos/Others/images/43.jpg"
-                    waves
-                />
-                <CardBody>
-                    <CardTitle>Card title</CardTitle>
-                    <CardText>
-                        Some quick example text to build on the card title and make
-                        up the bulk of the card&apos;s content.
-            </CardText>
-                    <Button type="button" >Button</Button>
-                </CardBody>
-            </Card>
-        </Col>
+            <Col>
+                <Card style={{ width: "16rem" }}>
+                    <CardImage
+                        className="img-fluid"
+                        src={project.projectImage}
+                        waves
+                    />
+                    <CardBody>
+                        <CardTitle>{project.name}</CardTitle>
+                        <CardText>
+                        {project.description}
+                        </CardText>
+                        {project.skills.map((skill, index) => <Badge color="light-blue" key={index} pill>{skill}</Badge>)}
 
-    )
+                        <Link to={`/project/${project.id}`}><Button type="button" >View Project</Button></Link>
+
+                    </CardBody>
+                </Card>
+            </Col>
+        )
+    } else return null
+
+
 
 }
 
-export default ProjectCard
+export default withRouter(ProjectCard)

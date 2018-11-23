@@ -2,7 +2,7 @@ const { AlreadyExistsError, AuthError, NotFoundError, ValueError } = require('..
 
 function routeHandler(callback, res) {
     try {
-        debugger
+
         callback()
             .catch(err => {
                 const { message } = err
@@ -23,7 +23,7 @@ function routeHandler(callback, res) {
             })
     } catch (err) {
         const { error: message } = err
-        debugger
+
         if (err instanceof TypeError || err instanceof ValueError) {
             res.status(400)
         } else {

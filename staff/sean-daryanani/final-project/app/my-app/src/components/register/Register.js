@@ -55,7 +55,7 @@ class Register extends Component {
                     <input className="form__input" placeholder="email" type="text" onChange={this.handleEmailChange} />
                     <input className="form__input" placeholder="username" type="text" onChange={this.handleUsernameChange} />
                     <input className="form__input" placeholder="password" type="password" onChange={this.handlePasswordChange} />
-                    <Button type="submit">Log in</Button>
+                    <Button type="submit">Register</Button>
                 </form>
                 <p className="go-back">Already have an account? <button onClick={this.props.onSkipToLogin} className="go-back__button" type="button">Log in</button></p>
             </section>

@@ -282,7 +282,7 @@ const logic = {
         return (async () => {
             const user = await User.findById(id).lean()
 
-            let projects = await Project.find({ collaborators: user._id })
+            let projects = await Project.find({ collaborators: user._id }).lean()
 
             projects.forEach(project => {
                 project.id = project._id.toString()
@@ -331,10 +331,26 @@ const logic = {
         if (!id.trim()) throw new ValueError('id is empty or blank')
 
         return (async () => {
+            debugger
+            const user = await User.findById(id).populate('savedProjects').lean().exec()
 
-            const user = await User.findById(id).populate('savedProjects').exec()
+            const savedProjects = user.savedProjects
 
-            return user.savedProjects
+            savedProjects.forEach( project => {
+
+                project.id = project._id.toString()
+
+                delete project._id
+
+                delete project.__v
+
+                project.owner = project.owner.toString()
+
+                return project
+            })
+
+            return savedProjects
+
 
         })()
     },
@@ -562,7 +578,7 @@ const logic = {
             if (query) {
                 let newQuery = query.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "")
 
-                const projects = await Project.find({ skills: { $in: [newQuery] } })
+                const projects = await Project.find({ name: { $regex: newQuery } })
 
                 projects.forEach(project => {
                     project.id = project._id.toString()
@@ -585,7 +601,9 @@ const logic = {
      * @param {array} array 
      * @returns {Promise <Object>}
      */
-    filterProjects(array) {
+    filterProjects(query) {
+
+        const array = query.split('+')
 
         if (!(array instanceof Array)) throw TypeError(`${id} is not a string`)
 
@@ -597,7 +615,7 @@ const logic = {
                     project.id = project._id.toString()
 
                     delete project._id
-
+                    //DELETE _V
                     project.owner = project.owner.toString()
 
                     return project
@@ -609,6 +627,7 @@ const logic = {
                 const projects = await Project.find()
 
                 projects.forEach(project => {
+
                     project.id = project._id.toString()
 
                     delete project._id
@@ -632,25 +651,25 @@ const logic = {
     insertProfileImage(userId, file) {
         validate([
             { key: 'userId', value: userId, type: String },
- 
+
         ])
- 
+
         return (async () => {
             let user = await User.findById(userId)
- 
-            if (!user) throw new NotFoundError(`user does not exist`) 
- 
+
+            if (!user) throw new NotFoundError(`user does not exist`)
+
             const result = await new Promise((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream((result, error) => {
                     if (error) return reject(error)
- 
+
                     resolve(result)
                 })
- 
+
                 file.pipe(stream)
             })
- 
-            await User.updateOne({ _id: userId }, {profileImage: result.url})
+
+            await User.updateOne({ _id: userId }, { profileImage: result.url })
 
         })()
     },
@@ -658,25 +677,25 @@ const logic = {
     insertProjectImage(projectId, file) {
         validate([
             { key: 'projectId', value: projectId, type: String },
- 
+
         ])
- 
+
         return (async () => {
             let project = await Project.findById(projectId)
- 
-            if (!project) throw new NotFoundError(`project does not exist`) 
- 
+
+            if (!project) throw new NotFoundError(`project does not exist`)
+
             const result = await new Promise((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream((result, error) => {
                     if (error) return reject(error)
- 
+
                     resolve(result)
                 })
- 
+
                 file.pipe(stream)
             })
- 
-            await Project.updateOne({ _id: projectId }, {projectImage: result.url})
+
+            await Project.updateOne({ _id: projectId }, { projectImage: result.url })
             const projects = await Project.find()
             debugger
         })()

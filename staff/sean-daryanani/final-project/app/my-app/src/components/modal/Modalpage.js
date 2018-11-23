@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Container, Button, Modal, ModalBody, ModalHeader, ModalFooter, Input } from 'mdbreact'
+import { Container, Button, Modal, ModalBody, ModalHeader, ModalFooter } from 'mdbreact'
 import './modalpage.css'
 import Checkbox from '../checkbox/Checkbox'
 
@@ -27,28 +27,25 @@ class Modalpage extends Component {
 
     toggle = () => {
         this.setState({
+
             modal: !this.state.modal
+
         });
     }
-    //arreglar esta basura
+
     handleSubmit = event => {
 
         event.preventDefault()
 
-        const { city, githubProfile, bio } = this.props.user
+        let skillsArray = []
 
-        this.setState({ city, githubProfile, bio }, () => {
+        for (const checkbox of this.selectedCheckboxes) {
 
-            const skillsArray = []
+            skillsArray.push(checkbox)
+        }
 
-            for (const checkbox of this.selectedCheckboxes) {
+        this.props.updateProfile(this.state.city, this.state.githubProfile, this.state.bio, skillsArray)
 
-                skillsArray.push(checkbox)
-
-            }
-            this.props.updateProfile(this.state.city, this.state.githubProfile, this.state.bio, skillsArray)
-
-        })
 
     }
 
@@ -69,9 +66,9 @@ class Modalpage extends Component {
     }
 
     onGithubChange = event => {
-        const github = event.target.value
+        const githubProfile = event.target.value
 
-        this.setState({ github })
+        this.setState({ githubProfile })
     }
 
     onBioChange = event => {
@@ -80,29 +77,9 @@ class Modalpage extends Component {
         this.setState({ bio })
     }
 
-    // componentDidUpdate() {
-    //     console.log('did mount')
-    //     const {city, github, bio} = this.props.user
-    //     this.setState({city, github, bio})
-    // }
-
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     const {city, github, bio} = this.props.user
-    //     this.setState({city, github, bio})
-    //     return true
-    // }
-
-    // componentDidMount() {
-    //     console.log('did mount')
-    //     // const {city, github, bio} = this.props.user
-    //     // debugger    
-    //     // this.setState({city, github, bio})
-    // }
-
     componentWillMount = () => {
-        console.log('will mount')
+
         this.selectedCheckboxes = new Set();
-        // this.selectedCheckboxes.add('javascript')
 
     }
 
