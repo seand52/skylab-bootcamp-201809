@@ -4,6 +4,20 @@ const logic = {
 
     url: 'NO-URL',
 
+    _changeDate(isoDate, type) {
+
+        let cleanDate = new Date(isoDate)
+        if (type === 'meeting') {
+
+            return `${cleanDate.getDate()}-${cleanDate.getMonth()}-${cleanDate.getFullYear()} at ${cleanDate.getHours()}:${cleanDate.getMinutes()}:${cleanDate.getSeconds()}`
+
+        } else {
+
+            return `${cleanDate.getDate()}-${cleanDate.getMonth()}-${cleanDate.getFullYear()}`
+        }
+
+    },
+
     registerUser(name, email, username, password) {
         if (typeof name !== 'string') throw TypeError(`${name} is not a string`)
         if (typeof email !== 'string') throw TypeError(`${email} is not a string`)
@@ -82,8 +96,9 @@ const logic = {
             .then(res => res.json())
             .then(res => {
                 if (res.error) throw Error(res.error)
-                res.data.joinDate = new Date(res.data.joinDate)
-                res.data.joinDate = res.data.joinDate.getDate() + '-' + (res.data.joinDate.getMonth() + 1) + '-' + res.data.joinDate.getFullYear()
+
+                res.data.joinDate = logic._changeDate(res.data.joinDate, 'profile')
+
                 return res.data
             })
     },
@@ -112,8 +127,6 @@ const logic = {
             .then(res => res.json())
             .then(res => {
                 if (res.error) throw Error(res.error)
-
-                console.log('ok')
             })
     },
 
@@ -166,6 +179,18 @@ const logic = {
     },
 
     addNewProject(name, description, skills, beginnerFriendly, maxMembers) {
+        if (typeof name !== 'string') throw TypeError(`${name} is not a string`)
+        if (typeof description !== 'string') throw TypeError(`${description} is not a string`)
+        if (typeof skills !== 'string') throw TypeError(`${skills} is not a string`)
+        if (typeof beginnerFriendly !== 'string') throw TypeError(`${beginnerFriendly} is not a string`)
+        if (typeof maxMembers !== 'string') throw TypeError(`${maxMembers} is not a string`)
+
+        if (!name.trim()) throw Error('name is empty or blank')
+        if (!description.trim()) throw Error('description is empty or blank')
+        if (!skills.trim()) throw Error('skills is empty or blank')
+        if (!beginnerFriendly.trim()) throw Error('beginnerFriendly is empty or blank')
+        if (!maxMembers.trim()) throw Error('maxMembers is empty or blank')
+
 
         return fetch(`${this.url}/users/${this._userId}/projects`, {
             method: 'POST',
@@ -183,7 +208,8 @@ const logic = {
     },
 
     searchProjects(query) {
-
+        if (typeof query !== 'string') throw TypeError(`${query} is not a string`)
+        if (!query.trim()) throw Error('query is empty or blank')
         return fetch(`${this.url}/users/${this._userId}/projects/search/${query}`, {
             method: 'GET',
             headers: {
@@ -199,7 +225,8 @@ const logic = {
     },
 
     filterProjects(query) {
-
+        if (typeof query !== 'string') throw TypeError(`${query} is not a string`)
+        if (!query.trim()) throw Error('query is empty or blank')
         return fetch(`${this.url}/users/${this._userId}/projects/filter/${query}`, {
             method: 'GET',
             headers: {
@@ -216,7 +243,9 @@ const logic = {
     },
 
     retrieveProjectInfo(projectid) {
-        
+
+        if (typeof projectid !== 'string') throw TypeError(`${projectid} is not a string`)
+        if (!projectid.trim()) throw Error('projectid is empty or blank')
         return fetch(`${this.url}/users/${this._userId}/project/${projectid}`, {
             method: 'GET',
             headers: {
@@ -229,7 +258,132 @@ const logic = {
 
                 return res.data
             })
+    },
+
+    listProjectMeetings(projectid) {
+        if (typeof projectid !== 'string') throw TypeError(`${projectid} is not a string`)
+        if (!projectid.trim()) throw Error('projectid is empty or blank')
+        return fetch(`${this.url}/users/${this._userId}/projects/${projectid}/meetings`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+
+                res.data.forEach(item => item.date = logic._changeDate(item.date, 'meeting'))
+
+                return res.data
+            })
+    },
+
+    attendMeetings(meetingId) {
+        if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
+        if (!meetingId.trim()) throw Error('meetingId is empty or blank')
+        return fetch(`${this.url}/users/${this._userId}/projects/${meetingId}/meetings`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+
+            },
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+            })
+    },
+
+    handleCollaboration(projectid, decision, collaboratorId) {
+        if (typeof decision !== 'string') throw TypeError(`${decision} is not a string`)
+        if (!decision.trim()) throw Error('decision is empty or blank')
+
+        return fetch(`${this.url}/users/${this._userId}/projects/${projectid}/collaborator`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+
+            },
+            body: JSON.stringify({ decision, collaboratorId })
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+            })
+    },
+
+    deleteMeeting(meetingId) {
+
+        return fetch(`${this.url}/users/${this._userId}/projects/meetings/${meetingId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+
+            },
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+            })
+    },
+
+    attendMeeting(meetingId) {
+        if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
+        if (!meetingId.trim()) throw Error('meetingId is empty or blank')
+        return fetch(`${this.url}/users/${this._userId}/projects/meetings/${meetingId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+
+            },
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+            })
+    },
+
+    retrieveMeetingInfo(meetingId) {
+        if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
+        if (!meetingId.trim()) throw Error('meetingId is empty or blank')
+        return fetch(`${this.url}/users/${this._userId}/meeting/${meetingId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+
+                return res.data
+            })
+
+    },
+
+    unAttendMeeting(meetingId) {
+        if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
+        if (!meetingId.trim()) throw Error('meetingId is empty or blank')
+        return fetch(`${this.url}/users/${this._userId}/projects/meetings/${meetingId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+
+            },
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+            })
     }
+
+
 }
 
 // export default logic

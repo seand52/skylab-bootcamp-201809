@@ -45,7 +45,7 @@ class Profile extends Component {
 
             <ProfileCard user={user} myProjects={ownProjects} collabProjects={collabProjects} />
 
-            <Modalpage user={user} updateProfile={this.sendProfileUpdate} />
+            <Modalpage user={user} updateProfile={this.sendProfileUpdate} render={'profile update'} />
 
             <section className="main-area">
                 {ownProjects && ownProjects.map((project, index) => <ProjectCard key={index} project={project} /> )}

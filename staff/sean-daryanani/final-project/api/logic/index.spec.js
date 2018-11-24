@@ -614,7 +614,7 @@ describe('logic', () => {
                 it('should successfuly filter results based on skills', async () => {
 
                     const arr = ['react', 'mongoose']
-                    debugger
+
                     const projects = await logic.filterProjects(arr)
 
                     expect(projects.length).to.equal(2)
@@ -640,13 +640,14 @@ describe('logic', () => {
                     const { name, description, skills, beginnerFriendly, maxMembers, owner } = project
 
                     const _project = await logic.retrieveProjectInfo(project.id)
+
                     expect(_project.name).to.equal(name)
                     expect(_project.description).to.equal(description)
                     expect(JSON.stringify(_project.skills)).to.equal(JSON.stringify(skills))
                     expect(_project.beginnerFriendly).to.equal(beginnerFriendly)
                     expect(_project.maxMembers).to.equal(maxMembers)
                     expect(_project.currentMembers).to.equal(1)
-                    expect(_project.owner.toString()).to.equal(owner.toString())
+
                 })
             })
 
@@ -804,7 +805,7 @@ describe('logic', () => {
 
                     project2 = new Project({ name: 'test12', description: 'testdescription12', skills: ['react12', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
 
-                    meeting1 = new Meeting({ project: project.id, date: Date.now(), location: 'barcelona' })
+                    meeting1 = new Meeting({ project: project.id, attending: [user.id], date: Date.now(), location: 'barcelona' })
 
                     meeting2 = new Meeting({ project: project.id, date: Date.now(), location: 'madrid' })
 
@@ -841,6 +842,21 @@ describe('logic', () => {
 
                 })
 
+                it('should retrieve information on a specific meeting', async () => {
+
+                    const meeting = await logic.retrieveMeetingInfo(meeting1.id)
+
+
+                    expect(meeting.project.toString()).to.equal(project.id)
+
+
+                    expect(meeting.location).to.equal('barcelona')
+
+                    expect(typeof meeting.attending[0].id).to.equal('string')
+
+
+                })
+
             })
 
             describe('attend meeting ', () => {
@@ -871,6 +887,40 @@ describe('logic', () => {
                     expect(meeting.attending.length).to.equal(1)
 
                     expect(meeting.attending[0].toString()).to.equal(user2.id)
+
+
+                })
+
+            })
+
+            describe('unattend meeting ', () => {
+                let user2, meeting1, meeting2
+
+                beforeEach(async () => {
+
+                    user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
+
+                    project2 = new Project({ name: 'test12', description: 'testdescription12', skills: ['react12', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, collaborators: [user2.id] })
+
+                    meeting1 = new Meeting({ project: project.id, date: Date.now(), location: 'barcelona', attending:[user2.id] })
+
+                    meeting2 = new Meeting({ project: project.id, date: Date.now(), location: 'madrid' })
+
+                    await user2.save()
+                    await project2.save()
+                    await meeting1.save()
+                    await meeting2.save()
+                })
+
+                it('should succeed on correct data', async () => {
+                    debugger
+                    await logic.unAttendMeeting(user2.id, meeting1.id)
+
+                    const meeting = await Meeting.findById(meeting1.id)
+
+                    expect(meeting.attending.length).to.equal(0)
+
+
 
 
                 })
@@ -934,8 +984,8 @@ describe('logic', () => {
 
                 var file = fs.createReadStream(image)
 
-       
-                await logic.insertProfileImage(user.id, file )
+
+                await logic.insertProfileImage(user.id, file)
 
                 const _user = await User.findById(user.id)
 
@@ -951,8 +1001,8 @@ describe('logic', () => {
 
                 var file = fs.createReadStream(image)
 
-       
-                await logic.insertProjectImage(project.id, file )
+
+                await logic.insertProjectImage(project.id, file)
 
                 const _user = await User.findById(user.id)
 

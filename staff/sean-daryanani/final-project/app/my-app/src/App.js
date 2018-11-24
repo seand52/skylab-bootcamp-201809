@@ -16,7 +16,8 @@ logic.url = 'http://localhost:5000/api'
 
 class App extends Component {
   state = {
-    error: null
+    error: null,
+    userId: null
   }
 
   handleRegisterClick = () => {
@@ -56,7 +57,9 @@ class App extends Component {
 
       logic.authenticate(username, password)
 
-        .then(() => this.setState({ error: null }, this.props.history.push('/home')))
+        .then((res) => {
+
+          this.setState({ error: null, userId: res.data.id }, this.props.history.push('/home'))})
 
         .catch(err => this.setState({ error: err.message }))
 
@@ -68,7 +71,7 @@ class App extends Component {
   }
 
   render() {
-    const { error } = this.state
+    const { error, userId } = this.state
     return (
       <div className="App">
         <Switch>
@@ -84,7 +87,7 @@ class App extends Component {
 
           <Route path="/explore" render={() => logic.loggedIn ? <Explore /> : <Redirect to="/" />} />
 
-          <Route path="/project/:id" render={props => logic.loggedIn ? <ProjectPage id={props.match.params.id} /> : <Redirect to="/" />} />
+          <Route path="/project/:id" render={props => logic.loggedIn ? <ProjectPage userId = {userId} id={props.match.params.id} /> : <Redirect to="/" />} />
 
           <Route path="/profile" render={ () => logic.loggedIn ? <Profile /> : <Redirect to="/" />} />
         </Switch>

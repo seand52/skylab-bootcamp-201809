@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
-import { Col } from "mdbreact";
 import "./searchbar.css";
-import logic from '../../logic'
 import { withRouter } from 'react-router-dom'
 
 class Searchbar extends Component {

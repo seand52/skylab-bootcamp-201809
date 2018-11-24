@@ -250,6 +250,22 @@ router.post('/users/:id/projects/:projectid/meetings', [bearerTokenParser, jwtVe
     }, res)
 })
 
+router.get('/users/:id/meeting/:meetingid', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+
+        const { sub, params: { id, meetingid }} = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.retrieveMeetingInfo(meetingid)
+            .then(meeting => res.json({
+                data: meeting
+            }))
+
+    }, res)
+})
+
+
 router.delete('/users/:id/projects/meetings/:meetingid', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
 
@@ -281,7 +297,7 @@ router.get('/users/:id/projects/:projectid/meetings', [bearerTokenParser, jwtVer
 })
 
 
-router.put('/users/:id/projects/:meetingid/meetings', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+router.put('/users/:id/projects/meetings/:meetingid', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
         const { params: { id, meetingid }, sub } = req
 
@@ -290,6 +306,20 @@ router.put('/users/:id/projects/:meetingid/meetings', [bearerTokenParser, jwtVer
         return logic.attendMeeting(id, meetingid)
             .then(() => res.json({
                 message: 'added to meeting'
+            }))
+    }, res)
+
+})
+
+router.patch('/users/:id/projects/meetings/:meetingid', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+        const { params: { id, meetingid }, sub } = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.unAttendMeeting(id, meetingid)
+            .then(() => res.json({
+                message: 'removed from meeting'
             }))
     }, res)
 

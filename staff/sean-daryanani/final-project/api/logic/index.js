@@ -259,6 +259,7 @@ const logic = {
                 project.id = project._id.toString()
 
                 delete project._id
+                delete project.__v
 
                 project.owner = project.owner.toString()
 
@@ -288,6 +289,8 @@ const logic = {
                 project.id = project._id.toString()
 
                 delete project._id
+
+                delete project.__v
 
                 project.owner = project.owner.toString()
 
@@ -331,12 +334,12 @@ const logic = {
         if (!id.trim()) throw new ValueError('id is empty or blank')
 
         return (async () => {
-            debugger
+
             const user = await User.findById(id).populate('savedProjects').lean().exec()
 
             const savedProjects = user.savedProjects
 
-            savedProjects.forEach( project => {
+            savedProjects.forEach(project => {
 
                 project.id = project._id.toString()
 
@@ -366,7 +369,45 @@ const logic = {
 
         return (async () => {
 
-            const project = await Project.findById(projectId)
+            const project = await Project.findById(projectId).populate('owner')
+                .populate('collaborators')
+                .populate('pendingCollaborators')
+                .lean()
+                .exec()
+
+            project.id = project._id.toString()
+
+            delete project._id
+
+            delete project.__v
+
+            project.owner.id = project.owner._id.toString()
+
+            delete project.owner._id
+
+            delete project.owner.__v
+
+            project.collaborators.forEach(collaborator => {
+
+                collaborator.id = collaborator._id.toString()
+
+                delete collaborator._id
+
+                delete collaborator.__v
+
+                return collaborator
+            })
+
+            project.pendingCollaborators.forEach(collaborator => {
+
+                collaborator.id = collaborator._id.toString()
+
+                delete collaborator._id
+
+                delete collaborator.__v
+
+                return collaborator
+            })
 
             if (!project) throw new NotFoundError(`project with id ${projectId} not found`)
 
@@ -502,19 +543,49 @@ const logic = {
 
         return (async () => {
 
-            const meetings = await Meeting.find({ project: projectId }).lean()
-
+            const meetings = await Meeting.find({ project: projectId }).lean().exec()
+            debugger
             meetings.forEach(meeting => {
+                if (meeting._id) {
+                    meeting.id = meeting._id.toString()
 
-                meeting.id = meeting._id.toString()
+                    delete meeting._id
 
-                delete meeting._id
+                    delete meeting.__v
+                }
+
+                meeting.attending.forEach(id => {
+                    return id.toString()                   
+
+                })
 
                 return meeting
             })
 
             return meetings
 
+        })()
+    },
+
+    retrieveMeetingInfo(meetingId) {
+        if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
+
+        return (async () => {
+            const meeting = await Meeting.findById(meetingId).populate('attending').lean().exec()
+
+            meeting.attending.forEach(attendee => {
+
+                attendee.id = attendee._id.toString()
+
+                delete attendee._id
+
+                delete attendee.__v
+
+                return attendee
+
+            })
+
+            return meeting
         })()
     },
 
@@ -535,6 +606,23 @@ const logic = {
             const user = await User.findById(id)
 
             await Meeting.updateOne({ _id: meetingId }, { $push: { attending: user.id } })
+
+
+        })()
+    },
+
+    unAttendMeeting(id, meetingId) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
+
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
+
+        return (async () => {
+
+            const user = await User.findById(id)
+
+            await Meeting.updateOne({ _id: meetingId }, { $pull: { attending: user.id } })
 
 
         })()
@@ -697,7 +785,7 @@ const logic = {
 
             await Project.updateOne({ _id: projectId }, { projectImage: result.url })
             const projects = await Project.find()
-            debugger
+
         })()
     },
 
