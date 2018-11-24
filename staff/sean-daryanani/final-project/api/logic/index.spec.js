@@ -422,6 +422,45 @@ describe('logic', () => {
                 // TODO other test cases
             })
 
+            describe('delete a project and associated meeings', () => {
+                let user, project, meeting1, meeting2, meeting3
+
+                beforeEach(async () => {
+                    user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
+                    project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+                    meeting1 = new Meeting({ project: project.id, date: Date.now(), location: 'madrid' })
+                    meeting2 = new Meeting({ project: project.id, date: Date.now(), location: 'madrid' })
+                    meeting3 = new Meeting({ project: project.id, date: Date.now(), location: 'madrid' })
+                    
+                    await user.save()
+                    await project.save()
+                    await meeting1.save()
+                    await meeting2.save()
+                    await meeting3.save()
+
+                })
+
+                it('should succeed on correct data', async () => {
+
+                    await logic.deleteProject(user.id, project.id)
+
+                    const _project = await Project.findById(project.id)
+
+                    const _meetings = await Meeting.find({ project: project.id })
+
+                    expect(_project).to.equal(null)
+
+                    expect(_meetings.length).to.equal(0)
+
+
+
+
+
+                })
+
+
+            })
+
             describe('save a project ', () => {
                 let user, user2, project
 
@@ -478,6 +517,29 @@ describe('logic', () => {
 
                 // TODO other test cases
             })
+
+            describe('leave a project (stop being collaborator)', () => {
+                let user, user2, project
+
+                beforeEach(async () => {
+                    user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
+                    user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '123' })
+                    project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, collaborators:[user2.id] })
+
+                    await user.save()
+                    await user2.save()
+                    await project.save()
+                })
+
+                it('should succeed on correct data', async () => {
+
+                    await logic.leaveProject(user2.id, project.id)
+
+                    const _project = await Project.findById(project.id)
+
+                    expect(_project.collaborators.length).to.equal(0)
+                })
+            }) 
 
             describe('list projects', () => {
                 let user, project, project2
@@ -913,7 +975,7 @@ describe('logic', () => {
                 })
 
                 it('should succeed on correct data', async () => {
-                    debugger
+
                     await logic.unAttendMeeting(user2.id, meeting1.id)
 
                     const meeting = await Meeting.findById(meeting1.id)

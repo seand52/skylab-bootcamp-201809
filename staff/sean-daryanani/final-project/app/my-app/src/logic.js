@@ -381,6 +381,70 @@ const logic = {
             .then(res => {
                 if (res.error) throw Error(res.error)
             })
+    },
+
+    deleteProject(userId, projectId) {
+        if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+
+        if (!userId.trim()) throw Error('userId is empty or blank')
+        if (!projectId.trim()) throw Error('projectId is empty or blank')
+
+        return fetch(`${this.url}/users/${this._userId}/deleteproject/${projectId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+
+            },
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+            })
+    },
+    leaveProject(projectId) {
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+
+        if (!projectId.trim()) throw Error('projectId is empty or blank')
+
+        return fetch(`${this.url}/users/${this._userId}/projects/${projectId}/leave`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+
+            },
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+            })
+    },
+
+
+    requestCollaboration(projectId, collaboratorId) {
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+        if (typeof collaboratorId !== 'string') throw TypeError(`${collaboratorId} is not a string`)
+
+        if (!projectId.trim()) throw Error('projectId is empty or blank')
+        if (!collaboratorId.trim()) throw Error('collaboratorId is empty or blank')
+
+        return fetch(`${this.url}/users/${this._userId}/projects/${projectId}/collaborator`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+
+            },
+            body: JSON.stringify({ collaboratorId })
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+            })
+
+
     }
 
 

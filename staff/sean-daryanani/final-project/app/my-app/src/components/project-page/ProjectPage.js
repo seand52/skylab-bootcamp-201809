@@ -7,6 +7,7 @@ import Modalpage from '../modal/Modalpage'
 import Collapsible from '../collapse/Collapse'
 import Meetings from '../meetings/Meetings'
 import CollaboratorCard from '../collaborator-card/CollaboratorCard'
+import { withRouter } from 'react-router-dom'
 
 class ProjectPage extends Component {
     state = {
@@ -52,6 +53,57 @@ class ProjectPage extends Component {
             .then(res => this.setState({ meetings: res }))
     }
 
+    handleDeleteProject = () => {
+        const { userId, id } = this.props
+        return logic.deleteProject(userId, id)
+            .then(() => this.props.history.push('/home'))
+    }
+
+    handleLeaveProject = () => {
+        const { id } = this.props
+        return logic.leaveProject(id)
+            .then(() => logic.retrieveProjectInfo(this.props.id))
+            .then(res => this.setState({ project: res }))
+    }
+
+    handleRequestCollaboration = () => {
+        const { id, userId } = this.props
+        return logic.requestCollaboration(id, userId)
+            .then(() => logic.retrieveProjectInfo(this.props.id))
+            .then(res => this.setState({ project: res }))
+    }
+
+    renderCollabButtons = () => {
+
+        const { state: { project }, props: { userId } } = this
+        if (project) {
+
+            if (project.collaborators.some(item => item.id === userId)) {
+                return (< div className="project-page-new-meeting">
+                    <p>Would you like to leave this project?</p>
+                    <button onClick={this.handleLeaveProject}>Leave project</button>
+                </div>)
+            } else if (!project.collaborators.some(item => item.id === userId) && !(project.pendingCollaborators.some(item => item.id === userId))) {
+                return (
+                    < div className="project-page-request-collaborate">
+                        <p>Would you like to collaborate?</p>
+                        <button onClick={this.handleRequestCollaboration}>Collaborate now</button>
+                    </div>
+                )
+            } else {
+                return (
+                    < div className="project-page-request-collaborate">
+                        <p>Your collaboration request is pending</p>
+                    </div>
+                )
+            }
+        }
+    }
+
+    handleAddNewEvent = () => {
+        this.props.history.push('/create-event')
+    }
+
     render() {
         const { project, meetings } = this.state
         return <div>
@@ -70,16 +122,18 @@ class ProjectPage extends Component {
                         <p>Host email: {project && project.owner.email}</p>
                     </div>
 
-                    {project && (!(this.props.userId === project.owner.id)) ? < div className="project-page-request-collaborate">
-                        <p>Would you like to collaborate?</p>
-                        <button>Collaborate now</button>
-                    </div> : null}
-
+                    {project && (!(this.props.userId === project.owner.id)) && this.renderCollabButtons()}
 
                     {project && (this.props.userId === project.owner.id) ? < div className="project-page-new-meeting">
                         <p>Would you like to create a new event?</p>
-                        <button>Add a new event</button>
+                        <button onClick={this.handleAddNewEvent}>Add a new event</button>
                     </div> : null}
+
+                    {project && (this.props.userId === project.owner.id) ? < div className="project-page-new-meeting">
+                        <p>Would you like to delete this project?</p>
+                        <button onClick={this.handleDeleteProject}>Delete project</button>
+                    </div> : null}
+
                 </div>
 
             </header>
@@ -101,15 +155,16 @@ class ProjectPage extends Component {
                     return (
                         <div key={index}>
                             <Meetings unAttendMeeting={this.handleUnAttendMeeting} attendMeeting={this.handleAttendMeeting} deleteMeeting={this.handleDeleteMeeting} userId={this.props.userId} key={index} meeting={meeting} project={project} />
-                            <Modalpage meetingId={meeting.id} render={'meeting attendees'}/>
+                            <Modalpage meetingId={meeting.id} render={'meeting attendees'} />
                         </div>)
                 })}
             </section>
             <section className="project-page-collaborators">
+                <h1>Current Collaborators</h1>
                 {project && project.collaborators.map((collaborator, index) => <CollaboratorCard collaborator={collaborator} key={index} />)}
             </section>
         </div >
     }
 }
 
-export default ProjectPage
+export default withRouter(ProjectPage)

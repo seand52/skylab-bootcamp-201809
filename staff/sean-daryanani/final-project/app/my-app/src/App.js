@@ -10,6 +10,7 @@ import Home from './components/home/Home'
 import Explore from './components/explore/Explore'
 import Profile from './components/profile/Profile'
 import ProjectPage from './components/project-page/ProjectPage'
+import CreateMeeting from './components/create-meetings/CreateMeeting'
 
 
 logic.url = 'http://localhost:5000/api'
@@ -90,6 +91,8 @@ class App extends Component {
           <Route path="/project/:id" render={props => logic.loggedIn ? <ProjectPage userId = {userId} id={props.match.params.id} /> : <Redirect to="/" />} />
 
           <Route path="/profile" render={ () => logic.loggedIn ? <Profile /> : <Redirect to="/" />} />
+
+           <Route path="/create-event" render={ () => logic.loggedIn ? <CreateMeeting /> : <Redirect to="/" />} />
         </Switch>
         {error && <Error message={error} />}
       </div>

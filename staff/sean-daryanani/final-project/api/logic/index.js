@@ -236,6 +236,27 @@ const logic = {
         })()
     },
 
+    deleteProject(userId, projectId) {
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+        if (!projectId.trim()) throw new ValueError('projectId is empty or blank')
+
+
+        return (async () => {
+
+            const project = await Project.findById(projectId)
+
+            if (project.owner.toString() !== userId) throw Error ('only project owner can delete a project')
+
+            await project.remove()
+
+            await Meeting.deleteMany({ project: projectId })
+
+
+
+
+        })()
+    },
+
     /**
  * List projects that belong to user
  * @param {string}id 
@@ -480,6 +501,33 @@ const logic = {
 
         })()
     },
+
+    leaveProject(id, projectId) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+
+        if (!id.trim()) throw new ValueError('id is empty or blank')
+        if (!projectId.trim()) throw new ValueError('projectId is empty or blank')
+
+        return (async () => {
+
+            const user = await User.findById(id)
+
+            if (!user) throw Error('user does not exist')
+
+            await Project.updateOne(
+                { _id: projectId },
+                {
+                    $pull: { collaborators: user.id },
+                }
+            )
+
+
+
+        })()
+    },
+
+
     /**
      * 
      * @param {string} id 
@@ -544,7 +592,7 @@ const logic = {
         return (async () => {
 
             const meetings = await Meeting.find({ project: projectId }).lean().exec()
-            debugger
+
             meetings.forEach(meeting => {
                 if (meeting._id) {
                     meeting.id = meeting._id.toString()
@@ -555,7 +603,7 @@ const logic = {
                 }
 
                 meeting.attending.forEach(id => {
-                    return id.toString()                   
+                    return id.toString()
 
                 })
 
