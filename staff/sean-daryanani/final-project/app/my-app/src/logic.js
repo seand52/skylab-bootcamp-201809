@@ -163,6 +163,35 @@ const logic = {
             })
     },
 
+    saveProject(projectId) {
+        return fetch(`${this.url}/users/${this._userId}/projects/${projectId}/save`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+
+            })
+    },
+
+    removeSavedProject(projectId) {
+        return fetch(`${this.url}/users/${this._userId}/projects/${projectId}/save`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+
+            })
+    },
+
+
     listSavedProjects() {
         return fetch(`${this.url}/users/${this._userId}/projects/save`, {
             method: 'GET',
@@ -181,13 +210,11 @@ const logic = {
     addNewProject(name, description, skills, beginnerFriendly, maxMembers) {
         if (typeof name !== 'string') throw TypeError(`${name} is not a string`)
         if (typeof description !== 'string') throw TypeError(`${description} is not a string`)
-        if (typeof skills !== 'string') throw TypeError(`${skills} is not a string`)
         if (typeof beginnerFriendly !== 'string') throw TypeError(`${beginnerFriendly} is not a string`)
         if (typeof maxMembers !== 'string') throw TypeError(`${maxMembers} is not a string`)
 
         if (!name.trim()) throw Error('name is empty or blank')
         if (!description.trim()) throw Error('description is empty or blank')
-        if (!skills.trim()) throw Error('skills is empty or blank')
         if (!beginnerFriendly.trim()) throw Error('beginnerFriendly is empty or blank')
         if (!maxMembers.trim()) throw Error('maxMembers is empty or blank')
 
@@ -438,6 +465,36 @@ const logic = {
 
             },
             body: JSON.stringify({ collaboratorId })
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+            })
+
+
+    },
+
+    addMeeting(userId, projectId, startDate, location, description) {
+        if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+        if (!(startDate instanceof Date)) throw TypeError(`${startDate} is not a date`)
+        if (typeof location !== 'string') throw TypeError(`${location} is not a string`)
+        if (typeof description !== 'string') throw TypeError(`${description} is not a string`)
+
+        if (!userId.trim()) throw Error('userId is empty or blank')
+        if (!projectId.trim()) throw Error('projectId is empty or blank')
+        if (!location.trim()) throw Error('location is empty or blank')
+        if (!description.trim()) throw Error('description is empty or blank')
+
+
+        return fetch(`${this.url}/users/${this._userId}/projects/${projectId}/meetings`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+
+            },
+            body: JSON.stringify({ startDate, location, description })
         })
             .then(res => res.json())
             .then(res => {

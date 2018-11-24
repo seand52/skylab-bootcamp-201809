@@ -12,7 +12,8 @@ import { withRouter } from 'react-router-dom'
 class ProjectPage extends Component {
     state = {
         project: null,
-        meetings: null
+        meetings: null,
+        user: null
     }
     componentDidMount() {
 
@@ -20,6 +21,8 @@ class ProjectPage extends Component {
             .then(res => this.setState({ project: res }))
             .then(() => logic.listProjectMeetings(this.props.id))
             .then(res => this.setState({ meetings: res }))
+            .then(() => logic.retrieveUserProfile(this.props.userId))
+            .then(res => this.setState({user: res}))
     }
 
     acceptCollabHandle = (id) => {
@@ -73,6 +76,20 @@ class ProjectPage extends Component {
             .then(res => this.setState({ project: res }))
     }
 
+    handleSaveProject = () => {
+        const { id, userId } = this.props
+        return logic.saveProject(id, userId)
+            .then(() => logic.retrieveUserProfile(userId))
+            .then(res => this.setState({ user: res }))
+    }
+
+    handleUnFollowProjects = () => {
+        const { id, userId } = this.props
+        return logic.removeSavedProject(id, userId)
+            .then(() => logic.retrieveUserProfile(userId))
+            .then(res => this.setState({ user: res }))
+    }
+
     renderCollabButtons = () => {
 
         const { state: { project }, props: { userId } } = this
@@ -100,8 +117,29 @@ class ProjectPage extends Component {
         }
     }
 
+ 
+
+    renderFavouritesButtons = () => {
+        const { state: { user, project }, props: { userId, id } } = this
+        
+        if (user) {
+            if (user.savedProjects.includes(id) && !project.collaborators.some(item => item.id === userId)) {
+                return (<div className="project-page-new-meeting">
+                    <p>You have saved this project. Click to unfollow</p>
+                    <button onClick={this.handleUnFollowProjects}>Unfollow</button>
+                </div>)
+            }else if(!(user.savedProjects.includes(id)) && !project.collaborators.some(item => item.id === userId)) {
+                return ( < div className="project-page-new-meeting">
+                     <p>Save the project to view later</p>
+                     <button onClick={this.handleSaveProject}>Save Project</button>
+                 </div>)
+             }
+        } 
+    }
+
     handleAddNewEvent = () => {
-        this.props.history.push('/create-event')
+
+        this.props.history.push(`/create-event/${this.props.id}`)
     }
 
     render() {
@@ -123,6 +161,13 @@ class ProjectPage extends Component {
                     </div>
 
                     {project && (!(this.props.userId === project.owner.id)) && this.renderCollabButtons()}
+                    {project && (!(this.props.userId === project.owner.id)) && this.renderFavouritesButtons()}
+
+                    {/* {project && (!(this.props.userId === project.owner.id)) ? < div className="project-page-new-meeting">
+                        <p>Save the project to view later</p>
+                        <button onClick={this.handleSaveProject}>Save Project</button>
+                    </div> : null} */}
+
 
                     {project && (this.props.userId === project.owner.id) ? < div className="project-page-new-meeting">
                         <p>Would you like to create a new event?</p>

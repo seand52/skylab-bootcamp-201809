@@ -21,7 +21,8 @@ class CreateProject extends Component {
         name: '',
         description: '',
         maxMembers: '',
-        toggleSuccess: false
+        error: false,
+        toggleSuccess: false,
     }
 
 
@@ -41,10 +42,10 @@ class CreateProject extends Component {
         try {
             logic.addNewProject(name, description, skillsArray, 'true', maxMembers)
                 .then(() => {
-                    this.setState({ toggleSuccess: true })
+                    this.setState({ error: false, toggleSuccess: !this.state.toggleSuccess })
                 })
         } catch(err) {
-            this.setState({toggleSuccess: false})
+            this.setState({error: true})
         }
 
         //TODO error handling
@@ -121,6 +122,8 @@ class CreateProject extends Component {
 
                     <Button type="submit" color="primary">Save changes</Button>
                 </form>
+                {this.state.error ? <p>You must complete all the fields</p> : null}
+                
                 {this.state.toggleSuccess ? <p>Project added</p> : null}
             </section>
             <aside className="rules">

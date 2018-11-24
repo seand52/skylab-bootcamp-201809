@@ -92,7 +92,7 @@ class App extends Component {
 
           <Route path="/profile" render={ () => logic.loggedIn ? <Profile /> : <Redirect to="/" />} />
 
-           <Route path="/create-event" render={ () => logic.loggedIn ? <CreateMeeting /> : <Redirect to="/" />} />
+           <Route path="/create-event/:id" render={ props => logic.loggedIn ? <CreateMeeting userId = {userId} id={props.match.params.id} /> : <Redirect to="/" />} />
         </Switch>
         {error && <Error message={error} />}
       </div>

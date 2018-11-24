@@ -379,6 +379,21 @@ const logic = {
         })()
     },
 
+    removeSavedProject(id, projectId) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+        if (!projectId.trim()) throw new ValueError('projectId is empty or blank')
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+
+        return (async () => {
+            const project = await Project.findById(projectId)
+            
+            const user = await User.findById(id)
+
+            await User.updateOne({ _id: user._id }, { $pull: { savedProjects: project._id } })
+
+        })()
+    },
     /**
      * 
      * @param {string} projectId 
@@ -535,12 +550,15 @@ const logic = {
      * @param {string} date 
      * @param {string} location 
      */
-    addMeeting(id, projectId, date, location) {
-        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
-        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+    addMeeting(id, projectId, date, location, description) {
 
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+        if (typeof description !== 'string') throw TypeError(`${description} is not a string`)
+
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+        if (typeof description !== 'string') throw TypeError(`${description} is not a string`)
 
         return (async () => {
             const user = await User.findById(id)
@@ -549,7 +567,7 @@ const logic = {
 
             if (!project) throw new NotFoundError(`project with id ${projectId} not found`)
 
-            const meeting = new Meeting({ project: project.id, date, location, attending: [user._id] })
+            const meeting = new Meeting({ project: project.id, date, location, attending: [user._id], description: description })
 
             await meeting.save()
 

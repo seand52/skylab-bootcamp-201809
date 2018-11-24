@@ -518,6 +518,29 @@ describe('logic', () => {
                 // TODO other test cases
             })
 
+            describe('remove a project from saved', () => {
+                let user, user2, project
+
+                beforeEach(async () => {
+                    user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
+                    project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, collaborators:[user.id] })
+                    await user.save()
+                    await project.save()
+                    user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '123', savedProjects:[project.id]})
+                    await user2.save()
+
+                })
+
+                it('should succeed on correct data', async () => {
+
+                    await logic.removeSavedProject(user2.id, project.id)
+                    const _user2 = await User.findById(user2.id)
+
+                    expect(_user2.savedProjects.length).to.equal(0)
+
+                })
+            })
+
             describe('leave a project (stop being collaborator)', () => {
                 let user, user2, project
 
@@ -818,7 +841,7 @@ describe('logic', () => {
             it('should succeed on correct data', async () => {
                 const date = Date.now()
 
-                await logic.addMeeting(user.id, project.id, date, 'barcelona')
+                await logic.addMeeting(user.id, project.id, date, 'barcelona', 'test description')
 
                 const meetings = await Meeting.find()
 
@@ -837,7 +860,7 @@ describe('logic', () => {
             it('should succeed on deleting event', async () => {
                 const date = Date.now()
 
-                await logic.addMeeting(user.id, project.id, date, 'barcelona')
+                await logic.addMeeting(user.id, project.id, date, 'barcelona', 'test description')
 
                 const meetings = await Meeting.find()
 
