@@ -64,7 +64,7 @@ router.get('/user-profile/:id', [bearerTokenParser, jwtVerifier], (req, res) => 
     routeHandler(() => {
         const { params: { id }, sub } = req
 
-        if (id !== sub) throw Error('token sub does not match user id')
+        // if (id !== sub) throw Error('token sub does not match user id')
 
         return logic.retrieveProfileInfo(id)
             .then(user =>
@@ -126,7 +126,7 @@ router.get('/users/projects/:id', [bearerTokenParser, jwtVerifier, jsonBodyParse
     routeHandler(() => {
         const { params: { id }, sub } = req
 
-        if (id !== sub) throw Error('token sub does not match user id')
+        // if (id !== sub) throw Error('token sub does not match user id')
 
         return logic.listOwnProjects(id)
             .then(projects => res.json({
@@ -142,7 +142,7 @@ router.get('/users/:id/collaborating', [bearerTokenParser, jwtVerifier, jsonBody
     routeHandler(() => {
         const { params: { id }, sub } = req
 
-        if (id !== sub) throw Error('token sub does not match user id')
+        // if (id !== sub) throw Error('token sub does not match user id')
 
         return logic.listCollaboratingProjects(id)
             .then(projects => res.json({
@@ -283,14 +283,14 @@ router.post('/users/:id/projects/:projectid/meetings', [bearerTokenParser, jwtVe
 })
 
 router.delete('/users/:id/deleteproject/:projectid', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
-  
+
     routeHandler(() => {
 
         const { sub, params: { id, projectid } } = req
 
         if (id !== sub) throw Error('token sub does not match user id')
 
-        return logic.deleteProject(projectid)
+        return logic.deleteProject(id, projectid)
             .then(() => res.json({
                 message: 'project has been deleted'
             }))

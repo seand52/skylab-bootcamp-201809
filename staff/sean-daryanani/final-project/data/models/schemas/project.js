@@ -60,7 +60,7 @@ const Project = new Schema({
     
     projectImage: {
         type: 'string',
-        default: 'https://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg'
+        default: 'https://steemitimages.com/DQmbt6RdzLkTYqTksex2dZBb2J2X78NygyBGK1Gqxj7Fqha/matrix.jpg'
     }
 })
 

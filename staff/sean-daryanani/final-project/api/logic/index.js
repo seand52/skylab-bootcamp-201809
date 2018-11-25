@@ -87,6 +87,7 @@ const logic = {
      * @returns {Promise <object>}
      */
     retrieveUser(id) {
+
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (!id.trim()) throw new ValueError('id is empty or blank')
 
@@ -114,7 +115,7 @@ const logic = {
 
         return (async () => {
 
-            const user = await User.findById(id, { '_id': 0, password: 0, email: 0, username: 0, __v: 0 }).lean()
+            const user = await User.findById(id, { '_id': 0, password: 0, username: 0, __v: 0 }).lean()
 
             if (!user) throw new NotFoundError(`user with id ${id} not found`)
 
@@ -361,7 +362,7 @@ const logic = {
             const savedProjects = user.savedProjects
 
             savedProjects.forEach(project => {
-
+                
                 project.id = project._id.toString()
 
                 delete project._id

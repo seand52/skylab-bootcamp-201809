@@ -1,0 +1,28 @@
+.profile-card-container {
+  width: 50%;
+  margin: 30px;
+  border-right: 1px solid #4340f5;
+  text-align: center;
+  flex: 0 0 2;
+}
+
+.top-area {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  border-bottom: 1px solid #4340f5;
+}
+
+.profile-img-container {
+  border-radius: 50%;
+  overflow: hidden;
+  flex: 1 .profile-img-container img;
+  flex-width: 100%;
+}
+
+.bottom-area {
+  padding-top: 40px;
+  height: 100%;
+}
+
+/*# sourceMappingURL=profile-card.css.map */

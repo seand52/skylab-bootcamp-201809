@@ -1,0 +1,98 @@
+@charset "UTF-8";
+.project-top-section {
+  height: 300px;
+  display: flex;
+  margin: 20px;
+  border: 3px solid #4340f5;
+  border-radius: 10px;
+  background-color: aliceblue;
+  padding: 20px;
+}
+
+.project-image-container {
+  flex: 0 0 30%;
+  overflow: hidden;
+}
+
+.extrainfo__image-profile {
+  width: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.project-page-new-meeting {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.top-section__extrainfo {
+  display: flex;
+  margin-left: 20px;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.project-page-header-additional-info, .extrainfo-image-container, .project-page-request-collaborate, .project-page-new-meeting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-page-header-additional-info span {
+  font-weight: bold;
+}
+.project-page-header-additional-info__user-link {
+  color: blue;
+  cursor: pointer;
+}
+
+.project-page-info-container {
+  display: flex;
+  margin: 20px;
+  border: 3px solid #4340f5;
+  border-radius: 10px;
+  background-color: aliceblue;
+}
+
+.project-page-project-info {
+  flex: 0 0 50%;
+  margin-right: 20px;
+  border-right: 1px solid black;
+}
+
+.project-page-meetings {
+  flex: 0 0 50%;
+}
+
+.delete-meeting-button {
+  background: none;
+  border: none;
+}
+
+.fa-remove:before, .fa-close:before, .fa-times:before {
+  content: "";
+  color: red;
+  cursor: pointer;
+  size: 15px;
+}
+
+.meeting-actions span {
+  font-weight: bold;
+}
+
+.individual-meeting-container {
+  border-bottom: 1px solid black;
+  margin-right: 50px;
+}
+
+.collapse {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.project-page-collaborators-display {
+  display: flex;
+}
+
+/*# sourceMappingURL=projectpage.css.map */

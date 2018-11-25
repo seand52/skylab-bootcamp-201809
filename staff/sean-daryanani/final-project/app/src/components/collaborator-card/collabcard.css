@@ -1,0 +1,14 @@
+.collab-card {
+  margin-left: 20px;
+}
+.collab-card img {
+  width: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.collab-card p {
+  color: blue;
+  cursor: pointer;
+}
+
+/*# sourceMappingURL=collabcard.css.map */

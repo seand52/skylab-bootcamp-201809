@@ -1,0 +1,19 @@
+
+.create-project__name-label, .create-project__description-label, .create-project__select-label,.create-project__technologies-label {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.create-project__select {
+    width: 60px;
+}
+
+.create-project__skills-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.checkbox {
+    flex: 0 0 30%;
+}
