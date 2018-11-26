@@ -7,8 +7,7 @@ import './create-project.css'
 const skills = [
     'Java',
     'Javascript',
-    'C#',
-    'C++',
+    'C-Sharp',
     'Python',
     'PHP',
     'React',

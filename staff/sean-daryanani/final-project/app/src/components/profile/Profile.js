@@ -6,6 +6,7 @@ import ProfileCard from '../profile-card/ProfileCard'
 import ProjectCard from '../project-card/ProjectCard'
 import Modalpage from '../modal/Modalpage'
 import SkillsTag from '../skills-tag/SkillsTag'
+import { withRouter } from 'react-router-dom'
 
 class Profile extends Component {
 
@@ -42,17 +43,17 @@ class Profile extends Component {
             })
     }
 
-    renderModal = () => {
+    // renderModal = () => {
 
-        const { state: { user }, props: { userId, id } } = this
-        if (user) {
-            if (id === userId) {
-                return <Modalpage user={user} updateProfile={this.sendProfileUpdate} render={'profile update'} />
-            } else {
-                return null
-            }
-        }
-    }
+    //     const { state: { user }, props: { userId, id } } = this
+    //     if (user) {
+    //         if (id === userId) {
+    //             return <Modalpage user={user} updateProfile={this.sendProfileUpdate} render={'profile update'} />
+    //         } else {
+    //             return null
+    //         }
+    //     }
+    // }
 
     handleShowCollabProjects = () => {
 
@@ -68,7 +69,7 @@ class Profile extends Component {
     }
 
     renderTitle = () => {
-        debugger
+
         const {user, showProjects} = this.state
 
         if (user) {
@@ -80,6 +81,11 @@ class Profile extends Component {
         }
     }
 
+    handleSearchTag = (query) => {
+
+        const searchQuery = `q=&f=${query}`
+        this.props.history.push(`/explore/${searchQuery}`)
+    }
 
 
     render() {
@@ -97,12 +103,12 @@ class Profile extends Component {
                     <div className="bio__extra-info">
                         <p><span>Bio</span>:{user && user.bio}</p>
                         <span>Github:</span> <a href="https://github.com">{user && user.githubProfile}</a>
-                        {this.renderModal()}
+                        <Modalpage user={user} updateProfile={this.sendProfileUpdate}/>
                     </div>
                     <div className="bio__interests">
                         <h2>Interests</h2>
                         <div className="skills-tag-container">
-                            {user && user.skills.map((skill, index) => <SkillsTag skill={skill} key={index} />)}
+                            {user && user.skills.map((skill, index) => <SkillsTag searchTag={this.handleSearchTag} skill={skill} key={index} />)}
                         </div>
                     </div>
                 </section>
@@ -115,8 +121,8 @@ class Profile extends Component {
 
                 </div>
                 <div className="main-area__projects">
-                    {ownProjects && (showProjects === 'my projects') && ownProjects.map((project, index) => <ProjectCard key={index} project={project} />)}
-                    {collabProjects && (showProjects === 'collab projects') && collabProjects.map((project, index) => <ProjectCard key={index} project={project} />)}
+                    {ownProjects && (showProjects === 'my projects') && ownProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
+                    {collabProjects && (showProjects === 'collab projects') && collabProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
 
                 </div>
             </section>
@@ -125,4 +131,4 @@ class Profile extends Component {
 
 }
 
-export default Profile
+export default withRouter(Profile)

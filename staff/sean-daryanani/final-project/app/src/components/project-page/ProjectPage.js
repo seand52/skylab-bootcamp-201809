@@ -8,6 +8,7 @@ import Meetings from '../meetings/Meetings'
 import CollaboratorCard from '../collaborator-card/CollaboratorCard'
 import { withRouter } from 'react-router-dom'
 import SkillsTag from '../skills-tag/SkillsTag'
+import MeetingAttendeesModal from '../meet-attendees-modal/MeetingAttendeesModal'
 
 class ProjectPage extends Component {
     state = {
@@ -91,6 +92,14 @@ class ProjectPage extends Component {
             .then(res => this.setState({ user: res }))
     }
 
+
+        handleSearchTag = (query) => {
+
+            const searchQuery = `q=&f=${query}`
+            this.props.history.push(`/explore/${searchQuery}`)
+        }
+    
+
     renderCollabButtons = () => {
 
         const { state: { project }, props: { userId } } = this
@@ -125,7 +134,8 @@ class ProjectPage extends Component {
         if (user && project) {
 
             const res = project.skills.filter(value => -1 !== user.skills.indexOf(value));
-            return `Matches with ${(res.length / user.skills.length).toFixed(2)}% of your interests`
+            if (res.length) return `Matches with ${(res.length / user.skills.length).toFixed(2)}% of your interests`
+            else return 'does not match with any of your interests :('
 
         }
 
@@ -198,7 +208,7 @@ class ProjectPage extends Component {
                     <h3>Description</h3>
                     <p>{project && project.description}</p>
                     <h3>Tech stack used</h3>
-                    {project && project.skills.map((skill, index) => <SkillsTag key={index} skill={skill} />)}
+                    {project && project.skills.map((skill, index) => <SkillsTag searchTag={this.handleSearchTag} key={index} skill={skill} />)}
                     <p>{this.calculateCommonInterests()}</p>
                 </section>
                 <section className="project-page-meetings">
@@ -207,7 +217,7 @@ class ProjectPage extends Component {
                         return (
                             <div className="individual-meeting-container" key={index}>
                                 <Meetings unAttendMeeting={this.handleUnAttendMeeting} attendMeeting={this.handleAttendMeeting} deleteMeeting={this.handleDeleteMeeting} userId={this.props.userId} key={index} meeting={meeting} project={project} />
-                                <Modalpage meetingId={meeting.id} render={'meeting attendees'} />
+                                <MeetingAttendeesModal clickName={this.clickProfileName} meetingId={meeting.id}/>
                             </div>)
                     })}
                 </section>

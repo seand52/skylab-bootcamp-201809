@@ -23,8 +23,9 @@ class App extends Component {
   }
 
   componentDidMount = () => {
+    
+    this.setState({userId: logic.UserId})
 
-    this.setState({userId: logic._userId})
   }
 
   handleRegisterClick = () => {
@@ -82,7 +83,7 @@ class App extends Component {
     const { error, userId } = this.state
     return (
       <div className="App">
-        <Navbarpage userId={userId} />
+      {logic.loggedIn && <Navbarpage userId={userId} />}
 
         <Switch>
           <Route exact path="/" render={() => !logic.loggedIn ? <Landing onRegisterClick={this.handleRegisterClick} onLoginClick={this.handleLoginClick} /> : <Redirect to="/home" />} />

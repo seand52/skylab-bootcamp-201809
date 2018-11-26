@@ -80,6 +80,10 @@ const logic = {
         return !!this._userId
     },
 
+    get UserId() {
+        return this._userId
+    },
+
     logout() {
         this._postits = []
         this._userId = null
@@ -256,6 +260,7 @@ const logic = {
     },
 
     filterProjects(query) {
+        debugger
         if (typeof query !== 'string') throw TypeError(`${query} is not a string`)
         if (!query.trim()) throw Error('query is empty or blank')
         return fetch(`${this.url}/users/${this._userId}/projects/filter/${query}`, {

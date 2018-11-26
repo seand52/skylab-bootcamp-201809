@@ -11,8 +11,7 @@ import ProjectCard from '../project-card/ProjectCard'
 const skills = [
     'Java',
     'Javascript',
-    'C#',
-    'C++',
+    'C-Sharp',
     'Python',
     'PHP',
     'React',
@@ -22,7 +21,8 @@ const skills = [
 
 class Explore extends Component {
     state = {
-        searchResults: null
+        searchResults: null,
+        searchQuery: ''
     }
     componentWillMount = () => {
 
@@ -31,8 +31,8 @@ class Explore extends Component {
     }
 
     componentDidMount() {
-        if (this.props.query && !this.props.query.includes('+')) {
-            logic.searchProjects(this.props.query)
+        if (this.props.query !== undefined) {
+            logic.filterProjects(this.props.query)
                 .then(res => {
                     this.setState({ searchResults: res })
 
@@ -40,18 +40,17 @@ class Explore extends Component {
         }
     }
 
+    queryListen = (query) => {
+        this.setState({ searchQuery: query })
+    }
+
     componentWillReceiveProps(props) {
 
-        if (this.props.query && !props.query.includes('+')) {
-            logic.searchProjects(props.query)
-                .then(res => {
-                    this.setState({ searchResults: res })
+        logic.filterProjects(props.query)
+            .then(res => {
+                this.setState({ searchResults: res })
 
-                })
-        } else {
-            logic.filterProjects(props.query)
-                .then(res => this.setState({ searchResults: res }))
-        }
+            })
     }
 
     toggleCheckbox = label => {
@@ -76,8 +75,14 @@ class Explore extends Component {
 
             skillsArray.push(checkbox)
         }
+        const search = this.state.searchQuery
 
-        const query = skillsArray.join('+')
+        let query
+
+        if (!skillsArray.length) query = `q=${search}`
+        else query = `q=${search}&f=${skillsArray.join('+')}`
+
+
 
         this.props.history.push(`/explore/${query}`)
 
@@ -86,6 +91,9 @@ class Explore extends Component {
         return <div>
             <div className="explore-container">
                 <div className="filters">
+                    <div>
+                        <Searchbar searchQuery={this.queryListen} />
+                    </div>
                     <h1>What are you looking to learn?</h1>
                     <div className='filter-skills'>
                         <form onSubmit={this.handleSubmit}>
@@ -95,9 +103,7 @@ class Explore extends Component {
                     </div>
                 </div>
                 <div className="search-area">
-                    <div>
-                        <Searchbar />
-                    </div>
+
                     <div className="search-results">
                         {this.state.searchResults && this.state.searchResults.map((project, index) => <ProjectCard key={index} project={project} />)}
                     </div>

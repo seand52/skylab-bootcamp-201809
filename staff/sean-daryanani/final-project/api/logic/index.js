@@ -246,7 +246,7 @@ const logic = {
 
             const project = await Project.findById(projectId)
 
-            if (project.owner.toString() !== userId) throw Error ('only project owner can delete a project')
+            if (project.owner.toString() !== userId) throw Error('only project owner can delete a project')
 
             await project.remove()
 
@@ -362,7 +362,7 @@ const logic = {
             const savedProjects = user.savedProjects
 
             savedProjects.forEach(project => {
-                
+
                 project.id = project._id.toString()
 
                 delete project._id
@@ -388,7 +388,7 @@ const logic = {
 
         return (async () => {
             const project = await Project.findById(projectId)
-            
+
             const user = await User.findById(id)
 
             await User.updateOne({ _id: user._id }, { $pull: { savedProjects: project._id } })
@@ -758,43 +758,55 @@ const logic = {
      */
     filterProjects(query) {
 
-        const array = query.split('+')
+        if (typeof query !== 'string') throw TypeError(`${query} is not a string`)
 
-        if (!(array instanceof Array)) throw TypeError(`${id} is not a string`)
+        let skillsArray = []
+        let searchTerm
+        if (query.split('&').length === 1) {
+            searchTerm = query.split('=')[1]
+        } else {
+            searchTerm = query.split('=')[1].split('&')[0]
+        }
+
+
+        if (query.indexOf('+') !== -1) {
+            const regSearch = query.match(/[+](.*)/)
+            const firstItem = [query.split('=')[2].split('+')[0]]
+            skillsArray = [...firstItem, ...regSearch[1].split('+')]
+
+        } else {
+            skillsArray.push(query.split('=')[2])
+        }
+
+        let newQuery = searchTerm.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "")
+
+    
+        const queryObject = {
+            name: {$regex: newQuery},
+            skills: { $all: skillsArray }
+        }
+
+
+        if (!queryObject.skills.$all.length ||queryObject.skills.$all[0]===undefined ) delete queryObject.skills
+
+        if (queryObject.name.$regex==='null') delete queryObject.name
 
         return (async () => {
-            if (array) {
-                const projects = await Project.find({ skills: { $all: array } })
+  
+            const projects = await Project.find(queryObject).lean()
 
-                projects.forEach(project => {
-                    project.id = project._id.toString()
 
-                    delete project._id
-                    //DELETE _V
-                    project.owner = project.owner.toString()
+            projects.forEach(project => {
+                project.id = project._id.toString()
 
-                    return project
-                })
+                delete project._id
+                delete project.__v
+                project.owner = project.owner.toString()
 
-                return projects
-            } else {
-
-                const projects = await Project.find()
-
-                projects.forEach(project => {
-
-                    project.id = project._id.toString()
-
-                    delete project._id
-
-                    project.owner = project.owner.toString()
-
-                    return project
-                })
-
-                return projects
-
-            }
+                return project
+            })
+            debugger
+            return projects
 
 
         })()

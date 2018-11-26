@@ -1,16 +1,11 @@
 import React, { Component } from 'react'
 import { Container, Button, Modal, ModalBody, ModalHeader, ModalFooter } from 'mdbreact'
-import './modalpage.css'
-import UpdateProfileForm from '../update-profile-form/UpdateProfileForm'
 import MeetingAttendees from '../meetingAttendees/MeetingAttendees'
 
 
-class Modalpage extends Component {
+class MeetingAttendeesModal extends Component {
     state = {
         modal: false,
-
-
-
     }
 
     toggle = () => {
@@ -24,15 +19,15 @@ class Modalpage extends Component {
 
     render() {
 
-        const { state: { modal }, props: { user, updateProfile }, toggle } = this
+        const { state: { modal }, props: { meetingId }, toggle } = this
 
         return (
             <Container>
-                <Button onClick={toggle}>Edit Profile</Button>
+                <Button onClick={toggle}>View Attendees</Button>
                 <Modal isOpen={modal} toggle={toggle}>
-                    <ModalHeader toggle={toggle}>Edit Profile</ModalHeader>
+                    <ModalHeader toggle={toggle}>View Attendees</ModalHeader>
                     <ModalBody>
-                        <UpdateProfileForm user={user} updateProfile={updateProfile} />
+                        <MeetingAttendees clickName={this.clickProfileName} meetingId={meetingId} toggle={toggle}/>
                     </ModalBody>
                     <ModalFooter>
                         <Button color="secondary" onClick={toggle}>Close</Button>{' '}
@@ -43,4 +38,4 @@ class Modalpage extends Component {
     }
 }
 
-export default Modalpage
+export default MeetingAttendeesModal

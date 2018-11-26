@@ -5,6 +5,7 @@ import "react-tabs/style/react-tabs.css";
 import logic from '../../logic'
 import ProjectCard from '../project-card/ProjectCard'
 import CreateProject from '../create-project/CreateProject'
+import { withRouter } from 'react-router-dom'
 
 class Home extends Component {
     state = {
@@ -41,9 +42,14 @@ class Home extends Component {
             default:
 
         }
-
-
     }
+
+    handleSearchTag = (query) => {
+        debugger
+        const searchQuery = `q=&f=${query}`
+        this.props.history.push(`/explore/${searchQuery}`)
+    }
+
 
     render() {
         const { collabProjects, ownProjects, savedProjects } = this.state
@@ -59,19 +65,19 @@ class Home extends Component {
 
                 <TabPanel>
                     <div className="home-myprojects-display">
-                        {ownProjects && ownProjects.map((project, index) => <ProjectCard key={index} project={project} />)}
+                        {ownProjects && ownProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
                     </div>
                 </TabPanel>
 
                 <TabPanel>
                     <div className="home-collaborations-display">
-                        {collabProjects && collabProjects.map((project, index) => <ProjectCard key={index} project={project} />)}
+                        {collabProjects && collabProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
                     </div>
                 </TabPanel>
 
                 <TabPanel>
                     <div className="home-savedprojects-display">
-                        {savedProjects && savedProjects.map((project, index) => <ProjectCard key={index} project={project} />)}
+                        {savedProjects && savedProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
                     </div>
                 </TabPanel>
 
@@ -84,4 +90,4 @@ class Home extends Component {
 
 }
 
-export default Home
+export default withRouter(Home)

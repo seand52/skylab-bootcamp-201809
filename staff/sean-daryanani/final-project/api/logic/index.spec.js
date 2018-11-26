@@ -685,24 +685,35 @@ describe('logic', () => {
                     await project5.save()
                 })
 
-                it('should successfuly query for projects based on a skill', async () => {
+                it('should successfuly query for projects based on a query', async () => {
 
-                    const query = 'rea'
+                    const query = 'q=mongoose'
 
-                    const projects = await logic.searchProjects(query)
+                    const projects = await logic.filterProjects(query)
 
-                    expect(projects.length).to.equal(3)
+                    expect(projects.length).to.equal(1)
 
                     const [_project1, _project2, _project3] = projects
                 })
 
-                it('should successfuly filter results based on skills', async () => {
+                false && it('should successfuly query for projects based on a query and filter', async () => {
 
-                    const arr = ['react', 'mongoose']
+                    const query = 'q=reach&f=mongoose+javascript'
 
-                    const projects = await logic.filterProjects(arr)
+                    const projects = await logic.filterProjects(query)
 
-                    expect(projects.length).to.equal(2)
+                    expect(projects.length).to.equal(1)
+
+                    const [_project1, _project2, _project3] = projects
+                })
+
+                false && it('should successfuly filter results based on skills', async () => {
+
+                    const query = 'q=null&f=javascript'
+
+                    const projects = await logic.filterProjects(query)
+
+                    expect(projects.length).to.equal(5)
 
                     const [_project1, _project2, _project3] = projects
                 })

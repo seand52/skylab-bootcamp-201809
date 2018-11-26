@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import "./searchbar.css";
 import { withRouter } from 'react-router-dom'
+import {Input} from 'mdbreact'
 
 class Searchbar extends Component {
     state = {
@@ -17,15 +18,17 @@ class Searchbar extends Component {
 
     onQueryChange = event => {
         const query = event.target.value
-
+        this.props.searchQuery(query)
         this.setState({query})
     }
+
+
 
 
     render() {
         return (
             <form onSubmit={this.handleSubmit}>
-                <input onChange={this.onQueryChange} className="explore-searchbar" type="text" placeholder="Search" aria-label="Search" />
+                <Input onChange={this.onQueryChange} className="explore-searchbar" type="text" placeholder="Search" aria-label="Search" />
                 <button  type="submit">Search</button>
             </form>
 

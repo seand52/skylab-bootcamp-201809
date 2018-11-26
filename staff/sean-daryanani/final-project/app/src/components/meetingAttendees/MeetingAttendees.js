@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import logic from '../../logic'
+import './meeting-attendees.css'
 class MeetingAttendees extends Component {
     state = {
         meeting: null
@@ -17,8 +18,8 @@ class MeetingAttendees extends Component {
 
     render() {
         const {meeting} = this.state
-        return <div>
-        {meeting && meeting.attending.map((attendee, index) => <p key={index}>{attendee.name}</p>)}
+        return <div className="attendees-list">
+        {meeting && meeting.attending.map((attendee, index) => <p onClick={this.props.clickName} key={index}>{attendee.name}</p>)}
         </div>
     }
 }

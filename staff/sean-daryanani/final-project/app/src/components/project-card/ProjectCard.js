@@ -5,7 +5,7 @@ import SkillsTag from '../skills-tag/SkillsTag'
 
 
 const ProjectCard = props => {
-    const { project } = props
+    const { project, searchTag } = props
 
     if (project) {
         return (
@@ -23,7 +23,7 @@ const ProjectCard = props => {
                         <CardText>
                         {project.description}
                         </CardText>
-                        {project.skills.map((skill, index) => <SkillsTag key={index} skill={skill} pill/>)}
+                        {project.skills.map((skill, index) => <SkillsTag searchTag={searchTag} key={index} skill={skill} pill/>)}
 
                         <Link to={`/project/${project.id}`}><Button type="button" >View Project</Button></Link>
 

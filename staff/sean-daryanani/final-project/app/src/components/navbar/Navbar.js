@@ -51,10 +51,11 @@ class Navbarpage extends React.Component {
                         <NavItem >
                             <button onClick={this.onProfileClick} className="navbar__button" type="button">Profile</button>
                         </NavItem>
-                    </NavbarNav>
-                    <NavbarNav right>
+                        <NavItem >
                         <button onClick={this.handleLogout} className="navbar__button" type="button">Logout</button>
+                        </NavItem>
                     </NavbarNav>
+
                 </Collapse>
             </Navbar>
         );

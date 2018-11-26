@@ -1,11 +1,11 @@
 import React from 'react'
 import './skillstag.css'
 const SkillsTag = props => {
-    const { skill } = props
+    const { skill, searchTag } = props
 
     if (skill) {
         return (
-                <button className="skills-tag" type="button">{skill}</button>
+                <button onClick={() => searchTag(skill)} className="skills-tag" type="button">{skill}</button>
         )
     } else return null
 
