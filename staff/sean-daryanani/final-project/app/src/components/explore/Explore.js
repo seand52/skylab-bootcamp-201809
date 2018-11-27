@@ -45,12 +45,13 @@ class Explore extends Component {
     }
 
     componentWillReceiveProps(props) {
+        if (props.query !== undefined) {
+            logic.filterProjects(props.query)
+                .then(res => {
+                    this.setState({ searchResults: res })
 
-        logic.filterProjects(props.query)
-            .then(res => {
-                this.setState({ searchResults: res })
-
-            })
+                })
+        }
     }
 
     toggleCheckbox = label => {
@@ -87,6 +88,13 @@ class Explore extends Component {
         this.props.history.push(`/explore/${query}`)
 
     }
+
+
+    handleSearchTag = (query) => {
+
+        const searchQuery = `q=&f=${query}`
+        this.props.history.push(`/explore/${searchQuery}`)
+    }
     render() {
         return <div>
             <div className="explore-container">
@@ -103,10 +111,9 @@ class Explore extends Component {
                     </div>
                 </div>
                 <div className="search-area">
-
-                    <div className="search-results">
-                        {this.state.searchResults && this.state.searchResults.map((project, index) => <ProjectCard key={index} project={project} />)}
-                    </div>
+                    {/* <div className="search-results"> */}
+                        {this.state.searchResults && this.state.searchResults.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
+                    {/* </div> */}
                 </div>
             </div>
         </div>

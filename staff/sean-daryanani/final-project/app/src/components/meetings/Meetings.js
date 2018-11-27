@@ -7,7 +7,7 @@ const Meetings = props => {
     if (meeting && project) {
         return (
             <div className="meeting-actions">
-                <p><span>Date</span>: {meeting.date}</p>
+                <p><span>Date</span>: {meeting.listDate}</p>
 
                 <p><span>Location</span>: {meeting.location}</p>
 

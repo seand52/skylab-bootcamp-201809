@@ -187,6 +187,7 @@ const logic = {
             { key: 'skills', value: skills, type: Array, optional: true }
         ])
 
+
         return (async () => {
             const user = await User.findById(id)
 
@@ -211,19 +212,21 @@ const logic = {
      * @param {string}beginnerFriendly 
      * @param {string}maxMembers 
      */
-    addNewProject(id, name, description, skills, beginnerFriendly, maxMembers) {
+    addNewProject(id, name, description, skills, beginnerFriendly, maxMembers, location) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof name !== 'string') throw TypeError(`${name} is not a string`)
         if (typeof description !== 'string') throw TypeError(`${description} is not a string`)
         if (!(skills instanceof Array)) throw TypeError(`${skill} is not an array`)
         if (typeof beginnerFriendly !== 'string') throw TypeError(`${beginnerFriendly} is not a string`)
         if (typeof maxMembers !== 'string') throw TypeError(`${maxMembers} is not a string`)
+        if (typeof location !== 'string') throw TypeError(`${location} is not a string`)
 
         if (!id.trim()) throw new ValueError('id is empty or blank')
         if (!name.trim()) throw new ValueError('name is empty or blank')
         if (!description.trim()) throw new ValueError('description is empty or blank')
         if (!beginnerFriendly.trim()) throw new ValueError('beginnerFriendly is empty or blank')
         if (!maxMembers.trim()) throw new ValueError('maxMembers is empty or blank')
+        if (!location.trim()) throw new ValueError('location is empty or blank')
 
         return (async () => {
 
@@ -231,7 +234,7 @@ const logic = {
 
             if (!user) throw new NotFoundError(`user with id ${id} not found`)
 
-            const project = new Project({ name, description, skills, beginnerFriendly, maxMembers, owner: user.id })
+            const project = new Project({ name, description, skills, beginnerFriendly, maxMembers, owner: user.id, location })
 
             await project.save()
         })()
@@ -322,6 +325,31 @@ const logic = {
             return projects
 
         })()
+    },
+
+    removeCollaboratorFromProject(id, collabId, projectId) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (typeof collabId !== 'string') throw TypeError(`${collabId} is not a string`)
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+        
+
+        if (!id.trim()) throw new ValueError('id is empty or blank')
+        if (!collabId.trim()) throw new ValueError('collabId is empty or blank')
+        if (!projectId.trim()) throw new ValueError('projectId is empty or blank')
+
+        return ( async () => {
+            const project = await Project.findById(projectId)
+            debugger
+            if (id !== project.owner.toString()) throw Error ('not the owner of the project')
+
+            const collaborator = await User.findById(collabId)
+
+            await Project.updateOne({_id: projectId}, {$pull: {collaborators: collaborator._id }})
+
+            const _project = await Project.findById(projectId)
+            debugger
+        })()
+
     },
 
     /**
@@ -517,6 +545,37 @@ const logic = {
 
         })()
     },
+
+    retrievePendingCollaboratorProjects(id) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (!id.trim()) throw new ValueError('id is empty or blank')
+
+        return (async () => {
+
+            const user = await User.findById(id)
+
+            const projects = await Project.find({ owner: user.id, pendingCollaborators: { "$exists": true, $not: { $size: 0 } } }).lean()
+
+            projects.forEach(project => {
+
+                project.id = project._id.toString()
+
+                delete project._id
+
+                delete project.__v
+
+                project.owner = project.owner.toString()
+
+                return project
+            })
+
+            return projects
+
+
+        })()
+
+    },
+
 
     leaveProject(id, projectId) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
@@ -725,30 +784,87 @@ const logic = {
      * @param {string} query 
      * @returns {Promise <Object>}
      */
-    searchProjects(query) {
+    // searchProjects(query) {
 
-        validate([{ key: 'query', value: query, type: String, optional: true }])
+    //     validate([{ key: 'query', value: query, type: String, optional: true }])
+
+    //     return (async () => {
+    //         if (query) {
+    //             let newQuery = query.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "")
+
+    //             const projects = await Project.find({ name: { $regex: newQuery } })
+
+    //             projects.forEach(project => {
+    //                 project.id = project._id.toString()
+
+    //                 delete project._id
+
+    //                 project.owner = project.owner.toString()
+
+    //                 return project
+    //             })
+
+    //             return projects
+
+    //         }
+    //     })()
+    // },
+
+    filterProjects(query) {
+
+        if (typeof query !== 'string') throw TypeError(`${query} is not a string`)
+
+        const queryObject = {
+            name: { $regex: '' },
+            skills: { $all: [] },
+            city: ''
+        }
+
+        query.split('&').forEach((item, index) => {
+            switch(index) {
+                case 0:
+                queryObject.name.$regex = item.match(/[=](.*)/)
+                break
+                case 1:
+                queryObject.skills.$all = item.match(/[=](.*)/).split('+')
+                break
+                case 2:
+                queryObject.city = item.match(/[=](.*)/).split('+')
+                break
+            }
+        })
+
+    
+
+        let newQuery = searchTerm.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "")
+
+
+
+
+        if (!queryObject.skills.$all.length || queryObject.skills.$all[0] === undefined) delete queryObject.skills
+
+        if (queryObject.name.$regex === 'null') delete queryObject.name
 
         return (async () => {
-            if (query) {
-                let newQuery = query.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "")
 
-                const projects = await Project.find({ name: { $regex: newQuery } })
+            const projects = await Project.find(queryObject).lean()
 
-                projects.forEach(project => {
-                    project.id = project._id.toString()
 
-                    delete project._id
+            projects.forEach(project => {
+                project.id = project._id.toString()
 
-                    project.owner = project.owner.toString()
+                delete project._id
+                delete project.__v
+                project.owner = project.owner.toString()
 
-                    return project
-                })
+                return project
+            })
 
-                return projects
+            return projects
 
-            }
+
         })()
+
     },
 
     /**
@@ -780,19 +896,19 @@ const logic = {
 
         let newQuery = searchTerm.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "")
 
-    
+
         const queryObject = {
-            name: {$regex: newQuery},
+            name: { $regex: newQuery },
             skills: { $all: skillsArray }
         }
 
 
-        if (!queryObject.skills.$all.length ||queryObject.skills.$all[0]===undefined ) delete queryObject.skills
+        if (!queryObject.skills.$all.length || queryObject.skills.$all[0] === undefined) delete queryObject.skills
 
-        if (queryObject.name.$regex==='null') delete queryObject.name
+        if (queryObject.name.$regex === 'null') delete queryObject.name
 
         return (async () => {
-  
+
             const projects = await Project.find(queryObject).lean()
 
 
@@ -805,7 +921,7 @@ const logic = {
 
                 return project
             })
-            debugger
+
             return projects
 
 
@@ -864,6 +980,7 @@ const logic = {
 
             await Project.updateOne({ _id: projectId }, { projectImage: result.url })
             const projects = await Project.find()
+
 
         })()
     },

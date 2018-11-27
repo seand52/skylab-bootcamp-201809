@@ -49,7 +49,7 @@ class UpdateProfileForm extends Component {
 
         this.props.updateProfile(this.state.city, this.state.githubProfile, this.state.bio, skillsArray)
 
-        this.props.toggle()
+  
 
     }
 
@@ -102,7 +102,7 @@ class UpdateProfileForm extends Component {
 
                 {skills.map(skill => <Checkbox label={skill} handleCheckboxChange={this.toggleCheckbox} key={skill} selected={this.selectedCheckboxes} />)}
 
-                <Button onClick={this.toggle} type="submit" color="primary">Save changes</Button>
+                <Button onClick={this.props.toggleModal} type="submit" color="primary">Save changes</Button>
             </form>
         </div>
     }

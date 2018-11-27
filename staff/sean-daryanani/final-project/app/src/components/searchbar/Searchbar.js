@@ -11,9 +11,9 @@ class Searchbar extends Component {
     handleSubmit = event => {
         event.preventDefault()
 
-        const {query} = this.state
+        // const {query} = this.state
         
-         this.props.history.push(`/explore/${query}`)
+        //  this.props.history.push(`/explore/${query}`)
     }
 
     onQueryChange = event => {
@@ -28,8 +28,7 @@ class Searchbar extends Component {
     render() {
         return (
             <form onSubmit={this.handleSubmit}>
-                <Input onChange={this.onQueryChange} className="explore-searchbar" type="text" placeholder="Search" aria-label="Search" />
-                <button  type="submit">Search</button>
+                <input onChange={this.onQueryChange} className="explore-searchbar" type="text" placeholder="Search" aria-label="Search" />
             </form>
 
         )

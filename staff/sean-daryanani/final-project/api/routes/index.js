@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken')
 const bearerTokenParser = require('../utils/bearer-token-parser')
 const jwtVerifier = require('./jwt-verifier')
 const routeHandler = require('./route-handler')
+const Busboy = require('busboy')
 
 const jsonBodyParser = bodyParser.json()
 
@@ -108,12 +109,12 @@ router.patch('/user-profile/:id', [bearerTokenParser, jwtVerifier, jsonBodyParse
 router.post('/users/:id/projects', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
 
-        const { sub, params: { id }, body: { name, description, skills, beginnerFriendly, maxMembers } } = req
+        const { sub, params: { id }, body: { name, description, skills, beginnerFriendly, maxMembers, location } } = req
 
 
         if (id !== sub) throw Error('token sub does not match user id')
 
-        return logic.addNewProject(id, name, description, skills, beginnerFriendly, maxMembers)
+        return logic.addNewProject(id, name, description, skills, beginnerFriendly, maxMembers, location)
             .then(() => res.json({
                 message: 'project added'
             }))
@@ -266,6 +267,40 @@ router.patch('/users/:id/projects/:projectid/collaborator', [bearerTokenParser, 
 
     }, res)
 })
+
+router.patch('/users/:id/projects/:projectid/removecollaborator', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+
+        const { sub, params: { id, projectid }, body: {collaboratorId } } = req
+
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.removeCollaboratorFromProject(id, collaboratorId, projectid)
+            .then(() => res.json({
+                message: 'collaborator removed'
+            }))
+
+    }, res)
+})
+
+router.get('/users/:id/pendingcollaborators', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+        debugger
+        const { params: { id }, sub } = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.retrievePendingCollaboratorProjects(id)
+            .then(project => res.json({
+                data: project
+            })
+            )
+    }, res)
+
+})
+
+
 
 router.post('/users/:id/projects/:projectid/meetings', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
@@ -420,19 +455,30 @@ router.get('/users/:id/projects/filter/:query', [bearerTokenParser, jwtVerifier,
 
 })
 
-// router.post('/users/:id/photo', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
-//     routeHandler(() => {
+router.post('/users/:id/photo', [bearerTokenParser, jwtVerifier], (req, res) => {
+    routeHandler(() => {
+        const { params: { id }, sub } = req
+        debugger
+        if (id !== sub) throw Error('token sub does not match user id')
 
-//         const { sub, params: { id, projectid }, body: { file } } = req
+        return new Promise((resolve, reject) => {
+            const busboy = new Busboy({ headers: req.headers })
 
-//         if (id !== sub) throw Error('token sub does not match user id')
+            busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+              debugger
+                logic.insertProfileImage(id, file, filename)
+            })
 
-//         return logic.addMeeting(id, projectid, date, location)
-//             .then(() => res.json({
-//                 message: 'meeting has been added'
-//             }))
+            busboy.on('finish', () => resolve())
 
-//     }, res)
-// })
+            busboy.on('error', err => reject(err))
+
+            req.pipe(busboy)
+        })
+            .then(() => res.json({
+                message: 'photo uploaded'
+            }))
+    }, res)
+})
 
 module.exports = router

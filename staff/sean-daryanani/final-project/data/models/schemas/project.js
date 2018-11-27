@@ -59,8 +59,13 @@ const Project = new Schema({
     }],
     
     projectImage: {
-        type: 'string',
+        type: String,
         default: 'https://steemitimages.com/DQmbt6RdzLkTYqTksex2dZBb2J2X78NygyBGK1Gqxj7Fqha/matrix.jpg'
+    },
+
+    location: {
+        type: String,
+        default: ''
     }
 })
 

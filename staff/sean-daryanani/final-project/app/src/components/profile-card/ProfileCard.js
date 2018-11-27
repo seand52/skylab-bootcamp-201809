@@ -2,7 +2,7 @@ import React from 'react'
 import './profile-card.css'
 
 const ProfileCard = props => {
-    const { user, myProjects, collabProjects, showCollabProjects, projectsStarted } = props
+    const { user, myProjects, collabProjects, showCollabProjects, projectsStarted, uploadImage, userId } = props
 
     if (user) {
         const { name, joinDate, city, githubProfile, skills, profileImage } = user
@@ -18,6 +18,9 @@ const ProfileCard = props => {
                     <div className='profile-img-container'>
                         <img src={profileImage} width='150' alt='project' />
                     </div>
+                    {(userId===user.id) && <form encType="multipart/form-data" onSubmit={uploadImage}>
+                        <input type="file" name="avatar" onChange={uploadImage} />
+                    </form>}
                 </div>
                 <div className='bottom-area'>
                     <button onClick={projectsStarted} type="button" className="btn btn-primary">

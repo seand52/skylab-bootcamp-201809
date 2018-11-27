@@ -23,8 +23,8 @@ class App extends Component {
   }
 
   componentDidMount = () => {
-    
-    this.setState({userId: logic.UserId})
+
+    this.setState({userId: logic.userId})
 
   }
 
@@ -38,10 +38,12 @@ class App extends Component {
 
   handleSkipToLogin = () => {
     this.props.history.push('login')
+    this.setState({error: null})
   }
 
   handleSkipToRegister = () => {
     this.props.history.push('/register')
+    this.setState({error: null})
   }
 
   handleRegister = (name, email, username, password) => {
@@ -104,7 +106,9 @@ class App extends Component {
 
           <Route path="/create-event/:id" render={props => logic.loggedIn ? <CreateMeeting userId={userId} id={props.match.params.id} /> : <Redirect to="/" />} />
         </Switch>
+
         {error && <Error message={error} />}
+        
       </div>
     );
   }

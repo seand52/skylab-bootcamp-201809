@@ -10,8 +10,8 @@ const ProjectCard = props => {
     if (project) {
         return (
 
-            <Col>
-                <Card style={{ width: "16rem" }}>
+
+                <Card style={{ width: "16rem", margin: "20px" }}>
                     <CardImage
                         className="img-fluid"
                         src={project.projectImage}
@@ -29,7 +29,7 @@ const ProjectCard = props => {
 
                     </CardBody>
                 </Card>
-            </Col>
+
         )
     } else return null
 

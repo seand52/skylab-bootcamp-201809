@@ -3,7 +3,9 @@ import './error.css'
 
 const Error = props => {
 
-    return <p className="error">{props.message}</p>
+    return   <div className="alert alert-danger">
+    <strong>{props.message}!</strong> 
+  </div>
 
 }
 

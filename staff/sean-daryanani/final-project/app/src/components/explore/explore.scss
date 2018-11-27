@@ -1,8 +1,6 @@
 .explore-container {
     display: flex;
-
-
-
+    height: 100vh;
 }
 
 .filters {
@@ -14,6 +12,12 @@
 .search-area {
     flex: 0.7;
     background-color: rgb(200, 200, 238);
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 20px;
+    flex-wrap: wrap;
 
 }
 
@@ -26,6 +30,7 @@
 
 
 .search-results {
-    display: flex;
+ display: flex;
+
     
 }

@@ -20,7 +20,7 @@ class CreateMeeting extends Component {
         event.preventDefault()
         const {startDate, description, location} = this.state
         return logic.addMeeting(this.props.userId, this.props.id, startDate, location, description)
-            .then(() => this.props.history.push('/home'))
+            .then(() => this.props.history.push(`/project/${this.props.id}`))
     }
 
     handleChange = date => {

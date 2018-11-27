@@ -19,7 +19,7 @@ class Profile extends Component {
 
     componentDidMount() {
         const { id } = this.props
-        Promise.all([logic.retrieveUserProfile(id), logic.listCollaboratingProjects(id), logic.listOwnProjects(id)])
+        Promise.all([logic.retrieveUserProfile(id), logic.retrievePendingCollaboratorProjects(id), logic.listOwnProjects(id)])
             .then(res => {
                 this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2] })
             })
@@ -70,13 +70,13 @@ class Profile extends Component {
 
     renderTitle = () => {
 
-        const {user, showProjects} = this.state
+        const { user, showProjects } = this.state
 
         if (user) {
-            if (showProjects==='my projects') {
+            if (showProjects === 'my projects') {
                 return <h1>{user.name}'s projects</h1>
             } else {
-                return <h1>{user.name}'s collaborations</h1>
+                return <h1>Projects with pending collaborators</h1>
             }
         }
     }
@@ -87,6 +87,16 @@ class Profile extends Component {
         this.props.history.push(`/explore/${searchQuery}`)
     }
 
+    handleUpload = event => {
+        debugger
+        logic.addProfileImage(event.target.files[0])
+            .then(image => {
+                debugger
+                this.setState({ avatar: image })
+            })
+    }
+
+
 
     render() {
 
@@ -96,14 +106,13 @@ class Profile extends Component {
 
         return <div className="profile-page-container">
             <section className="profile-top-area">
-
-                <ProfileCard showCollabProjects={this.handleShowCollabProjects} user={user} myProjects={ownProjects} projectsStarted={this.handleshowOwnProjects} collabProjects={collabProjects} />
+                <ProfileCard uploadImage={this.handleUpload} showCollabProjects={this.handleShowCollabProjects} user={user} myProjects={ownProjects} projectsStarted={this.handleshowOwnProjects} collabProjects={collabProjects} userId={userId} />
 
                 <section className="bio">
                     <div className="bio__extra-info">
                         <p><span>Bio</span>:{user && user.bio}</p>
                         <span>Github:</span> <a href="https://github.com">{user && user.githubProfile}</a>
-                        <Modalpage user={user} updateProfile={this.sendProfileUpdate}/>
+                 {user && (user.id===userId) && <Modalpage user={user} updateProfile={this.sendProfileUpdate} />}
                     </div>
                     <div className="bio__interests">
                         <h2>Interests</h2>

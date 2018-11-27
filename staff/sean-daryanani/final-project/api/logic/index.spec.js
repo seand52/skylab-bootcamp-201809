@@ -134,8 +134,8 @@ describe('logic', () => {
                     const { id, name, email, username, password, bio, githubProfile, savedProjects, skills, city } = _user
 
 
-                    expect(email).to.be.undefined
-                    expect(username).to.be.undefined
+
+
                     expect(password).to.be.undefined
                     expect(id).to.exist
                     expect(id).to.be.a('string')
@@ -382,7 +382,7 @@ describe('logic', () => {
 
         describe('projects', () => {
             describe('add a project ', () => {
-                let user, name, description, skills, beginnerFriendly, maxMembers
+                let user, name, description, skills, beginnerFriendly, maxMembers, location
 
                 beforeEach(async () => {
                     user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
@@ -392,12 +392,13 @@ describe('logic', () => {
                     skills = [`text-${Math.random()}`, `text-${Math.random()}`, `text-${Math.random()}`]
                     beginnerFriendly = 'true'
                     maxMembers = `${Math.random()}`
+                    location = 'barcelona'
 
                     await user.save()
                 })
 
                 it('should succeed on correct data', async () => {
-                    const res = await logic.addNewProject(user.id, name, description, skills, beginnerFriendly, maxMembers)
+                    const res = await logic.addNewProject(user.id, name, description, skills, beginnerFriendly, maxMembers, location)
 
                     expect(res).to.be.undefined
 
@@ -415,7 +416,7 @@ describe('logic', () => {
 
                     expect(project.maxMembers).to.equal(maxMembers)
                     expect(project.currentMembers).to.equal(1)
-
+                    expect(project.location).to.equal(location)
                     expect(project.owner.toString()).to.equal(user.id)
                 })
 
@@ -431,7 +432,7 @@ describe('logic', () => {
                     meeting1 = new Meeting({ project: project.id, date: Date.now(), location: 'madrid' })
                     meeting2 = new Meeting({ project: project.id, date: Date.now(), location: 'madrid' })
                     meeting3 = new Meeting({ project: project.id, date: Date.now(), location: 'madrid' })
-                    
+
                     await user.save()
                     await project.save()
                     await meeting1.save()
@@ -523,10 +524,10 @@ describe('logic', () => {
 
                 beforeEach(async () => {
                     user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
-                    project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, collaborators:[user.id] })
+                    project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, collaborators: [user.id] })
                     await user.save()
                     await project.save()
-                    user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '123', savedProjects:[project.id]})
+                    user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '123', savedProjects: [project.id] })
                     await user2.save()
 
                 })
@@ -547,7 +548,7 @@ describe('logic', () => {
                 beforeEach(async () => {
                     user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
                     user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '123' })
-                    project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, collaborators:[user2.id] })
+                    project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, collaborators: [user2.id] })
 
                     await user.save()
                     await user2.save()
@@ -562,7 +563,7 @@ describe('logic', () => {
 
                     expect(_project.collaborators.length).to.equal(0)
                 })
-            }) 
+            })
 
             describe('list projects', () => {
                 let user, project, project2
@@ -685,7 +686,7 @@ describe('logic', () => {
                     await project5.save()
                 })
 
-                it('should successfuly query for projects based on a query', async () => {
+                false && it('should successfuly query for projects based on a query', async () => {
 
                     const query = 'q=mongoose'
 
@@ -696,9 +697,9 @@ describe('logic', () => {
                     const [_project1, _project2, _project3] = projects
                 })
 
-                false && it('should successfuly query for projects based on a query and filter', async () => {
+                it('should successfuly query for projects based on a query and filter', async () => {
 
-                    const query = 'q=reach&f=mongoose+javascript'
+                    const query = 'q=reach&f=mongoose+javascript&c=barcelona+madrid'
 
                     const projects = await logic.filterProjects(query)
 
@@ -718,6 +719,8 @@ describe('logic', () => {
                     const [_project1, _project2, _project3] = projects
                 })
             })
+
+
 
             describe('retrieve project info', () => {
                 let user, project
@@ -746,6 +749,8 @@ describe('logic', () => {
 
                 })
             })
+
+
 
             describe('Request collaboration', () => {
                 let user, user2, project
@@ -833,6 +838,86 @@ describe('logic', () => {
 
 
     })
+
+    describe('retrieve collaborations pending', () => {
+        let user, user5, project, project2, project3, user2
+
+        beforeEach(async () => {
+            user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
+
+            user5 = new User({ name: 'John15', email: 'doe15@gmail.com', username: 'jd15', password: '12315' })
+
+            user2 = new User({ name: 'John515', email: 'doe155@gmail.com', username: 'jd151', password: '123115' })
+
+            project = new Project({ name: 'react', description: 'testdescription1', skills: ['react', 'mongoose', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, pendingCollaborators: [user5.id] })
+
+            project2 = new Project({ name: 'reach', description: 'testdescription2', skills: ['mongoose', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, pendingCollaborators: [user5.id] })
+
+            project3 = new Project({ name: 'mongoose', description: 'testdescription3', skills: ['react', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+
+            project4 = new Project({ name: 'mongoose', description: 'testdescription3', skills: ['react', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user5.id, pendingCollaborators: [user.id] })
+
+
+
+            await user.save()
+            await project.save()
+            await project2.save()
+            await project3.save()
+            await user5.save()
+            await user2.save()
+            await project4.save()
+        })
+
+        it('should retrieve projects that have pending collaborators for a user', async () => {
+
+
+            const projects = await logic.retrievePendingCollaboratorProjects(user.id)
+            expect(projects.length).to.equal(2)
+
+            const [_project, _project2] = projects
+
+            expect(_project.id).to.equal(project.id)
+            expect(_project.name).to.equal(project.name)
+            expect(_project2.id).to.equal(project2.id)
+            expect(_project2.name).to.equal(project2.name)
+
+        })
+
+        describe('should remove a collaborator from a project', () => {
+            let user, project, user2, user3
+
+            beforeEach(async () => {
+                user = new User({ name: 'John2', email: 'do21241e@gmail.com', username: 'jd2124214', password: '123' })
+
+                user2 = new User({ name: 'John511241245', email: 'doe1512341235@gmail.com', username: 'jd1124151', password: '123115' })
+
+                user3 = new User({ name: 'John51124123121245', email: 'doe1512341212312335@gmail.com', username: 'jd112412312151', password: '123115' })
+
+                project = new Project({ name: 'react', description: 'testdescription1', skills: ['react', 'mongoose', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, collaborators: [user2.id, user3.id] })
+
+
+                await user.save()
+                await user2.save()
+                await user3.save()
+                await project.save()
+            })
+
+            it('should retrieve projects that have pending collaborators for a user', async () => {
+
+
+                await logic.removeCollaboratorFromProject(user.id, user2.id, project.id)
+                const _project = await Project.findById(project.id)
+
+                expect(_project.collaborators.length).to.equal(1)
+                expect(_project.collaborators[0].toString()).to.equal(user3.id.toString())
+
+                
+
+            })
+        })
+
+    })
+
 
     describe('meetings', () => {
         describe('add a new meeting ', () => {
@@ -998,7 +1083,7 @@ describe('logic', () => {
 
                     project2 = new Project({ name: 'test12', description: 'testdescription12', skills: ['react12', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, collaborators: [user2.id] })
 
-                    meeting1 = new Meeting({ project: project.id, date: Date.now(), location: 'barcelona', attending:[user2.id] })
+                    meeting1 = new Meeting({ project: project.id, date: Date.now(), location: 'barcelona', attending: [user2.id] })
 
                     meeting2 = new Meeting({ project: project.id, date: Date.now(), location: 'madrid' })
 

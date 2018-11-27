@@ -23,6 +23,7 @@ class CreateProject extends Component {
         maxMembers: '',
         error: false,
         toggleSuccess: false,
+        location: ''
     }
 
 
@@ -37,15 +38,15 @@ class CreateProject extends Component {
 
         }
 
-        const { name, description, maxMembers } = this.state
+        const { name, description, maxMembers, location } = this.state
 
         try {
-            logic.addNewProject(name, description, skillsArray, 'true', maxMembers)
+            logic.addNewProject(name, description, skillsArray, 'true', maxMembers, location)
                 .then(() => {
                     this.setState({ error: false, toggleSuccess: !this.state.toggleSuccess })
                 })
-        } catch(err) {
-            this.setState({error: true})
+        } catch (err) {
+            this.setState({ error: true })
         }
 
         //TODO error handling
@@ -88,6 +89,11 @@ class CreateProject extends Component {
         this.setState({ maxMembers })
     }
 
+    onLocationChange = event => {
+        const location = event.target.value
+        this.setState({location})
+    }
+
 
 
     render() {
@@ -100,9 +106,19 @@ class CreateProject extends Component {
 
                     <label className="create-project__description-label" >Describe who should join, and what you aim to achieve</label>
 
-                    <Input type="textarea" onChange={this.onProjectDescriptionChange} className="form-control rounded-0" id="exampleFormControlTextarea2" rows="3"/>
+                    <Input type="textarea" onChange={this.onProjectDescriptionChange} className="form-control rounded-0" id="exampleFormControlTextarea2" rows="3" />
 
-                    <label className="create-project__select-label">What is the maximum amount of members you would like to allow?</label><br/>
+                    <label className="create-project__select-label">In what city will your meetings be hosted?</label><br />
+
+                    <select className="create-project__select" onChange={this.onLocationChange} name="agent" id="agent">
+                        <option value="Barcelona">Barcelona</option>
+                        <option value="Madrid">Madrid</option>
+                        <option value="Bilbao">Bilbao</option>
+                        <option value="Sevilla">Sevilla</option>
+                        <option value="Valencia">Valencia</option>
+                    </select> <br />
+
+                    <label className="create-project__select-label">What is the maximum amount of members you would like to allow?</label><br />
 
                     <select className="create-project__select" onChange={this.onMaxMembersChange} name="agent" id="agent">
                         <option value="1">1</option>
@@ -118,23 +134,23 @@ class CreateProject extends Component {
 
                     <label className="create-project__technologies-label">What technologies will your project include?</label>
                     <div className="create-project__skills-checkboxes">
-                    {skills.map(skill => <Checkbox label={skill} handleCheckboxChange={this.toggleCheckbox} key={skill} selected={this.selectedCheckboxes} />)}
+                        {skills.map(skill => <Checkbox label={skill} handleCheckboxChange={this.toggleCheckbox} key={skill} selected={this.selectedCheckboxes} />)}
                     </div>
 
                     <Button type="submit" color="primary">Save changes</Button>
                 </form>
                 {this.state.error ? <p>You must complete all the fields</p> : null}
-                
+
                 {this.state.toggleSuccess ? <p>Project added</p> : null}
                 <aside className="rules">
-                <p>Remember to keep in mind the following:</p>
-                <ul>
-                    <li>Arrange real, in-person sessions</li>
-                    <li>Have open and honest intentions</li>
-                    <li>Always be safe and respectful</li>
-                    <li>Put your members first</li>
-                </ul>
-            </aside>
+                    <p>Remember to keep in mind the following:</p>
+                    <ul>
+                        <li>Arrange real, in-person sessions</li>
+                        <li>Have open and honest intentions</li>
+                        <li>Always be safe and respectful</li>
+                        <li>Put your members first</li>
+                    </ul>
+                </aside>
             </section>
 
 

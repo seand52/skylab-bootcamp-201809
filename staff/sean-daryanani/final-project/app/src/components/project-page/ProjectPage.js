@@ -22,7 +22,7 @@ class ProjectPage extends Component {
             .then(res => this.setState({ project: res }))
             .then(() => logic.listProjectMeetings(this.props.id))
             .then(res => this.setState({ meetings: res }))
-            .then(() => logic.retrieveUserProfile(this.props.userId))
+            .then(() => logic.retrieveUserProfile(this.state.project.owner.id))
             .then(res => this.setState({ user: res }))
     }
 
@@ -93,12 +93,18 @@ class ProjectPage extends Component {
     }
 
 
-        handleSearchTag = (query) => {
+    handleSearchTag = (query) => {
 
-            const searchQuery = `q=&f=${query}`
-            this.props.history.push(`/explore/${searchQuery}`)
-        }
-    
+        const searchQuery = `q=&f=${query}`
+        this.props.history.push(`/explore/${searchQuery}`)
+    }
+
+    handleRemoveCollaborator = (collaboratorId) => {
+        return logic.removeCollaborator(collaboratorId, this.props.id)
+            .then(() => logic.retrieveProjectInfo(this.props.id))
+            .then(res => this.setState({ project: res }))
+    }
+
 
     renderCollabButtons = () => {
 
@@ -134,7 +140,7 @@ class ProjectPage extends Component {
         if (user && project) {
 
             const res = project.skills.filter(value => -1 !== user.skills.indexOf(value));
-            if (res.length) return `Matches with ${(res.length / user.skills.length).toFixed(2)}% of your interests`
+            if (res.length) return `Matches with ${(res.length / user.skills.length).toFixed(2) * 100}% of your interests`
             else return 'does not match with any of your interests :('
 
         }
@@ -213,11 +219,11 @@ class ProjectPage extends Component {
                 </section>
                 <section className="project-page-meetings">
                     <h2>Upcoming Meetings</h2>
-                    {meetings && meetings.map((meeting, index) => {
+                    {meetings && meetings.sort((a, b) => a.realDate - b.realDate).map((meeting, index) => {
                         return (
                             <div className="individual-meeting-container" key={index}>
                                 <Meetings unAttendMeeting={this.handleUnAttendMeeting} attendMeeting={this.handleAttendMeeting} deleteMeeting={this.handleDeleteMeeting} userId={this.props.userId} key={index} meeting={meeting} project={project} />
-                                <MeetingAttendeesModal clickName={this.clickProfileName} meetingId={meeting.id}/>
+                                <MeetingAttendeesModal clickName={this.clickProfileName} meetingId={meeting.id} />
                             </div>)
                     })}
                 </section>
@@ -227,7 +233,7 @@ class ProjectPage extends Component {
             <section className="project-page-collaborators">
                 <h1>Current Collaborators</h1>
                 <div className="project-page-collaborators-display">
-                    {project && project.collaborators.map((collaborator, index) => <CollaboratorCard clickName={this.clickProfileName} collaborator={collaborator} key={index} />)}
+                    {project && project.collaborators.map((collaborator, index) => <CollaboratorCard clickName={this.clickProfileName} collaborator={collaborator} key={index} userId={this.props.userId} ownerId={project.owner.id} removeCollaborator={this.handleRemoveCollaborator} />)}
                 </div>
             </section>
             {project && (this.props.userId === project.owner.id) ? <section className="project-page-pending-collaborators">

@@ -45,7 +45,7 @@ class Home extends Component {
     }
 
     handleSearchTag = (query) => {
-        debugger
+
         const searchQuery = `q=&f=${query}`
         this.props.history.push(`/explore/${searchQuery}`)
     }

@@ -80,7 +80,7 @@ const logic = {
         return !!this._userId
     },
 
-    get UserId() {
+    get userId() {
         return this._userId
     },
 
@@ -95,7 +95,7 @@ const logic = {
 
     retrieveUserProfile(id) {
 
-        return fetch(`${this.url}/user-profile/${id}`, {
+        return fetch(`${this.url}/user-profile/${id || this._userId}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${this._token}`
@@ -172,6 +172,7 @@ const logic = {
     },
 
     saveProject(projectId) {
+
         return fetch(`${this.url}/users/${this._userId}/projects/${projectId}/save`, {
             method: 'POST',
             headers: {
@@ -215,7 +216,7 @@ const logic = {
             })
     },
 
-    addNewProject(name, description, skills, beginnerFriendly, maxMembers) {
+    addNewProject(name, description, skills, beginnerFriendly, maxMembers, location) {
         if (typeof name !== 'string') throw TypeError(`${name} is not a string`)
         if (typeof description !== 'string') throw TypeError(`${description} is not a string`)
         if (typeof beginnerFriendly !== 'string') throw TypeError(`${beginnerFriendly} is not a string`)
@@ -234,7 +235,7 @@ const logic = {
                 'Authorization': `Bearer ${this._token}`
 
             },
-            body: JSON.stringify({ name, description, skills, beginnerFriendly, maxMembers })
+            body: JSON.stringify({ name, description, skills, beginnerFriendly, maxMembers, location })
         })
             .then(res => res.json())
             .then(res => {
@@ -260,7 +261,7 @@ const logic = {
     },
 
     filterProjects(query) {
-        debugger
+
         if (typeof query !== 'string') throw TypeError(`${query} is not a string`)
         if (!query.trim()) throw Error('query is empty or blank')
         return fetch(`${this.url}/users/${this._userId}/projects/filter/${query}`, {
@@ -309,7 +310,10 @@ const logic = {
             .then(res => {
                 if (res.error) throw Error(res.error)
 
-                res.data.forEach(item => item.date = logic._changeDate(item.date, 'meeting'))
+                res.data.forEach(item => {
+                    item.realDate = new Date(item.date)
+                    item.listDate = logic._changeDate(item.date, 'meeting')
+                })
 
                 return res.data
             })
@@ -348,6 +352,45 @@ const logic = {
             .then(res => res.json())
             .then(res => {
                 if (res.error) throw Error(res.error)
+            })
+    },
+
+    removeCollaborator(collaboratorId, projectId) {
+        if (typeof collaboratorId !== 'string') throw TypeError(`${collaboratorId} is not a string`)
+        if (!collaboratorId.trim()) throw Error('collaboratid is empty or blank')
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+        if (!projectId.trim()) throw Error('projectId is empty or blank')
+
+        return fetch(`${this.url}/users/${this._userId}/projects/${projectId}/removecollaborator`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+
+            },
+            body: JSON.stringify({ collaboratorId })
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+            })
+    },
+
+    retrievePendingCollaboratorProjects(id) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (!id.trim()) throw Error('id is empty or blank')
+
+        return fetch(`${this.url}/users/${this._userId || id}/pendingcollaborators`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+
+                return res.data
             })
     },
 
@@ -511,7 +554,25 @@ const logic = {
             })
 
 
-    }
+    },
+
+
+
+    addProfileImage(file) {
+        let avatar = new FormData()
+
+        avatar.append('avatar', file)
+
+        return fetch(`${this.url}/users/${this._userId}/photo`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            },
+            body: avatar
+        })
+            .then(res => res.json())
+            .then(res => res.data)
+    },
 
 
 }

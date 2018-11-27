@@ -1,17 +1,22 @@
 .explore-container {
   display: flex;
+  height: 100vh;
 }
 
 .filters {
   flex: 0.3;
   background-color: #eecccc;
-  height: 100vh;
 }
 
 .search-area {
   flex: 0.7;
   background-color: #c8c8ee;
-  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 20px;
+  flex-wrap: wrap;
 }
 
 .filter-skills {
@@ -19,6 +24,10 @@
   flex-direction: column;
   flex-wrap: wrap;
   justify-content: space-between;
+}
+
+.search-results {
+  display: flex;
 }
 
 /*# sourceMappingURL=explore.css.map */
