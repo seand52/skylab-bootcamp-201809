@@ -296,6 +296,7 @@ const logic = {
         })()
     },
 
+
     /**
      * List all projects where the user is a collaborator
      * @param {string} id 
@@ -344,7 +345,7 @@ const logic = {
 
             const collaborator = await User.findById(collabId)
 
-            await Project.updateOne({ _id: projectId }, { $pull: { collaborators: collaborator._id } })
+            await Project.updateOne({ _id: projectId }, { $pull: { collaborators: collaborator._id }, $inc: { currentMembers: -1 } })
 
             const _project = await Project.findById(projectId)
 
@@ -497,6 +498,10 @@ const logic = {
 
             const user = await User.findById(id)
 
+            const project = await Project.findById(projectId)
+
+            if (parseInt(project.maxMembers) === project.currentMembers) throw Error('project capacity is full')
+
             await Project.updateOne({ _id: projectId }, { $push: { pendingCollaborators: user._id } })
 
         })()
@@ -529,7 +534,8 @@ const logic = {
                     { _id: projectId },
                     {
                         $pull: { pendingCollaborators: collab.id },
-                        $push: { collaborators: collab.id }
+                        $push: { collaborators: collab.id },
+                        $inc: { currentMembers: 1 }
                     }
                 )
             } else {
@@ -616,9 +622,10 @@ const logic = {
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
         if (typeof description !== 'string') throw TypeError(`${description} is not a string`)
 
-        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
-        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
-        if (typeof description !== 'string') throw TypeError(`${description} is not a string`)
+        if (!id.trim()) throw new ValueError('id is empty or blank')
+        if (!projectId.trim()) throw new ValueError('projectId is empty or blank')
+
+        if (new Date() > date) throw Error('cannot create a meeting in the past')
 
         return (async () => {
             const user = await User.findById(id)
@@ -638,11 +645,8 @@ const logic = {
      * @param {string} meetingId 
      */
     deleteMeeting(meetingId) {
-        // if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
-
-        // if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
-        if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
+        if (!meetingId.trim()) throw new ValueError('meetingId is empty or blank')
 
         return (async () => {
 
@@ -661,11 +665,10 @@ const logic = {
      * @returns {Promise <Object>}
      */
     listProjectMeetings(projectId) {
-        // if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
-        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
 
-        // if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+        if (!projectId.trim()) throw new ValueError('projectId is empty or blank')
+
 
         return (async () => {
 
@@ -695,6 +698,7 @@ const logic = {
 
     retrieveMeetingInfo(meetingId) {
         if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
+        if (!meetingId.trim()) throw new ValueError('meetingId is empty or blank')
 
         return (async () => {
             const meeting = await Meeting.findById(meetingId).populate('attending').lean().exec()
@@ -724,8 +728,8 @@ const logic = {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
 
-        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
-        if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
+        if (!id.trim()) throw new ValueError('id is empty or blank')
+        if (!meetingId.trim()) throw new ValueError('meetingId is empty or blank')
 
         return (async () => {
 
@@ -741,8 +745,8 @@ const logic = {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
 
-        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
-        if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
+        if (!id.trim()) throw new ValueError('id is empty or blank')
+        if (!meetingId.trim()) throw new ValueError('meetingId is empty or blank')
 
         return (async () => {
 
@@ -757,19 +761,25 @@ const logic = {
     userUpcomingMeetings(id) {
 
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
-        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (!id.trim()) throw new ValueError('id is empty or blank')
 
         return (async () => {
 
             const user = await User.findById(id)
 
             const meetings = await Meeting.find({ attending: { $in: [user.id] } })
+                .lean()
+                .sort({ date: 1 })
+                .populate({ path: 'project', select: '_id' })
+                .populate({ path: 'project', select: 'name' })
+                .exec()
 
             meetings.forEach(meeting => {
                 meeting.id = meeting._id.toString()
-
+                meeting.project._id && (meeting.project.id = meeting.project._id.toString())
+                delete meeting.project._id
                 delete meeting._id
-
+                delete meeting.__v
                 return meeting
             })
 
@@ -779,36 +789,6 @@ const logic = {
         })()
     },
 
-    /**
-     * 
-     * @param {string} query 
-     * @returns {Promise <Object>}
-     */
-    // searchProjects(query) {
-
-    //     validate([{ key: 'query', value: query, type: String, optional: true }])
-
-    //     return (async () => {
-    //         if (query) {
-    //             let newQuery = query.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "")
-
-    //             const projects = await Project.find({ name: { $regex: newQuery } })
-
-    //             projects.forEach(project => {
-    //                 project.id = project._id.toString()
-
-    //                 delete project._id
-
-    //                 project.owner = project.owner.toString()
-
-    //                 return project
-    //             })
-
-    //             return projects
-
-    //         }
-    //     })()
-    // },
 
     filterProjects(query) {
 
@@ -870,7 +850,7 @@ const logic = {
 
     },
 
-    
+
 
     insertProfileImage(userId, file) {
         validate([
@@ -931,7 +911,7 @@ const logic = {
         return (async () => {
             const user = await User.findById(id)
 
-            const picture = cloudinary.url(user.profileImage, {width: width, height: height, gravity: "face", radius: "max", crop: "fill", fetch_format: "auto", type: "fetch"})
+            const picture = cloudinary.url(user.profileImage, { width: width, height: height, gravity: "face", radius: "max", crop: "fill", fetch_format: "auto", type: "fetch" })
 
 
             return picture
@@ -944,7 +924,7 @@ const logic = {
         return (async () => {
             const project = await Project.findById(projectId)
 
-            const picture = cloudinary.url(project.projectImage, {width: 300, height: 300, crop: "scale", fetch_format: "auto", type: "fetch"})
+            const picture = cloudinary.url(project.projectImage, { width: 300, height: 300, crop: "scale", fetch_format: "auto", type: "fetch" })
 
             return picture
         })()

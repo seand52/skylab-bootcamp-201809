@@ -2,7 +2,7 @@ import React from 'react'
 import './profile-card.css'
 
 const ProfileCard = props => {
-    const { user, myProjects, collabProjects, showCollabProjects, projectsStarted, uploadImage, userId, profileImage } = props
+    const { user, myProjects, collabProjects, showCollabProjects, projectsStarted, uploadImage, userId, profileImage, meetings, numberOfMeetings } = props
 
     if (user) {
         const { name, joinDate, city, githubProfile, skills } = user
@@ -29,8 +29,8 @@ const ProfileCard = props => {
                     {(userId===user.id) && <button onClick={showCollabProjects} type="button" className="btn btn-primary">
                         Collaborations <span className="badge badge-light">{collabProjects ? collabProjects.length : 0}</span>
                     </button>}
-                    <button type="button" className="btn btn-primary">
-                        Interests <span className="badge badge-light">{skills && skills.length}</span>
+                    <button onClick={() => meetings(user.id)} type="button" className="btn btn-primary">
+                        Upcoming Meetings <span className="badge badge-light">{numberOfMeetings ? numberOfMeetings : 0}</span>
                     </button>
 
                 </div>

@@ -6,7 +6,9 @@ import ProfileCard from '../profile-card/ProfileCard'
 import ProjectCard from '../project-card/ProjectCard'
 import Modalpage from '../modal/Modalpage'
 import SkillsTag from '../skills-tag/SkillsTag'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
+
+import Meetings from '../meetings/Meetings'
 
 class Profile extends Component {
 
@@ -14,6 +16,7 @@ class Profile extends Component {
         user: null,
         ownProjects: false,
         collabProjects: false,
+        upComingMeetings: false,
         showProjects: 'my projects',
         image: false
     }
@@ -22,7 +25,7 @@ class Profile extends Component {
         const { id } = this.props
         Promise.all([logic.retrieveUserProfile(id), logic.retrievePendingCollaboratorProjects(id), logic.listOwnProjects(id), logic.retrieveProfileImage(id)])
             .then(res => {
-                this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2], image:res[3] })
+                this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2], image: res[3] })
             })
     }
 
@@ -69,6 +72,12 @@ class Profile extends Component {
             .then(res => this.setState({ ownProjects: res, showProjects: 'my projects' }))
     }
 
+    handleUpComingMeetings = (id) => {
+        debugger
+        return logic.userUpcomingMeetings(id)
+            .then(result => this.setState({ upComingMeetings: result, showProjects: 'meetings' }))
+    }
+
     renderTitle = () => {
 
         const { user, showProjects } = this.state
@@ -80,6 +89,10 @@ class Profile extends Component {
                 return <h1>Projects with pending collaborators</h1>
             }
         }
+    }
+
+    goToMeetingProject = () => {
+
     }
 
     handleSearchTag = (query) => {
@@ -99,21 +112,23 @@ class Profile extends Component {
 
 
 
+
+
     render() {
 
 
-        const { state: { user, ownProjects, collabProjects, showProjects, image }, props: { id, userId } } = this
+        const { state: { user, ownProjects, collabProjects, showProjects, image, upComingMeetings }, props: { id, userId } } = this
 
 
         return <div className="profile-page-container">
             <section className="profile-top-area">
-                <ProfileCard uploadImage={this.handleUpload} showCollabProjects={this.handleShowCollabProjects} user={user} myProjects={ownProjects} projectsStarted={this.handleshowOwnProjects} collabProjects={collabProjects} userId={userId} profileImage={image} />
+                <ProfileCard uploadImage={this.handleUpload} showCollabProjects={this.handleShowCollabProjects} user={user} myProjects={ownProjects} projectsStarted={this.handleshowOwnProjects} collabProjects={collabProjects} userId={userId} profileImage={image} meetings={this.handleUpComingMeetings} numberOfMeetings={upComingMeetings.length} />
 
                 <section className="bio">
                     <div className="bio__extra-info">
                         <p><span>Bio</span>:{user && user.bio}</p>
                         <span>Github:</span> <a href="https://github.com">{user && user.githubProfile}</a>
-                 {user && (user.id===userId) && <Modalpage user={user} updateProfile={this.sendProfileUpdate} />}
+                        {user && (user.id === userId) && <Modalpage user={user} updateProfile={this.sendProfileUpdate} />}
                     </div>
                     <div className="bio__interests">
                         <h2>Interests</h2>
@@ -133,6 +148,14 @@ class Profile extends Component {
                 <div className="main-area__projects">
                     {ownProjects && (showProjects === 'my projects') && ownProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
                     {collabProjects && (showProjects === 'collab projects') && collabProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
+                    {upComingMeetings && (showProjects === 'meetings') && upComingMeetings.map((meeting, index) => {
+                        debugger
+                        return (<div key={index}>
+                            <p>{meeting.location}</p>
+                            <p>{meeting.date}</p>
+                            <Link to={`/project/${meeting.project.id}`}><p>{meeting.project.name}</p></Link>
+                        </div>)
+                    })}
 
                 </div>
             </section>

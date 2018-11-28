@@ -18,7 +18,7 @@ class ProjectPage extends Component {
         projectImage: null
     }
     componentDidMount() {
-        debugger
+
         return logic.retrieveProjectInfo(this.props.id)
             .then(res => this.setState({ project: res }))
             .then(() => logic.listProjectMeetings(this.props.id))
@@ -76,9 +76,15 @@ class ProjectPage extends Component {
 
     handleRequestCollaboration = () => {
         const { id, userId } = this.props
+        try {
         return logic.requestCollaboration(id, userId)
             .then(() => logic.retrieveProjectInfo(this.props.id))
             .then(res => this.setState({ project: res }))
+            .catch((err) => console.error(err))
+
+        } catch (err) {
+            console.error(err)
+        }
     }
 
     handleSaveProject = () => {

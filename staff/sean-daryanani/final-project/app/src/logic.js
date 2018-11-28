@@ -85,7 +85,6 @@ const logic = {
     },
 
     logout() {
-        this._postits = []
         this._userId = null
         this._token = null
 
@@ -336,6 +335,24 @@ const logic = {
             })
     },
 
+    userUpcomingMeetings(id) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (!id.trim()) throw Error('id is empty or blank')
+        return fetch(`${this.url}/users/${this._userId}/meetings`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+
+                return res.data
+            })
+
+    },
+
     handleCollaboration(projectid, decision, collaboratorId) {
         if (typeof decision !== 'string') throw TypeError(`${decision} is not a string`)
         if (!decision.trim()) throw Error('decision is empty or blank')
@@ -537,6 +554,8 @@ const logic = {
         if (!projectId.trim()) throw Error('projectId is empty or blank')
         if (!location.trim()) throw Error('location is empty or blank')
         if (!description.trim()) throw Error('description is empty or blank')
+        debugger
+        if(new Date() > startDate ) throw Error ('cannot create a meeting in the past')
 
 
         return fetch(`${this.url}/users/${this._userId}/projects/${projectId}/meetings`, {

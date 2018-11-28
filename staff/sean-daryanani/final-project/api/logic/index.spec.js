@@ -907,7 +907,6 @@ describe('logic', () => {
 
                 await logic.removeCollaboratorFromProject(user.id, user2.id, project.id)
                 const _project = await Project.findById(project.id)
-
                 expect(_project.collaborators.length).to.equal(1)
                 expect(_project.collaborators[0].toString()).to.equal(user3.id.toString())
 
@@ -1123,9 +1122,11 @@ describe('logic', () => {
 
                 project2 = new Project({ name: 'test12', description: 'testdescription12', skills: ['react12', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id })
 
-                meeting1 = new Meeting({ project: project.id, date: Date.now(), location: 'barcelona', attending: [user2.id] })
-                meeting2 = new Meeting({ project: project.id, date: Date.now(), location: 'madrid', attending: [user.id] })
-                meeting3 = new Meeting({ project: project.id, date: Date.now(), location: 'bilbao', attending: [user2.id] })
+                meeting1 = new Meeting({ project: project.id, date: new Date('2018-12-01T14:26:31.000Z'), location: 'barcelona', attending: [user2.id] })
+                meeting2 = new Meeting({ project: project.id, date: new Date('2018-12-01T14:32:30.000Z'), location: 'madrid', attending: [user.id] })
+                meeting3 = new Meeting({ project: project.id, date: new Date('2017-12-01T14:32:30.000Z'), location: 'bilbao', attending: [user2.id] })
+                meeting4 = new Meeting({ project: project2.id, date: new Date('2018-11-01T14:32:30.000Z'), location: 'bilbao', attending: [user2.id] })
+                meeting5 = new Meeting({ project: project2.id, date: new Date('2018-10-01T14:32:30.000Z'), location: 'bilbao', attending: [user.id] })
 
                 await user.save()
                 await user2.save()
@@ -1134,13 +1135,15 @@ describe('logic', () => {
                 await meeting1.save()
                 await meeting2.save()
                 await meeting3.save()
+                await meeting4.save()
+                await meeting5.save()
             })
 
             it('should succeed on correct data', async () => {
-
+                debugger
                 const meetings = await logic.userUpcomingMeetings(user2.id)
 
-                expect(meetings.length).to.equal(2)
+                expect(meetings.length).to.equal(3)
 
                 const [_meeting1, _meeting2] = meetings
 
