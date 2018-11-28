@@ -7,6 +7,7 @@ import './navbar.css'
 class Navbarpage extends React.Component {
     state = {
         isOpen: false,
+        pendingCollaborators: false,
     };
 
 
@@ -22,6 +23,22 @@ class Navbarpage extends React.Component {
         logic.logout()
 
         this.props.history.push('/')
+    }
+
+    componentDidMount() {
+        console.log('did mount dong stuff')
+        if(this.props.userId) {
+        logic.retrievePendingCollaboratorProjects(this.props.userId)
+            .then(res => this.setState({pendingCollaborators : res.length}))
+        }
+    }
+
+    componentWillReceiveProps(props) {
+        console.log('wil receive props dong stuff')
+        if(props.userId) {
+            logic.retrievePendingCollaboratorProjects(props.userId)
+            .then(res => this.setState({pendingCollaborators : res.length}))
+        }
     }
 
     toggleCollapse = () => this.setState({ isOpen: !this.state.isOpen })
@@ -50,6 +67,9 @@ class Navbarpage extends React.Component {
                         </NavItem>
                         <NavItem >
                             <button onClick={this.onProfileClick} className="navbar__button" type="button">Profile</button>
+                        </NavItem>
+                        <NavItem >
+                            <p>{this.state.pendingCollaborators && this.state.pendingCollaborators}</p>
                         </NavItem>
                         <NavItem >
                         <button onClick={this.handleLogout} className="navbar__button" type="button">Logout</button>

@@ -581,6 +581,7 @@ describe('logic', () => {
                 })
 
                 it('should succeed on listing all projects where user is owner', async () => {
+
                     const projects = await logic.listOwnProjects(user.id)
                     expect(projects).not.to.be.undefined
 
@@ -728,17 +729,19 @@ describe('logic', () => {
                 beforeEach(async () => {
 
                     user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
+                    user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '123', skills: ['javascript', 'python'] })
 
-                    project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+                    project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, collaborators: [user2.id], pendingCollaborators: [user2.id] })
 
                     await user.save()
+                    await user2.save()
                     await project.save()
                 })
 
                 it('should retrieve information on correct project ID', async () => {
                     const { name, description, skills, beginnerFriendly, maxMembers, owner } = project
 
-                    const _project = await logic.retrieveProjectInfo(project.id)
+                    const _project = await logic.retrieveProjectInfo(project.id, user2.id)
 
                     expect(_project.name).to.equal(name)
                     expect(_project.description).to.equal(description)
@@ -1140,7 +1143,7 @@ describe('logic', () => {
             })
 
             it('should succeed on correct data', async () => {
-                debugger
+
                 const meetings = await logic.userUpcomingMeetings(user2.id)
 
                 expect(meetings.length).to.equal(3)

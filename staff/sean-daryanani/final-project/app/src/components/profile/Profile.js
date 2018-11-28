@@ -47,20 +47,7 @@ class Profile extends Component {
             })
     }
 
-    // renderModal = () => {
-
-    //     const { state: { user }, props: { userId, id } } = this
-    //     if (user) {
-    //         if (id === userId) {
-    //             return <Modalpage user={user} updateProfile={this.sendProfileUpdate} render={'profile update'} />
-    //         } else {
-    //             return null
-    //         }
-    //     }
-    // }
-
     handleShowCollabProjects = () => {
-
         const { id } = this.props
         return logic.retrievePendingCollaboratorProjects(id)
             .then(res => this.setState({ collabProjects: res, showProjects: 'collab projects' }))
@@ -73,7 +60,7 @@ class Profile extends Component {
     }
 
     handleUpComingMeetings = (id) => {
-        debugger
+
         return logic.userUpcomingMeetings(id)
             .then(result => this.setState({ upComingMeetings: result, showProjects: 'meetings' }))
     }
@@ -105,14 +92,10 @@ class Profile extends Component {
 
         logic.addProfileImage(event.target.files[0])
             .then(image => {
-
+                debugger
                 this.setState({ avatar: image })
             })
     }
-
-
-
-
 
     render() {
 

@@ -1,8 +1,6 @@
 const { models: { User, Project, Meeting } } = require('data')
 const { AlreadyExistsError, AuthError, NotAllowedError, NotFoundError, ValueError } = require('../errors')
 const validate = require('../utils/validate')
-const fs = require('fs')
-const path = require('path')
 const cloudinary = require('cloudinary')
 cloudinary.config({
     cloud_name: 'dql7wn1ej',
@@ -11,26 +9,6 @@ cloudinary.config({
 })
 
 const logic = {
-
-    /**
-     * Upload an image to cloudinary 
-     * @param {string} base64Image 
-     */
-    _saveImage(base64Image) {
-        return Promise.resolve().then(() => {
-            if (typeof base64Image !== 'string') throw new LogicError('base64Image is not a string')
-
-            return new Promise((resolve, reject) => {
-                return cloudinary.v2.uploader.upload(base64Image, function (err, data) {
-                    if (err) return reject(err)
-
-                    resolve(data.url)
-                })
-            })
-        })
-    },
-
-
     /**
      * Register User
      * @param {string} name 
@@ -429,17 +407,26 @@ const logic = {
      * @param {string} projectId 
      * @returns {Promise <Object>}
      */
-    retrieveProjectInfo(projectId) {
+    retrieveProjectInfo(projectId, userId) {
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
         if (!projectId.trim()) throw new ValueError('projectId is empty or blank')
 
+        if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
+        if (!userId.trim()) throw new ValueError('projectId is empty or blank')
+
         return (async () => {
 
-            const project = await Project.findById(projectId).populate('owner')
+            const project = await Project.findById(projectId)
+                .populate('owner')
+                .populate({ path: 'owner', select: 'profileImage name email' })
                 .populate('collaborators')
+                .populate({ path: 'collaborators', select: 'name profileImage' })
                 .populate('pendingCollaborators')
+                .populate({ path: 'pendingCollaborators', select: 'name profileImage' })
                 .lean()
                 .exec()
+
+            if (!project) throw new NotFoundError(`project with id ${projectId} not found`)
 
             project.id = project._id.toString()
 
@@ -451,15 +438,11 @@ const logic = {
 
             delete project.owner._id
 
-            delete project.owner.__v
-
             project.collaborators.forEach(collaborator => {
 
                 collaborator.id = collaborator._id.toString()
 
                 delete collaborator._id
-
-                delete collaborator.__v
 
                 return collaborator
             })
@@ -470,12 +453,14 @@ const logic = {
 
                 delete collaborator._id
 
-                delete collaborator.__v
-
                 return collaborator
             })
 
-            if (!project) throw new NotFoundError(`project with id ${projectId} not found`)
+            const user = await User.findById(userId)
+            project.viewerSkills = user.skills
+            project.viewerSavedProjects = user.savedProjects
+
+
 
             return project
 
@@ -559,18 +544,19 @@ const logic = {
         return (async () => {
 
             const user = await User.findById(id)
-
-            const projects = await Project.find({ owner: user.id, pendingCollaborators: { "$exists": true, $not: { $size: 0 } } }).lean()
+            const keepFields = {
+                name: true,
+                description: true,
+                projectImage: true,
+                skills: true
+            }
+            const projects = await Project.find({ owner: user.id, pendingCollaborators: { "$exists": true, $not: { $size: 0 } } }, keepFields).lean()
 
             projects.forEach(project => {
 
                 project.id = project._id.toString()
 
                 delete project._id
-
-                delete project.__v
-
-                project.owner = project.owner.toString()
 
                 return project
             })
@@ -829,16 +815,18 @@ const logic = {
 
 
         return (async () => {
-
-            const projects = await Project.find(queryObject).lean()
-
+            const keepFields = {
+                name: true,
+                description: true,
+                projectImage: true,
+                skills: true
+            }
+            const projects = await Project.find(queryObject, keepFields).lean()
 
             projects.forEach(project => {
                 project.id = project._id.toString()
 
                 delete project._id
-                delete project.__v
-                project.owner = project.owner.toString()
 
                 return project
             })

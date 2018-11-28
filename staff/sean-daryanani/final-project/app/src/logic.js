@@ -579,7 +579,7 @@ const logic = {
 
     addProfileImage(file) {
         let avatar = new FormData()
-
+        
         avatar.append('avatar', file)
 
         return fetch(`${this.url}/users/${this._userId}/photo`, {
@@ -606,7 +606,10 @@ const logic = {
             body: avatar
         })
             .then(res => res.json())
-            .then(res => res.data)
+            .then(res => {
+                console.log('got image')
+
+                return res.data})
     },
 
     retrieveProfileImage(id, width, height) {
@@ -628,7 +631,7 @@ const logic = {
     },
 
     retrieveProjectImage(id, projectId) {
-        debugger
+
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (!id.trim()) throw Error('id is empty or blank')
 

@@ -23,8 +23,6 @@ class ProjectPage extends Component {
             .then(res => this.setState({ project: res }))
             .then(() => logic.listProjectMeetings(this.props.id))
             .then(res => this.setState({ meetings: res }))
-            .then(() => logic.retrieveUserProfile(this.state.project.owner.id))
-            .then(res => this.setState({ user: res }))
             .then(() => logic.retrieveProjectImage(this.props.userId, this.props.id))
             .then(res => this.setState({ projectImage: res }))
     }
@@ -77,10 +75,10 @@ class ProjectPage extends Component {
     handleRequestCollaboration = () => {
         const { id, userId } = this.props
         try {
-        return logic.requestCollaboration(id, userId)
-            .then(() => logic.retrieveProjectInfo(this.props.id))
-            .then(res => this.setState({ project: res }))
-            .catch((err) => console.error(err))
+            return logic.requestCollaboration(id, userId)
+                .then(() => logic.retrieveProjectInfo(this.props.id))
+                .then(res => this.setState({ project: res }))
+                .catch((err) => console.error(err))
 
         } catch (err) {
             console.error(err)
@@ -90,15 +88,15 @@ class ProjectPage extends Component {
     handleSaveProject = () => {
         const { id, userId } = this.props
         return logic.saveProject(id, userId)
-            .then(() => logic.retrieveUserProfile(userId))
-            .then(res => this.setState({ user: res }))
+            .then(() => logic.retrieveProjectInfo(id))
+            .then(res => this.setState({ project: res }))
     }
 
     handleUnFollowProjects = () => {
         const { id, userId } = this.props
         return logic.removeSavedProject(id, userId)
-            .then(() => logic.retrieveUserProfile(userId))
-            .then(res => this.setState({ user: res }))
+            .then(() => logic.retrieveProjectInfo(id))
+            .then(res => this.setState({ project: res }))
     }
 
 
@@ -144,17 +142,17 @@ class ProjectPage extends Component {
 
     clickProfileName = (event, id) => {
 
-        if (!id) this.props.history.push(`/profile/${this.state.user.id}`)
+        if (!id) this.props.history.push(`/profile/${this.state.project.owner.id}`)
         else this.props.history.push(`/profile/${id}`)
 
     }
 
     calculateCommonInterests = () => {
-        const { project, user } = this.state
-        if (user && project) {
+        const { project } = this.state
+        if (project) {
+            const res = project.skills.filter(value => -1 !== project.viewerSkills.indexOf(value));
 
-            const res = project.skills.filter(value => -1 !== user.skills.indexOf(value));
-            if (res.length) return `Matches with ${(res.length / user.skills.length).toFixed(2) * 100}% of your interests`
+            if (res.length) return `Matches with ${(res.length / project.viewerSkills.length).toFixed(2) * 100}% of your interests`
             else return 'does not match with any of your interests :('
 
         }
@@ -163,24 +161,34 @@ class ProjectPage extends Component {
     }
 
     uploadImage = event => {
+        // console.log('initialise uploadimage')
+        // return logic.addProjectImage(event.target.files[0], this.props.id)
+        //     .then(() => {
+        //         console.log('retrieving')
+        //         return logic.retrieveProjectImage(this.props.userId, this.props.id)
+        //         .then(image => {
+        //             console.log('got image', image)
+        //             this.setState({ projectImage: image })}, () => console.log('uploaded'))
+        //     })
 
-        return logic.addProjectImage(event.target.files[0], this.props.id)
-            .then(() => logic.retrieveProjectImage(this.props.userId, this.props.id))
-            .then(projectImage => {
+            return logic.addProjectImage(event.target.files[0], this.props.id)
+            .then(() => {
+                return logic.retrieveProjectInfo(this.props.id)
+                    .then(res => this.setState({ projectImage: res }))
+            })
 
-                this.setState({ projectImage })}, () => console.log('uploaded'))
     }
 
     renderFavouritesButtons = () => {
-        const { state: { user, project }, props: { userId, id } } = this
+        const { state: { project }, props: { userId, id } } = this
 
-        if (user) {
-            if (user.savedProjects.includes(id) && !project.collaborators.some(item => item.id === userId)) {
+        if (project) {
+            if (project.viewerSavedProjects.includes(id) && !project.collaborators.some(item => item.id === userId)) {
                 return (<div className="project-page-new-meeting">
                     <p>You have saved this project. Click to unfollow</p>
                     <Button onClick={this.handleUnFollowProjects}>Unfollow</Button>
                 </div>)
-            } else if (!(user.savedProjects.includes(id)) && !project.collaborators.some(item => item.id === userId)) {
+            } else if (!(project.viewerSavedProjects.includes(id)) && !project.collaborators.some(item => item.id === userId)) {
                 return (< div className="project-page-new-meeting">
                     <p>Save the project to view later</p>
                     <Button onClick={this.handleSaveProject}>Save Project</Button>
@@ -199,19 +207,19 @@ class ProjectPage extends Component {
     }
 
     render() {
-        const { project, meetings, user, projectImage } = this.state
-        console.log(projectImage)
+        const { project, meetings, projectImage } = this.state
+
         return <div>
             <h1>{project && project.name}</h1>
             <header className="project-top-section">
                 <div className="project-image-container">
-                    <img src={projectImage ? projectImage : null} />
+                    <img src={project ? project.projectImage : null} />
                 </div>
                 <div className="top-section__extrainfo">
 
                     <div className="project-page-header-additional-info">
                         <div className="extrainfo-image-container">
-                            <img className="extrainfo__image-profile" src={user && user.profileImage} alt="profile" />
+                            <img className="extrainfo__image-profile" src={project && project.owner.profileImage} alt="profile" />
                             <form encType="multipart/form-data" onSubmit={this.uploadImage}>
                                 <input type="file" name="avatar" onChange={this.uploadImage} />
                             </form>
