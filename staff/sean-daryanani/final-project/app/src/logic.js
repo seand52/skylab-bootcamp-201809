@@ -574,6 +574,59 @@ const logic = {
             .then(res => res.data)
     },
 
+    addProjectImage(file, projectId) {
+        let avatar = new FormData()
+
+        avatar.append('avatar', file)
+
+        return fetch(`${this.url}/users/${this._userId}/projects/${projectId}/photo`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            },
+            body: avatar
+        })
+            .then(res => res.json())
+            .then(res => res.data)
+    },
+
+    retrieveProfileImage(id, width, height) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (!id.trim()) throw Error('id is empty or blank')
+
+        return fetch(`${this.url}/users/${id}/photo/width/${width}/height/${height}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+
+                return res.data
+            })
+    },
+
+    retrieveProjectImage(id, projectId) {
+        debugger
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (!id.trim()) throw Error('id is empty or blank')
+
+        return fetch(`${this.url}/users/${this._userId}/projects/${projectId}/photos`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+
+                return res.data
+            })
+    }
+
 
 }
 

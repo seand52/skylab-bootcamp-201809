@@ -668,15 +668,15 @@ describe('logic', () => {
                 beforeEach(async () => {
                     user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
 
-                    project = new Project({ name: 'react', description: 'testdescription1', skills: ['react', 'mongoose', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+                    project = new Project({ name: 'react', description: 'testdescription1', skills: ['react', 'mongoose', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, location: 'Barcelona' })
 
-                    project2 = new Project({ name: 'reach', description: 'testdescription2', skills: ['mongoose', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+                    project2 = new Project({ name: 'reach', description: 'testdescription2', skills: ['mongoose', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, location: 'Madrid' })
 
-                    project3 = new Project({ name: 'mongoose', description: 'testdescription3', skills: ['react', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+                    project3 = new Project({ name: 'mongoose', description: 'testdescription3', skills: ['react', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, location: 'Barcelona' })
 
-                    project4 = new Project({ name: 'rpo', description: 'testdescription4', skills: ['mongoose', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+                    project4 = new Project({ name: 'rpo', description: 'testdescription4', skills: ['mongoose', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, location: 'Bilbao' })
 
-                    project5 = new Project({ name: 'oterea', description: 'testdescription5', skills: ['react', 'mongoose', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+                    project5 = new Project({ name: 'oterea', description: 'testdescription5', skills: ['react', 'mongoose', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, location: 'Barcelona' })
 
                     await user.save()
                     await project.save()
@@ -686,12 +686,12 @@ describe('logic', () => {
                     await project5.save()
                 })
 
-                false && it('should successfuly query for projects based on a query', async () => {
+                 false && it('should successfuly query for projects based on a query', async () => {
 
-                    const query = 'q=mongoose'
+                    const query = 'q=MONGOOSE&f=&c='
 
                     const projects = await logic.filterProjects(query)
-
+             
                     expect(projects.length).to.equal(1)
 
                     const [_project1, _project2, _project3] = projects
@@ -699,19 +699,19 @@ describe('logic', () => {
 
                 it('should successfuly query for projects based on a query and filter', async () => {
 
-                    const query = 'q=reach&f=mongoose+javascript&c=barcelona+madrid'
+                    const query = 'q=&f=react+javascript&c=Barcelona'
 
                     const projects = await logic.filterProjects(query)
 
-                    expect(projects.length).to.equal(1)
+                    expect(projects.length).to.equal(3)
 
                     const [_project1, _project2, _project3] = projects
                 })
 
-                false && it('should successfuly filter results based on skills', async () => {
+                 it('should successfuly filter results based on skills', async () => {
 
-                    const query = 'q=null&f=javascript'
-
+                    const query = 'q=&f=javascript'
+                
                     const projects = await logic.filterProjects(query)
 
                     expect(projects.length).to.equal(5)

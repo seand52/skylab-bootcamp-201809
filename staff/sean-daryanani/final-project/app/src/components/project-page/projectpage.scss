@@ -10,8 +10,12 @@
 
 }
 .project-image-container {
-    flex: 0 0 30%;
-    overflow: hidden;
+    width: 300px;
+    & img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
 }
 
 

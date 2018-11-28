@@ -14,10 +14,14 @@
 }
 
 .profile-img-container {
+  width: 100px;
+}
+.profile-img-container img {
+  display: block;
+  width: 100%;
+  height: auto;
   border-radius: 50%;
   overflow: hidden;
-  flex: 1 .profile-img-container img;
-  flex-width: 100%;
 }
 
 .bottom-area {

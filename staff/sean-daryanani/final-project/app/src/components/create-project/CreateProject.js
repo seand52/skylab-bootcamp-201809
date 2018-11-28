@@ -91,7 +91,13 @@ class CreateProject extends Component {
 
     onLocationChange = event => {
         const location = event.target.value
-        this.setState({location})
+        this.setState({ location })
+    }
+
+    renderDropDown = () => {
+        var members = [0,1,2,3,4,5,6,7,8,9,10]
+
+        return members.map((item, index) => <option key={index} value={item}>{item}</option>)
     }
 
 
@@ -110,22 +116,13 @@ class CreateProject extends Component {
 
                     <label className="create-project__select-label">In what city will your meetings be hosted?</label><br />
 
-                    <select className="create-project__select" onChange={this.onLocationChange} name="agent" id="agent">
-                        <option value="Barcelona">Barcelona</option>
-                        <option value="Madrid">Madrid</option>
-                        <option value="Bilbao">Bilbao</option>
-                        <option value="Sevilla">Sevilla</option>
-                        <option value="Valencia">Valencia</option>
-                    </select> <br />
+                    <Input onChange={this.onLocationChange} type="text" id="exampleForm2" className="form-control" /><br />
+
 
                     <label className="create-project__select-label">What is the maximum amount of members you would like to allow?</label><br />
 
                     <select className="create-project__select" onChange={this.onMaxMembersChange} name="agent" id="agent">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
+                        {this.renderDropDown()}
                     </select> <br />
 
                     {/* <label>Check the box if your project is beginner friendly</label>
@@ -137,8 +134,14 @@ class CreateProject extends Component {
                         {skills.map(skill => <Checkbox label={skill} handleCheckboxChange={this.toggleCheckbox} key={skill} selected={this.selectedCheckboxes} />)}
                     </div>
 
+                    
+
+
+
                     <Button type="submit" color="primary">Save changes</Button>
                 </form>
+
+               
                 {this.state.error ? <p>You must complete all the fields</p> : null}
 
                 {this.state.toggleSuccess ? <p>Project added</p> : null}

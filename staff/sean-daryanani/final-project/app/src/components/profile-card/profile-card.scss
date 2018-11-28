@@ -14,13 +14,14 @@
 }
 
 .profile-img-container {
-    border-radius: 50%;
-    overflow: hidden;
-    flex: 1
-     & img {
-         width: 100%;
-
-     }
+    width: 100px;
+    & img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 50%;
+        overflow: hidden;
+    }
 }
 
 .bottom-area {

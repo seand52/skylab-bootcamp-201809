@@ -8,7 +8,7 @@ const CollaboratorCard = props => {
         return (
             <div className="collab-card">
                 <img src={collaborator.profileImage} alt="profile" />
-                <p onClick={clickName}>{collaborator.name}</p>
+                <p onClick={() => clickName(undefined, collaborator.id)}>{collaborator.name}</p>
                 {(userId === ownerId) && <Button onClick={() => removeCollaborator(collaborator.id)}>Remove Collaborator</Button>}
             </div>
         )

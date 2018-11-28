@@ -2,10 +2,10 @@ import React from 'react'
 import './profile-card.css'
 
 const ProfileCard = props => {
-    const { user, myProjects, collabProjects, showCollabProjects, projectsStarted, uploadImage, userId } = props
+    const { user, myProjects, collabProjects, showCollabProjects, projectsStarted, uploadImage, userId, profileImage } = props
 
     if (user) {
-        const { name, joinDate, city, githubProfile, skills, profileImage } = user
+        const { name, joinDate, city, githubProfile, skills } = user
 
         return (
             <div className='profile-card-container'>
@@ -16,7 +16,7 @@ const ProfileCard = props => {
                         <p><span>Location</span>: {city}</p>
                     </div>
                     <div className='profile-img-container'>
-                        <img src={profileImage} width='150' alt='project' />
+                        <img src={user.profileImage}/>
                     </div>
                     {(userId===user.id) && <form encType="multipart/form-data" onSubmit={uploadImage}>
                         <input type="file" name="avatar" onChange={uploadImage} />
@@ -26,9 +26,9 @@ const ProfileCard = props => {
                     <button onClick={projectsStarted} type="button" className="btn btn-primary">
                         Projects started <span className="badge badge-light">{myProjects ? myProjects.length : 0}</span>
                     </button>
-                    <button onClick={showCollabProjects} type="button" className="btn btn-primary">
+                    {(userId===user.id) && <button onClick={showCollabProjects} type="button" className="btn btn-primary">
                         Collaborations <span className="badge badge-light">{collabProjects ? collabProjects.length : 0}</span>
-                    </button>
+                    </button>}
                     <button type="button" className="btn btn-primary">
                         Interests <span className="badge badge-light">{skills && skills.length}</span>
                     </button>

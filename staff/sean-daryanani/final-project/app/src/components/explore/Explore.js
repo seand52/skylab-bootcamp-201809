@@ -22,7 +22,8 @@ const skills = [
 class Explore extends Component {
     state = {
         searchResults: null,
-        searchQuery: ''
+        searchQuery: '',
+        cityQuery: '',
     }
     componentWillMount = () => {
 
@@ -66,22 +67,29 @@ class Explore extends Component {
         }
     }
 
+    onCityFilterChange = event => {
+        const city = event.target.value
+
+        this.setState({ cityQuery: city })
+
+    }
     handleSubmit = event => {
 
         event.preventDefault()
-
+        
+        const { searchQuery, cityQuery } = this.state
         let skillsArray = []
 
         for (const checkbox of this.selectedCheckboxes) {
 
             skillsArray.push(checkbox)
         }
-        const search = this.state.searchQuery
+        // const search = searchQuery
 
-        let query
+        let query = `q=${searchQuery}&f=${skillsArray.join('+')}&c=${cityQuery}`
 
-        if (!skillsArray.length) query = `q=${search}`
-        else query = `q=${search}&f=${skillsArray.join('+')}`
+        // if (!skillsArray.length) query = `q=${search}`
+        // else query = `q=${search}&f=${skillsArray.join('+')}`
 
 
 
@@ -106,13 +114,16 @@ class Explore extends Component {
                     <div className='filter-skills'>
                         <form onSubmit={this.handleSubmit}>
                             {skills.map(skill => <Checkbox label={skill} handleCheckboxChange={this.toggleCheckbox} key={skill} selected={this.selectedCheckboxes} />)}
+                            <h1>Filter by city</h1>
+                            <input onChange={this.onCityFilterChange} type="text" />
                             <Button type="submit" color="primary">Search now</Button>
                         </form>
                     </div>
+
                 </div>
                 <div className="search-area">
                     {/* <div className="search-results"> */}
-                        {this.state.searchResults && this.state.searchResults.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
+                    {this.state.searchResults && this.state.searchResults.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
                     {/* </div> */}
                 </div>
             </div>

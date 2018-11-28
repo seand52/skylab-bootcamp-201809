@@ -13,7 +13,7 @@ const PendingCollaborators = props => {
 
                 <img src={pendingCollaborators.profileImage} alt="profile" />
 
-                <p onClick={clickName}>{pendingCollaborators.name}</p>
+                <p onClick={() => clickName(undefined, pendingCollaborators.id)}>{pendingCollaborators.name}</p>
 
                 <Button type="button" onClick={() => props.accept(pendingCollaborators.id)}>Accept</Button>
 

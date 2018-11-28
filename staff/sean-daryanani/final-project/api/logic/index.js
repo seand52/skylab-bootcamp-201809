@@ -331,23 +331,23 @@ const logic = {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof collabId !== 'string') throw TypeError(`${collabId} is not a string`)
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
-        
+
 
         if (!id.trim()) throw new ValueError('id is empty or blank')
         if (!collabId.trim()) throw new ValueError('collabId is empty or blank')
         if (!projectId.trim()) throw new ValueError('projectId is empty or blank')
 
-        return ( async () => {
+        return (async () => {
             const project = await Project.findById(projectId)
-            debugger
-            if (id !== project.owner.toString()) throw Error ('not the owner of the project')
+
+            if (id !== project.owner.toString()) throw Error('not the owner of the project')
 
             const collaborator = await User.findById(collabId)
 
-            await Project.updateOne({_id: projectId}, {$pull: {collaborators: collaborator._id }})
+            await Project.updateOne({ _id: projectId }, { $pull: { collaborators: collaborator._id } })
 
             const _project = await Project.findById(projectId)
-            debugger
+
         })()
 
     },
@@ -817,119 +817,60 @@ const logic = {
         const queryObject = {
             name: { $regex: '' },
             skills: { $all: [] },
-            city: ''
+            location: { $regex: '' },
         }
-
         query.split('&').forEach((item, index) => {
-            switch(index) {
+            switch (index) {
                 case 0:
-                queryObject.name.$regex = item.match(/[=](.*)/)
-                break
+                    queryObject.name.$regex = item.match(/[=](.*)/)[1].replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "")
+                    break
                 case 1:
-                queryObject.skills.$all = item.match(/[=](.*)/).split('+')
-                break
+                    queryObject.skills.$all = [].concat.apply([], queryObject.skills.$all.concat([(item.match(/[=](.*)/)[1].indexOf('+') !== -1) ? item.match(/[=](.*)/)[1].split('+') : item.match(/[=](.*)/)[1]]))
+                    break
                 case 2:
-                queryObject.city = item.match(/[=](.*)/).split('+')
-                break
+                    queryObject.location.$regex = item.match(/[=](.*)/)[1].replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "")
+                    break
             }
         })
 
+        if (!queryObject.skills.$all.length || queryObject.skills.$all[0] === '') { delete queryObject.skills }
+
+        if (queryObject.name.$regex === '') {
+            delete queryObject.name
+        } else {
+            queryObject.name.$regex = new RegExp(queryObject.name.$regex, 'i')
+        }
+
+        if (queryObject.location.$regex === '') {
+            delete queryObject.location
+        } else {
+            queryObject.location.$regex = new RegExp(queryObject.location.$regex, 'i')
+        }
+
+
+        return (async () => {
+
+            const projects = await Project.find(queryObject).lean()
+
+
+            projects.forEach(project => {
+                project.id = project._id.toString()
+
+                delete project._id
+                delete project.__v
+                project.owner = project.owner.toString()
+
+                return project
+            })
+
+            return projects
+
+
+        })()
+
+    },
+
     
-
-        let newQuery = searchTerm.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "")
-
-
-
-
-        if (!queryObject.skills.$all.length || queryObject.skills.$all[0] === undefined) delete queryObject.skills
-
-        if (queryObject.name.$regex === 'null') delete queryObject.name
-
-        return (async () => {
-
-            const projects = await Project.find(queryObject).lean()
-
-
-            projects.forEach(project => {
-                project.id = project._id.toString()
-
-                delete project._id
-                delete project.__v
-                project.owner = project.owner.toString()
-
-                return project
-            })
-
-            return projects
-
-
-        })()
-
-    },
-
-    /**
-     * 
-     * @param {array} array 
-     * @returns {Promise <Object>}
-     */
-    filterProjects(query) {
-
-        if (typeof query !== 'string') throw TypeError(`${query} is not a string`)
-
-        let skillsArray = []
-        let searchTerm
-        if (query.split('&').length === 1) {
-            searchTerm = query.split('=')[1]
-        } else {
-            searchTerm = query.split('=')[1].split('&')[0]
-        }
-
-
-        if (query.indexOf('+') !== -1) {
-            const regSearch = query.match(/[+](.*)/)
-            const firstItem = [query.split('=')[2].split('+')[0]]
-            skillsArray = [...firstItem, ...regSearch[1].split('+')]
-
-        } else {
-            skillsArray.push(query.split('=')[2])
-        }
-
-        let newQuery = searchTerm.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "")
-
-
-        const queryObject = {
-            name: { $regex: newQuery },
-            skills: { $all: skillsArray }
-        }
-
-
-        if (!queryObject.skills.$all.length || queryObject.skills.$all[0] === undefined) delete queryObject.skills
-
-        if (queryObject.name.$regex === 'null') delete queryObject.name
-
-        return (async () => {
-
-            const projects = await Project.find(queryObject).lean()
-
-
-            projects.forEach(project => {
-                project.id = project._id.toString()
-
-                delete project._id
-                delete project.__v
-                project.owner = project.owner.toString()
-
-                return project
-            })
-
-            return projects
-
-
-        })()
-
-    },
-
-
 
     insertProfileImage(userId, file) {
         validate([
@@ -957,7 +898,7 @@ const logic = {
         })()
     },
 
-    insertProjectImage(projectId, file) {
+    insertProjectImage(file, projectId) {
         validate([
             { key: 'projectId', value: projectId, type: String },
 
@@ -979,11 +920,35 @@ const logic = {
             })
 
             await Project.updateOne({ _id: projectId }, { projectImage: result.url })
-            const projects = await Project.find()
+
 
 
         })()
     },
+
+    returnUserImage(id, width, height) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        return (async () => {
+            const user = await User.findById(id)
+
+            const picture = cloudinary.url(user.profileImage, {width: width, height: height, gravity: "face", radius: "max", crop: "fill", fetch_format: "auto", type: "fetch"})
+
+
+            return picture
+        })()
+    },
+
+    returnProjectPageImages(projectId) {
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+
+        return (async () => {
+            const project = await Project.findById(projectId)
+
+            const picture = cloudinary.url(project.projectImage, {width: 300, height: 300, crop: "scale", fetch_format: "auto", type: "fetch"})
+
+            return picture
+        })()
+    }
 
 
 }

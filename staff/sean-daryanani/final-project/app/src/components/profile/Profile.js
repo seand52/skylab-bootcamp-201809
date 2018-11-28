@@ -14,21 +14,22 @@ class Profile extends Component {
         user: null,
         ownProjects: false,
         collabProjects: false,
-        showProjects: 'my projects'
+        showProjects: 'my projects',
+        image: false
     }
 
     componentDidMount() {
         const { id } = this.props
-        Promise.all([logic.retrieveUserProfile(id), logic.retrievePendingCollaboratorProjects(id), logic.listOwnProjects(id)])
+        Promise.all([logic.retrieveUserProfile(id), logic.retrievePendingCollaboratorProjects(id), logic.listOwnProjects(id), logic.retrieveProfileImage(id)])
             .then(res => {
-                this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2] })
+                this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2], image:res[3] })
             })
     }
 
     componentWillReceiveProps(props) {
 
         const { id } = props
-        Promise.all([logic.retrieveUserProfile(id), logic.listCollaboratingProjects(id), logic.listOwnProjects(id)])
+        Promise.all([logic.retrieveUserProfile(id), logic.retrievePendingCollaboratorProjects(id), logic.listOwnProjects(id)])
             .then(res => {
                 this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2] })
             })
@@ -58,7 +59,7 @@ class Profile extends Component {
     handleShowCollabProjects = () => {
 
         const { id } = this.props
-        return logic.listCollaboratingProjects(id)
+        return logic.retrievePendingCollaboratorProjects(id)
             .then(res => this.setState({ collabProjects: res, showProjects: 'collab projects' }))
     }
 
@@ -88,10 +89,10 @@ class Profile extends Component {
     }
 
     handleUpload = event => {
-        debugger
+
         logic.addProfileImage(event.target.files[0])
             .then(image => {
-                debugger
+
                 this.setState({ avatar: image })
             })
     }
@@ -101,12 +102,12 @@ class Profile extends Component {
     render() {
 
 
-        const { state: { user, ownProjects, collabProjects, showProjects }, props: { id, userId } } = this
+        const { state: { user, ownProjects, collabProjects, showProjects, image }, props: { id, userId } } = this
 
 
         return <div className="profile-page-container">
             <section className="profile-top-area">
-                <ProfileCard uploadImage={this.handleUpload} showCollabProjects={this.handleShowCollabProjects} user={user} myProjects={ownProjects} projectsStarted={this.handleshowOwnProjects} collabProjects={collabProjects} userId={userId} />
+                <ProfileCard uploadImage={this.handleUpload} showCollabProjects={this.handleShowCollabProjects} user={user} myProjects={ownProjects} projectsStarted={this.handleshowOwnProjects} collabProjects={collabProjects} userId={userId} profileImage={image} />
 
                 <section className="bio">
                     <div className="bio__extra-info">

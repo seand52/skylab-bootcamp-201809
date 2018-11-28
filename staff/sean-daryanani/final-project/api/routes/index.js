@@ -6,9 +6,9 @@ const bearerTokenParser = require('../utils/bearer-token-parser')
 const jwtVerifier = require('./jwt-verifier')
 const routeHandler = require('./route-handler')
 const Busboy = require('busboy')
-
+const sharp = require('sharp');
 const jsonBodyParser = bodyParser.json()
-
+const cloudinary = require('cloudinary')
 const router = express.Router()
 
 const { env: { JWT_SECRET } } = process
@@ -271,7 +271,7 @@ router.patch('/users/:id/projects/:projectid/collaborator', [bearerTokenParser, 
 router.patch('/users/:id/projects/:projectid/removecollaborator', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
 
-        const { sub, params: { id, projectid }, body: {collaboratorId } } = req
+        const { sub, params: { id, projectid }, body: { collaboratorId } } = req
 
 
         if (id !== sub) throw Error('token sub does not match user id')
@@ -286,7 +286,7 @@ router.patch('/users/:id/projects/:projectid/removecollaborator', [bearerTokenPa
 
 router.get('/users/:id/pendingcollaborators', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
-        debugger
+
         const { params: { id }, sub } = req
 
         if (id !== sub) throw Error('token sub does not match user id')
@@ -336,7 +336,7 @@ router.delete('/users/:id/deleteproject/:projectid', [bearerTokenParser, jwtVeri
 router.get('/users/:id/meeting/:meetingid', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
 
-        const { sub, params: { id, meetingid }} = req
+        const { sub, params: { id, meetingid } } = req
 
         if (id !== sub) throw Error('token sub does not match user id')
 
@@ -458,14 +458,14 @@ router.get('/users/:id/projects/filter/:query', [bearerTokenParser, jwtVerifier,
 router.post('/users/:id/photo', [bearerTokenParser, jwtVerifier], (req, res) => {
     routeHandler(() => {
         const { params: { id }, sub } = req
-        debugger
+
         if (id !== sub) throw Error('token sub does not match user id')
 
         return new Promise((resolve, reject) => {
             const busboy = new Busboy({ headers: req.headers })
 
             busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
-              debugger
+
                 logic.insertProfileImage(id, file, filename)
             })
 
@@ -480,5 +480,61 @@ router.post('/users/:id/photo', [bearerTokenParser, jwtVerifier], (req, res) => 
             }))
     }, res)
 })
+
+router.post('/users/:id/projects/:projectid/photo', [bearerTokenParser, jwtVerifier], (req, res) => {
+    routeHandler(() => {
+        const { params: { id, projectid }, sub } = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return new Promise((resolve, reject) => {
+            const busboy = new Busboy({ headers: req.headers })
+
+            busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+
+                logic.insertProjectImage(file, projectid)
+            })
+
+            busboy.on('finish', () => resolve())
+
+            busboy.on('error', err => reject(err))
+
+            req.pipe(busboy)
+        })
+            .then(() => res.json({
+                message: 'photo uploaded'
+            }))
+    }, res)
+})
+
+router.get('/users/:id/photo/width/:width/height/:height', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+
+    routeHandler(() => {
+
+        const { params: { id, width, height }, sub } = req
+        return logic.returnUserImage(id, width, height)
+        .then(img => res.json({
+            data: img
+        })
+        )
+    }, res)
+
+})
+
+router.get('/users/:id/projects/:projectid/photos', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+
+    routeHandler(() => {
+
+        const { params: { id, projectid, width, height }, sub } = req
+        debugger
+        return logic.returnProjectPageImages(projectid)
+        .then(img => res.json({
+            data: img
+        })
+        )
+    }, res)
+
+})
+
 
 module.exports = router

@@ -15,15 +15,18 @@ class ProjectPage extends Component {
         project: null,
         meetings: null,
         user: null,
+        projectImage: null
     }
     componentDidMount() {
-
+        debugger
         return logic.retrieveProjectInfo(this.props.id)
             .then(res => this.setState({ project: res }))
             .then(() => logic.listProjectMeetings(this.props.id))
             .then(res => this.setState({ meetings: res }))
             .then(() => logic.retrieveUserProfile(this.state.project.owner.id))
             .then(res => this.setState({ user: res }))
+            .then(() => logic.retrieveProjectImage(this.props.userId, this.props.id))
+            .then(res => this.setState({ projectImage: res }))
     }
 
     acceptCollabHandle = (id) => {
@@ -133,7 +136,12 @@ class ProjectPage extends Component {
         }
     }
 
-    clickProfileName = () => this.props.history.push(`/profile/${this.state.user.id}`)
+    clickProfileName = (event, id) => {
+
+        if (!id) this.props.history.push(`/profile/${this.state.user.id}`)
+        else this.props.history.push(`/profile/${id}`)
+
+    }
 
     calculateCommonInterests = () => {
         const { project, user } = this.state
@@ -146,6 +154,15 @@ class ProjectPage extends Component {
         }
 
 
+    }
+
+    uploadImage = event => {
+
+        return logic.addProjectImage(event.target.files[0], this.props.id)
+            .then(() => logic.retrieveProjectImage(this.props.userId, this.props.id))
+            .then(projectImage => {
+
+                this.setState({ projectImage })}, () => console.log('uploaded'))
     }
 
     renderFavouritesButtons = () => {
@@ -166,25 +183,32 @@ class ProjectPage extends Component {
         }
     }
 
+    getImageId = () => {
+        if (this.state.project) return this.state.project.projectImage
+    }
+
     handleAddNewEvent = () => {
 
         this.props.history.push(`/create-event/${this.props.id}`)
     }
 
     render() {
-        const { project, meetings, user } = this.state
+        const { project, meetings, user, projectImage } = this.state
+        console.log(projectImage)
         return <div>
             <h1>{project && project.name}</h1>
             <header className="project-top-section">
                 <div className="project-image-container">
-                    <img className="projecct-page-project-image" src={project && project.projectImage} alt="background" />
+                    <img src={projectImage ? projectImage : null} />
                 </div>
                 <div className="top-section__extrainfo">
 
                     <div className="project-page-header-additional-info">
                         <div className="extrainfo-image-container">
                             <img className="extrainfo__image-profile" src={user && user.profileImage} alt="profile" />
-
+                            <form encType="multipart/form-data" onSubmit={this.uploadImage}>
+                                <input type="file" name="avatar" onChange={this.uploadImage} />
+                            </form>
                         </div>
                         <span>Hosted by</span><p className="project-page-header-additional-info__user-link" onClick={this.clickProfileName}>{project && project.owner.name}</p>
                         <span>Host email:</span>{project && project.owner.email}
