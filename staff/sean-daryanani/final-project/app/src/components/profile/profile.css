@@ -7,7 +7,7 @@
 
 .profile-page-container {
   background-color: #f5f0f0;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 .profile-pic-container {

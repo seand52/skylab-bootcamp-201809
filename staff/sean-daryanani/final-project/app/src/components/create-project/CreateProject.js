@@ -97,7 +97,7 @@ class CreateProject extends Component {
     renderDropDown = () => {
         var members = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-        return members.map((item, index) => <option key={index} value={item}>{item}</option>)
+        return members.map((item, index) => <option key={index} disabled={(index===0) ? 'disabled' : false} value={item}>{item}</option>)
     }
 
 
@@ -134,11 +134,6 @@ class CreateProject extends Component {
                         <div className="create-project__skills-checkboxes">
                             {skills.map(skill => <Checkbox label={skill} handleCheckboxChange={this.toggleCheckbox} key={skill} selected={this.selectedCheckboxes} />)}
                         </div>
-
-
-
-
-
                         <Button type="submit" color="primary">Save changes</Button>
                     </form>
 

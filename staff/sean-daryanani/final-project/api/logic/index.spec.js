@@ -742,6 +742,7 @@ describe('logic', () => {
                     const { name, description, skills, beginnerFriendly, maxMembers, owner } = project
 
                     const _project = await logic.retrieveProjectInfo(project.id, user2.id)
+                        
 
                     expect(_project.name).to.equal(name)
                     expect(_project.description).to.equal(description)
@@ -1150,7 +1151,7 @@ describe('logic', () => {
 
                 const [_meeting1, _meeting2] = meetings
 
-                expect(_meeting1.location).to.equal('barcelona')
+                expect(_meeting1.location).to.equal('bilbao')
                 expect(_meeting2.location).to.equal('bilbao')
 
             })
@@ -1175,8 +1176,8 @@ describe('logic', () => {
                 await logic.insertProfileImage(user.id, file)
 
                 const _user = await User.findById(user.id)
-
-                expect(_user.insertProfileImage).not.to.equal('https://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg')
+                debugger
+                expect(_user.profileImage).not.to.equal('https://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg')
 
             })
 
@@ -1189,7 +1190,7 @@ describe('logic', () => {
                 var file = fs.createReadStream(image)
 
 
-                await logic.insertProjectImage(project.id, file)
+                await logic.insertProjectImage(file, project.id)
 
                 const _user = await User.findById(user.id)
 

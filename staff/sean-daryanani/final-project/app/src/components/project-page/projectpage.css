@@ -1,16 +1,11 @@
 @charset "UTF-8";
 .project-top-section {
-  height: 300px;
-  display: flex;
-  margin: 20px;
-  border: 3px solid #4340f5;
-  border-radius: 10px;
-  background-color: aliceblue;
-  padding: 20px;
+  width: 80%;
+  margin: 20px auto !important;
 }
 
 .project-image-container {
-  width: 400px;
+  width: 300px;
 }
 .project-image-container img {
   display: block;
@@ -18,8 +13,8 @@
   height: auto;
 }
 
-.extrainfo__image-profile {
-  width: 50px;
+.extrainfo-image-container .extrainfo__image-profile {
+  width: 100px;
   border-radius: 50%;
   overflow: hidden;
 }
@@ -36,11 +31,8 @@
   justify-content: space-between;
 }
 
-.project-page-header-additional-info, .extrainfo-image-container, .project-page-request-collaborate, .project-page-new-meeting {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+.owner-name-and-email {
+  text-align: left;
 }
 
 .project-page-header-additional-info span {
@@ -50,23 +42,43 @@
   color: blue;
   cursor: pointer;
 }
+.project-page-header-additional-info h1 {
+  text-align: left;
+  padding-left: 50px;
+  padding-bottom: 20px;
+}
 
-.project-page-info-container {
+.project-page-header-collab-and-favourites {
   display: flex;
-  margin: 20px;
-  border: 3px solid #4340f5;
-  border-radius: 10px;
-  background-color: aliceblue;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.project-page-main-section-container {
+  height: 100vh;
+  background-color: #f5f0f0;
+  box-shadow: inset 0px 7px 3px -3px rgba(50, 50, 50, 0.75);
 }
 
 .project-page-project-info {
-  flex: 0 0 50%;
-  margin-right: 20px;
-  border-right: 1px solid black;
+  margin-left: 25px;
+  margin-top: 20px;
+  height: 400px;
+  overflow: auto;
+  border: 2px solid #ccc;
+  border-radius: 20px;
+  background-color: white;
 }
 
 .project-page-meetings {
-  flex: 0 0 50%;
+  margin-top: 20px;
+  margin-left: 40px;
+  height: 400px;
+  overflow: auto;
+  border: 2px solid #ccc;
+  border-radius: 20px;
+  background-color: white;
 }
 
 .delete-meeting-button {
@@ -85,9 +97,15 @@
   font-weight: bold;
 }
 
+.meeting-details {
+  text-align: left;
+}
+
 .individual-meeting-container {
-  border-bottom: 1px solid black;
-  margin-right: 50px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 2px solid #ccc;
+  border-radius: 20px;
 }
 
 .collapse {
@@ -96,7 +114,16 @@
 }
 
 .project-page-collaborators-display {
-  display: flex;
+  margin-bottom: 20px;
+}
+
+.project-page-collaborators {
+  margin-top: 20px;
+  margin-left: 30px;
+  padding: 20px;
+  border: 2px solid #ccc;
+  border-radius: 20px;
+  background-color: white;
 }
 
 /*# sourceMappingURL=projectpage.css.map */

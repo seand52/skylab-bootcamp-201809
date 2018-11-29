@@ -95,10 +95,14 @@ class Profile extends Component {
 
     handleUpload = event => {
 
-        logic.addProfileImage(event.target.files[0])
+        return logic.addProfileImage(event.target.files[0])
             .then(image => {
-                debugger
-                this.setState({ avatar: image })
+
+                return logic.retrieveUserProfile(this.props.id)
+                    .then(res => {
+
+                        debugger
+                        this.setState({user: res})}, () => console.log('finished setstate'))
             })
     }
 

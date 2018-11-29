@@ -1,4 +1,3 @@
-
 global.sessionStorage = require('sessionstorage')
 
 const logic = {
@@ -171,7 +170,7 @@ const logic = {
     },
 
     saveProject(projectId) {
-
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
         return fetch(`${this.url}/users/${this._userId}/projects/${projectId}/save`, {
             method: 'POST',
             headers: {
@@ -180,6 +179,7 @@ const logic = {
         })
             .then(res => res.json())
             .then(res => {
+
                 if (res.error) throw Error(res.error)
 
             })
@@ -238,26 +238,27 @@ const logic = {
         })
             .then(res => res.json())
             .then(res => {
+
                 if (res.error) throw Error(res.error)
             })
     },
 
-    searchProjects(query) {
-        if (typeof query !== 'string') throw TypeError(`${query} is not a string`)
-        if (!query.trim()) throw Error('query is empty or blank')
-        return fetch(`${this.url}/users/${this._userId}/projects/search/${query}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${this._token}`
-            }
-        })
-            .then(res => res.json())
-            .then(res => {
-                if (res.error) throw Error(res.error)
+    // searchProjects(query) {
+    //     if (typeof query !== 'string') throw TypeError(`${query} is not a string`)
+    //     if (!query.trim()) throw Error('query is empty or blank')
+    //     return fetch(`${this.url}/users/${this._userId}/projects/search/${query}`, {
+    //         method: 'GET',
+    //         headers: {
+    //             'Authorization': `Bearer ${this._token}`
+    //         }
+    //     })
+    //         .then(res => res.json())
+    //         .then(res => {
+    //             if (res.error) throw Error(res.error)
 
-                return res.data
-            })
-    },
+    //             return res.data
+    //         })
+    // },
 
     filterProjects(query) {
 
@@ -584,7 +585,7 @@ const logic = {
         let avatar = new FormData()
         
         avatar.append('avatar', file)
-
+        debugger
         return fetch(`${this.url}/users/${this._userId}/photo`, {
             method: 'POST',
             headers: {
@@ -593,7 +594,9 @@ const logic = {
             body: avatar
         })
             .then(res => res.json())
-            .then(res => res.data)
+            .then(res => {
+                debugger
+               })
     },
 
     addProjectImage(file, projectId) {

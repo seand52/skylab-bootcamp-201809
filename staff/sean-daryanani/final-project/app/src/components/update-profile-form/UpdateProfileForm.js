@@ -15,21 +15,22 @@ const skills = [
 class UpdateProfileForm extends Component {
 
     state = {
-        city:  '',
-        githubProfile: '',
-        bio:  '',
+        city:   this.props.user ? this.props.user.city : '',
+        githubProfile: this.props.user ? this.props.user.githubProfile: '',
+        bio: this.props.user ? this.props.user.bio : '',
         skills: []
     }
 
 
-    // componentWillReceiveProps(props) {
-    //     debugger
-    //     if (props.user) {
-    //         const { city, githubProfile, bio } = props.user
+    componentWillReceiveProps(props) {
 
-    //         this.setState({ city, githubProfile, bio })
-    //     }
-    // }
+        if (props.user && !props.toggleModal) {
+            const { city, githubProfile, bio } = props.user
+
+            this.setState({ city, githubProfile, bio })
+        } 
+
+    }
    
     componentWillMount = () => {
 
@@ -42,13 +43,13 @@ class UpdateProfileForm extends Component {
         event.preventDefault()
 
         let skillsArray = []
-        debugger
+
         for (const checkbox of this.selectedCheckboxes) {
 
             skillsArray.push(checkbox)
         }
         const {city, githubProfile, bio} = this.state
-        debugger
+
         this.props.updateProfile(this.state.city, this.state.githubProfile, this.state.bio, skillsArray)
 
   
@@ -57,20 +58,20 @@ class UpdateProfileForm extends Component {
 
     onCityChange = event => {
         const city = event.target.value
-        console.log(city)
+
         this.setState({ city })
 
     }
 
     onGithubChange = event => {
         const githubProfile = event.target.value
-        console.log(githubProfile)
+
         this.setState({ githubProfile })
     }
 
     onBioChange = event => {
         const bio = event.target.value
-        console.log(bio)
+
         this.setState({ bio })
     }
 
@@ -104,7 +105,7 @@ class UpdateProfileForm extends Component {
 
                 {skills.map(skill => <Checkbox label={skill} handleCheckboxChange={this.toggleCheckbox} key={skill} selected={this.selectedCheckboxes} />)}
 
-                <Button onClick={this.props.toggleModal} type="submit" color="primary">Save changes</Button>
+                <Button  type="submit" color="primary">Save changes</Button>
             </form>
         </div>
     }

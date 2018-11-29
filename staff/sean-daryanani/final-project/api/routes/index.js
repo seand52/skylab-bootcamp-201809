@@ -448,16 +448,23 @@ router.post('/users/:id/photo', [bearerTokenParser, jwtVerifier], (req, res) => 
 
         if (id !== sub) throw Error('token sub does not match user id')
 
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             const busboy = new Busboy({ headers: req.headers })
+            
+            await busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
 
-            busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+                logic.insertProfileImage(id, file)
+                .then(()=>{
+                    resolve()
+                })
 
-                logic.insertProfileImage(id, file, filename)
             })
+            busboy.on('finish', () => {
+                
 
-            busboy.on('finish', () => resolve())
-
+                // resolve()
+              
+            })
             busboy.on('error', err => reject(err))
 
             req.pipe(busboy)
@@ -474,16 +481,23 @@ router.post('/users/:id/projects/:projectid/photo', [bearerTokenParser, jwtVerif
 
         if (id !== sub) throw Error('token sub does not match user id')
 
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             const busboy = new Busboy({ headers: req.headers })
-
-            busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+            
+            await busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
 
                 logic.insertProjectImage(file, projectid)
+                .then(()=>{
+                    resolve()
+                })
+
             })
+            busboy.on('finish', () => {
+                
 
-            busboy.on('finish', () => resolve())
-
+                // resolve()
+              
+            })
             busboy.on('error', err => reject(err))
 
             req.pipe(busboy)

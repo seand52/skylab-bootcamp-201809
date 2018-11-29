@@ -119,7 +119,7 @@ class Explore extends Component {
                     <form onSubmit={this.handleSubmit}>
                         <label className="explore-search-form__label">
                             <input onChange={this.onSearchNameQueryChange} className="explore-searchbar" type="text" placeholder="Search by project name" aria-label="Search" />
-                            <button type="submit" class="btn btn-primary">Search</button>
+                            <button type="submit" className="btn btn-primary">Search</button>
                         </label>
                         </form>
                     </div>

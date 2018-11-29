@@ -15,61 +15,97 @@ class ProjectPage extends Component {
         project: null,
         meetings: null,
         user: null,
-        projectImage: null
+        projectImage: null,
     }
     componentDidMount() {
-
-        return logic.retrieveProjectInfo(this.props.id)
-            .then(res => this.setState({ project: res }))
-            .then(() => logic.listProjectMeetings(this.props.id))
-            .then(res => this.setState({ meetings: res }))
-            .then(() => logic.retrieveProjectImage(this.props.userId, this.props.id))
-            .then(res => this.setState({ projectImage: res }))
+        try {
+            return logic.retrieveProjectInfo(this.props.id)
+                .then(res => this.setState({ project: res }))
+                .then(() => logic.listProjectMeetings(this.props.id))
+                .then(res => this.setState({ meetings: res }))
+                .then(() => logic.retrieveProjectImage(this.props.userId, this.props.id))
+                .then(res => this.setState({ projectImage: res }))
+        } catch (err) {
+            console.error(err)
+        }
     }
 
     acceptCollabHandle = (id) => {
-        return logic.handleCollaboration(this.state.project.id, 'accept', id)
-            .then(() => logic.retrieveProjectInfo(this.props.id))
-            .then(res => this.setState({ project: res }))
+        try {
+
+            return logic.handleCollaboration(this.state.project.id, 'accept', id)
+                .then(() => logic.retrieveProjectInfo(this.props.id))
+                .then(res => this.setState({ project: res }))
+        } catch (err) {
+            console.error(err)
+        }
     }
 
     rejectCollabHandle = (id) => {
-        return logic.handleCollaboration(this.state.project.id, 'reject', id)
-            .then(() => logic.retrieveProjectInfo(this.props.id))
-            .then(res => this.setState({ project: res }))
+        try {
+
+            return logic.handleCollaboration(this.state.project.id, 'reject', id)
+                .then(() => logic.retrieveProjectInfo(this.props.id))
+                .then(res => this.setState({ project: res }))
+        } catch (err) {
+            console.error(err)
+        }
     }
 
     handleDeleteMeeting = (meetingId) => {
-        return logic.deleteMeeting(meetingId)
-            .then(() => logic.listProjectMeetings(this.props.id))
-            .then(res => this.setState({ meetings: res }))
+        try {
+
+            return logic.deleteMeeting(meetingId)
+                .then(() => logic.listProjectMeetings(this.props.id))
+                .then(res => this.setState({ meetings: res }))
+        } catch (err) {
+            console.error(err)
+        }
     }
 
     handleAttendMeeting = (meetingId) => {
-        return logic.attendMeeting(meetingId)
-            .then(() => logic.listProjectMeetings(this.props.id))
-            .then(res => this.setState({ meetings: res }))
+        try {
+
+            return logic.attendMeeting(meetingId)
+                .then(() => logic.listProjectMeetings(this.props.id))
+                .then(res => this.setState({ meetings: res }))
+        } catch (err) {
+            console.error(err)
+        }
 
     }
 
     handleUnAttendMeeting = (meetingId) => {
-        return logic.unAttendMeeting(meetingId)
-            .then(() => logic.listProjectMeetings(this.props.id))
-            .then(res => this.setState({ meetings: res }))
+        try {
+            return logic.unAttendMeeting(meetingId)
+                .then(() => logic.listProjectMeetings(this.props.id))
+                .then(res => this.setState({ meetings: res }))
+        } catch (err) {
+            console.error(err)
+        }
     }
 
     handleDeleteProject = () => {
+        try {
 
-        const { userId, id } = this.props
-        return logic.deleteProject(userId, id)
-            .then(() => this.props.history.push('/home'))
+            const { userId, id } = this.props
+            return logic.deleteProject(userId, id)
+                .then(() => this.props.history.push('/home'))
+        } catch (err) {
+            console.error(err)
+        }
     }
 
     handleLeaveProject = () => {
         const { id } = this.props
-        return logic.leaveProject(id)
-            .then(() => logic.retrieveProjectInfo(this.props.id))
-            .then(res => this.setState({ project: res }))
+        try {
+
+            return logic.leaveProject(id)
+                .then(() => logic.retrieveProjectInfo(this.props.id))
+                .then(res => this.setState({ project: res }))
+        } catch (err) {
+            console.error(err)
+        }
     }
 
     handleRequestCollaboration = () => {
@@ -87,16 +123,26 @@ class ProjectPage extends Component {
 
     handleSaveProject = () => {
         const { id, userId } = this.props
-        return logic.saveProject(id, userId)
-            .then(() => logic.retrieveProjectInfo(id))
-            .then(res => this.setState({ project: res }))
+        try {
+
+            return logic.saveProject(id, userId)
+                .then(() => logic.retrieveProjectInfo(id))
+                .then(res => this.setState({ project: res }))
+        } catch (err) {
+            console.error(err)
+        }
     }
 
     handleUnFollowProjects = () => {
         const { id, userId } = this.props
-        return logic.removeSavedProject(id, userId)
-            .then(() => logic.retrieveProjectInfo(id))
-            .then(res => this.setState({ project: res }))
+        try {
+
+            return logic.removeSavedProject(id, userId)
+                .then(() => logic.retrieveProjectInfo(id))
+                .then(res => this.setState({ project: res }))
+        } catch (err) {
+            console.error(err)
+        }
     }
 
 
@@ -107,9 +153,14 @@ class ProjectPage extends Component {
     }
 
     handleRemoveCollaborator = (collaboratorId) => {
-        return logic.removeCollaborator(collaboratorId, this.props.id)
-            .then(() => logic.retrieveProjectInfo(this.props.id))
-            .then(res => this.setState({ project: res }))
+        try {
+
+            return logic.removeCollaborator(collaboratorId, this.props.id)
+                .then(() => logic.retrieveProjectInfo(this.props.id))
+                .then(res => this.setState({ project: res }))
+        } catch (err) {
+            console.error(err)
+        }
     }
 
 
@@ -120,13 +171,11 @@ class ProjectPage extends Component {
 
             if (project.collaborators.some(item => item.id === userId)) {
                 return (< div className="project-page-new-meeting">
-                    <p>Would you like to leave this project?</p>
                     <Button onClick={this.handleLeaveProject}>Leave project</Button>
                 </div>)
             } else if (!project.collaborators.some(item => item.id === userId) && !(project.pendingCollaborators.some(item => item.id === userId))) {
                 return (
                     < div className="project-page-new-meeting">
-                        <p>Would you like to collaborate?</p>
                         <Button onClick={this.handleRequestCollaboration}>Collaborate now</Button>
                     </div>
                 )
@@ -151,7 +200,6 @@ class ProjectPage extends Component {
         const { project } = this.state
         if (project) {
             const res = project.skills.filter(value => -1 !== project.viewerSkills.indexOf(value));
-
             if (res.length) return `Matches with ${(res.length / project.viewerSkills.length).toFixed(2) * 100}% of your interests`
             else return 'does not match with any of your interests :('
 
@@ -161,21 +209,16 @@ class ProjectPage extends Component {
     }
 
     uploadImage = event => {
-        // console.log('initialise uploadimage')
-        // return logic.addProjectImage(event.target.files[0], this.props.id)
-        //     .then(() => {
-        //         console.log('retrieving')
-        //         return logic.retrieveProjectImage(this.props.userId, this.props.id)
-        //         .then(image => {
-        //             console.log('got image', image)
-        //             this.setState({ projectImage: image })}, () => console.log('uploaded'))
-        //     })
+        try {
 
             return logic.addProjectImage(event.target.files[0], this.props.id)
-            .then(() => {
-                return logic.retrieveProjectInfo(this.props.id)
-                    .then(res => this.setState({ projectImage: res }))
-            })
+                .then(() => {
+                    return logic.retrieveProjectInfo(this.props.id)
+                        .then(res => this.setState({ project: res }))
+                })
+        } catch (err) {
+            console.error(err)
+        }
 
     }
 
@@ -185,12 +228,10 @@ class ProjectPage extends Component {
         if (project) {
             if (project.viewerSavedProjects.includes(id) && !project.collaborators.some(item => item.id === userId)) {
                 return (<div className="project-page-new-meeting">
-                    <p>You have saved this project. Click to unfollow</p>
                     <Button onClick={this.handleUnFollowProjects}>Unfollow</Button>
                 </div>)
             } else if (!(project.viewerSavedProjects.includes(id)) && !project.collaborators.some(item => item.id === userId)) {
                 return (< div className="project-page-new-meeting">
-                    <p>Save the project to view later</p>
                     <Button onClick={this.handleSaveProject}>Save Project</Button>
                 </div>)
             }
@@ -209,76 +250,94 @@ class ProjectPage extends Component {
     render() {
         const { project, meetings, projectImage } = this.state
 
-        return <div>
-            <h1>{project && project.name}</h1>
-            <header className="project-top-section">
-                <div className="project-image-container">
+        return <div className="project-page-container">
+            <header className="project-top-section row">
+                <div className="project-image-container col-3">
                     <img src={project ? project.projectImage : null} />
+                    <form encType="multipart/form-data" onSubmit={this.uploadImage}>
+                        <label className="profileImage-upload">
+                            <input className="uploadImage-input" type="file" name="avatar" onChange={this.uploadImage} />
+                            Edit image
+                                </label>
+                    </form>
                 </div>
-                <div className="top-section__extrainfo">
 
-                    <div className="project-page-header-additional-info">
-                        <div className="extrainfo-image-container">
+
+                <div className="project-page-header-additional-info col-4" align="center">
+                    <h1>{project && project.name}</h1>
+                    <div className="owner-photo-and-extra-info row">
+                        <div className="extrainfo-image-container col-3">
                             <img className="extrainfo__image-profile" src={project && project.owner.profileImage} alt="profile" />
-                            <form encType="multipart/form-data" onSubmit={this.uploadImage}>
-                                <input type="file" name="avatar" onChange={this.uploadImage} />
-                            </form>
                         </div>
-                        <span>Hosted by</span><p className="project-page-header-additional-info__user-link" onClick={this.clickProfileName}>{project && project.owner.name}</p>
-                        <span>Host email:</span>{project && project.owner.email}
+                        <div className="owner-name-and-email col-9">
+                            <span>Hosted by</span><p className="project-page-header-additional-info__user-link" onClick={this.clickProfileName}>{project && project.owner.name}</p>
+                            <span>Host email:</span>{project && project.owner.email}
+                        </div>
                     </div>
+                </div>
 
+                <div className="project-page-header-collab-and-favourites col-5">
                     {project && (!(this.props.userId === project.owner.id)) && this.renderCollabButtons()}
                     {project && (!(this.props.userId === project.owner.id)) && this.renderFavouritesButtons()}
 
 
                     {project && (this.props.userId === project.owner.id) ? < div className="project-page-new-meeting">
-                        <p>Would you like to create a new event?</p>
                         <Button onClick={this.handleAddNewEvent}>Add a new event</Button>
                     </div> : null}
 
                     {project && (this.props.userId === project.owner.id) ? < div className="project-page-new-meeting">
-                        <p>Would you like to delete this project?</p>
-                        <Button onClick={this.handleDeleteProject}>Delete project</Button>
+                        <Button color="unique" onClick={this.handleDeleteProject}>Delete project</Button>
                     </div> : null}
-
                 </div>
+
+
 
             </header>
-            <section className="project-page-info-container">
-                <section className="project-page-project-info">
-                    <h2>Information</h2>
-                    <p>Beginner Friendly: {(project && project.beginnerFriendly === 'true') ? 'yes' : 'no'}</p>
-                    <h3>Description</h3>
-                    <p>{project && project.description}</p>
-                    <h3>Tech stack used</h3>
-                    {project && project.skills.map((skill, index) => <SkillsTag searchTag={this.handleSearchTag} key={index} skill={skill} />)}
-                    <p>{this.calculateCommonInterests()}</p>
-                </section>
-                <section className="project-page-meetings">
-                    <h2>Upcoming Meetings</h2>
-                    {meetings && meetings.sort((a, b) => a.realDate - b.realDate).map((meeting, index) => {
-                        return (
-                            <div className="individual-meeting-container" key={index}>
-                                <Meetings unAttendMeeting={this.handleUnAttendMeeting} attendMeeting={this.handleAttendMeeting} deleteMeeting={this.handleDeleteMeeting} userId={this.props.userId} key={index} meeting={meeting} project={project} />
-                                <MeetingAttendeesModal clickName={this.clickProfileName} meetingId={meeting.id} />
-                            </div>)
-                    })}
-                </section>
-            </section>
-
-
-            <section className="project-page-collaborators">
-                <h1>Current Collaborators</h1>
-                <div className="project-page-collaborators-display">
-                    {project && project.collaborators.map((collaborator, index) => <CollaboratorCard clickName={this.clickProfileName} collaborator={collaborator} key={index} userId={this.props.userId} ownerId={project.owner.id} removeCollaborator={this.handleRemoveCollaborator} />)}
+            <section className="project-page-main-section-container">
+                <div className="row">
+                    <section className="project-page-project-info col-5">
+                        <h2>Project Details</h2>
+                        <p>Beginner Friendly: {(project && project.beginnerFriendly === 'true') ? 'yes' : 'no'}</p>
+                        <h3>Description</h3>
+                        <p>{project && project.description}</p>
+                        <h3>Tech stack used</h3>
+                        {project && project.skills.map((skill, index) => <SkillsTag searchTag={this.handleSearchTag} key={index} skill={skill} viewerSkills={project.viewerSkills} />)}
+                        <p>{this.calculateCommonInterests()}</p>
+                    </section>
+                    <section className="project-page-meetings col-6">
+                        <h2>Upcoming Meetings</h2>
+                        {meetings && meetings.sort((a, b) => a.realDate - b.realDate).map((meeting, index) => {
+                            return (
+                                <div className="individual-meeting-container col-10 offset-1" key={index}>
+                                    <Meetings unAttendMeeting={this.handleUnAttendMeeting} attendMeeting={this.handleAttendMeeting} deleteMeeting={this.handleDeleteMeeting} userId={this.props.userId} key={index} meeting={meeting} project={project} />
+                                    <MeetingAttendeesModal clickName={this.clickProfileName} meetingId={meeting.id} />
+                                </div>)
+                        })}
+                    </section>
                 </div>
-            </section>
-            {project && (this.props.userId === project.owner.id) ? <section className="project-page-pending-collaborators">
-                <Collapsible clickName={this.clickProfileName} accept={this.acceptCollabHandle} reject={this.rejectCollabHandle} pendingCollabs={project.pendingCollaborators} />
-            </section> : null}
 
-        </div >
+
+                <div className="current-and-pending-collaborators row">
+                    <section className="project-page-collaborators col-5">
+                        <h1>Current Collaborators</h1>
+                        <div className="project-page-collaborators-display row">
+
+                            {project && project.collaborators.map((collaborator, index) => <CollaboratorCard clickName={this.clickProfileName} collaborator={collaborator} key={index} userId={this.props.userId} ownerId={project.owner.id} removeCollaborator={this.handleRemoveCollaborator} />)}
+                        </div>
+                        {project && (this.props.userId === project.owner.id) ? <section className="project-page-pending-collaborators">
+                            <Collapsible clickName={this.clickProfileName} accept={this.acceptCollabHandle} reject={this.rejectCollabHandle} pendingCollabs={project.pendingCollaborators} />
+                        </section> : null}
+                    </section>
+                    <section className="project-page-collaborators col-6">
+                        <h1>Comments</h1>
+                        Comments in development :)
+                    </section>
+                </div>
+
+
+            </section>
+
+        </div>
     }
 }
 
