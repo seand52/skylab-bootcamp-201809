@@ -72,8 +72,11 @@ class Profile extends Component {
         if (user) {
             if (showProjects === 'my projects') {
                 return <h1>{user.name}'s projects</h1>
-            } else {
+            } 
+            else if (showProjects==='collab projects') {
                 return <h1>Projects with pending collaborators</h1>
+            } else {
+                return <h1>Upcoming Meetings</h1>
             }
         }
     }
@@ -132,7 +135,6 @@ class Profile extends Component {
                     {ownProjects && (showProjects === 'my projects') && ownProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
                     {collabProjects && (showProjects === 'collab projects') && collabProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
                     {upComingMeetings && (showProjects === 'meetings') && upComingMeetings.map((meeting, index) => {
-                        debugger
                         return (<div key={index}>
                             <p>{meeting.location}</p>
                             <p>{meeting.date}</p>
