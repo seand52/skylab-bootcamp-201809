@@ -1,8 +1,8 @@
 .create-meeting-container {
   width: 50%;
   margin: 100px auto;
-  border: 2px solid #7878f7;
   border-radius: 20px;
+  border: 2px solid #ccc;
   background-color: #fcf6f6;
 }
 

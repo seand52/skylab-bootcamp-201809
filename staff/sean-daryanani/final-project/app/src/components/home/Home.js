@@ -53,7 +53,7 @@ class Home extends Component {
 
     render() {
         const { collabProjects, ownProjects, savedProjects } = this.state
-        return <div>
+        return <div className="home-page-container">
             <Tabs selectedIndex={this.state.tabIndex} onSelect={this.handleTabChange}>
 
                 <TabList>

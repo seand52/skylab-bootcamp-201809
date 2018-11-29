@@ -6,21 +6,25 @@
 
 }
 
-.create-project-form {
-    width: 40%;
-    margin: 30px auto;
+.home-page-container {
+  height: 100vh;
+  background-color: rgb(245, 240, 240)
+}
+
+.create-project-form-section {
+
 }
 
 
 .react-tabs {
-    background-color: rgb(252, 246, 246);
+    // background-color: rgb(252, 246, 246);
     -webkit-tap-highlight-color: transparent;
     margin: 15px;
-    border: 3px solid rgb(160, 200, 235);
+    border: 2px solid #ccc;
     border-radius: 20px;
   
     &__tab-list {
-      border-bottom: 3px solid rgb(160, 200, 235);
+      // border-bottom: 3px solid rgb(160, 200, 235);
       margin: 0 0 10px;
       padding: 20px;
     }
@@ -59,7 +63,7 @@
           left: -4px;
           right: -4px;
           bottom: -5px;
-          background: rgb(255, 255, 255);
+          // background: rgb(255, 255, 255);
         }
       }
     }

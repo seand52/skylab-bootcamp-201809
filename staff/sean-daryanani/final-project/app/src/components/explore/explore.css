@@ -1,22 +1,63 @@
 .explore-container {
-  display: flex;
-  height: 100vh;
+  padding: 10px;
+  background-color: #e9e7e7;
+}
+.explore-container h2 {
+  margin-bottom: 20px;
+}
+
+.explore-header {
+  background-color: #ff8888;
+  border-radius: 20px;
+  color: white;
+}
+.explore-header h2 {
+  margin-bottom: 20px;
+}
+
+.searchbar-container {
+  position: relative;
+  bottom: -20px;
+  padding: 10px;
+  background-color: black;
+  opacity: 0.9;
+  margin: 0 auto;
+  justify-content: left;
+  border-radius: 20px;
+}
+
+.explore-search-form {
+  text-align: left;
+}
+.explore-search-form label {
+  color: white;
 }
 
 .filters {
-  flex: 0.3;
-  background-color: #eecccc;
+  border: 2px solid #ccc;
+  background-color: white;
+  border-radius: 20px;
+  margin-left: 20px;
+  padding: 20px;
+}
+
+.explore-searchbar {
+  width: 50%;
+  margin-right: 30px;
 }
 
 .search-area {
   flex: 0.7;
-  background-color: #c8c8ee;
+  background-color: white;
+  border: 2px solid #ccc;
+  border-radius: 20px;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: flex-start;
   padding: 20px;
   flex-wrap: wrap;
+  margin-left: 60px;
 }
 
 .filter-skills {
@@ -25,9 +66,34 @@
   flex-wrap: wrap;
   justify-content: space-between;
 }
+.filter-skills form {
+  text-align: left;
+}
+.filter-skills h1 {
+  text-align: center;
+}
 
 .search-results {
   display: flex;
+}
+
+.main-explore-area {
+  margin-top: 30px;
+  margin-right: 0px;
+  margin-left: 0px;
+}
+
+.explore-search-form__label {
+  width: 100%;
+}
+
+.checkbox {
+  text-align: left;
+  margin-left: 20px;
+}
+
+.search-city-input {
+  width: 100%;
 }
 
 /*# sourceMappingURL=explore.css.map */

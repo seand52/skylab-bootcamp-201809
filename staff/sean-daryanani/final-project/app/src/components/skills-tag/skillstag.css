@@ -1,13 +1,26 @@
 .skills-tag {
-  border-radius: 30px;
-  background-color: thistle;
-  min-width: 50px;
-  max-width: 100px;
-  margin-left: 1px;
-  padding: 5px;
-  flex: 0 50%;
-  margin-top: 20px;
+  background: #b8d7f1;
+  border: none;
+  border-radius: 10px;
+  color: #555858;
+  display: inline-block;
+  height: 26px;
+  line-height: 26px;
+  padding: 0 20px 0 23px;
+  position: relative;
+  margin: 0 10px 10px 0;
+  text-decoration: none;
+  -webkit-transition: color 0.2s;
   cursor: pointer;
+}
+
+.skills-tag:hover {
+  background-color: #e5fcd0;
+  color: #ac8e8e;
+}
+
+.skills-tag:hover::after {
+  border-left-color: #a79296;
 }
 
 /*# sourceMappingURL=skillstag.css.map */

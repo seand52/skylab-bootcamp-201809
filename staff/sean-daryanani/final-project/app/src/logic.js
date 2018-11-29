@@ -347,7 +347,10 @@ const logic = {
             .then(res => res.json())
             .then(res => {
                 if (res.error) throw Error(res.error)
-
+                res.data.forEach(item => {
+                    item.realDate = new Date(item.date)
+                    item.listDate = logic._changeDate(item.date, 'meeting')
+                })
                 return res.data
             })
 
@@ -554,7 +557,7 @@ const logic = {
         if (!projectId.trim()) throw Error('projectId is empty or blank')
         if (!location.trim()) throw Error('location is empty or blank')
         if (!description.trim()) throw Error('description is empty or blank')
-        debugger
+
         if(new Date() > startDate ) throw Error ('cannot create a meeting in the past')
 
 

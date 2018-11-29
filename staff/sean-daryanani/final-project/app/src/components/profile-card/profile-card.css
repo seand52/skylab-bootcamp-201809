@@ -1,7 +1,6 @@
 .profile-card-container {
   width: 50%;
   margin: 30px;
-  border-right: 1px solid #4340f5;
   text-align: center;
   flex: 0 0 2;
 }
@@ -10,11 +9,20 @@
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  border-bottom: 1px solid #4340f5;
+  border: 2px solid #ccc;
+  margin-top: 20px;
+  border-radius: 20px;
+  background-color: white;
+  margin-bottom: 20px;
 }
 
 .profile-img-container {
   width: 100px;
+  position: absolute;
+  top: -30px;
+  right: 0;
+  border: 1px solid #ccc;
+  border-radius: 50%;
 }
 .profile-img-container img {
   display: block;
@@ -24,9 +32,61 @@
   overflow: hidden;
 }
 
+.uploadImage-input {
+  display: none;
+}
+
+.profileImage-upload {
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 20px;
+}
+
 .bottom-area {
-  padding-top: 40px;
-  height: 100%;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #ccc;
+  border-radius: 20px;
+}
+
+.profile-card-button {
+  background: none;
+  border-bottom: 1px solid #ccc;
+  padding: 10px;
+  cursor: pointer;
+}
+
+#first-button {
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+#last-button {
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.profile-card-button:focus {
+  outline: 0 !important;
+  background: #aabecf;
+}
+
+.profile-card-button:active {
+  background: #aabecf;
+}
+
+.badge {
+  background-color: blue !important;
+}
+
+.projects-badge {
+  border: 1px solid #ccc;
+  background-color: aliceblue;
+  width: 5%;
+  padding: 2px;
 }
 
 /*# sourceMappingURL=profile-card.css.map */

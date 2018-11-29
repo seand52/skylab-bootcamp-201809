@@ -20,7 +20,11 @@ const Meeting = new Schema({
     attending: [{
         type: ObjectId,
         ref: 'User'
-    }]
+    }],
+
+    description: {
+        type: String,
+    }
 })
 
 module.exports = Meeting

@@ -6,7 +6,8 @@
 }
 
 .profile-page-container {
-    background-color: rgb(252, 249, 249);
+    background-color: rgb(245, 240, 240);
+    height: 100vh
 }
 
 .profile-pic-container {
@@ -40,14 +41,15 @@
 }
 
 .profile-top-area {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    background: aliceblue;
+    // display: flex;
+    // flex-direction: row;
+    // align-items: center;
+    // justify-content: center;
+    // background: aliceblue;
     margin: 20px;
-    border: 3px solid rgb(67, 64, 245);
-    border-radius: 10px;
+    padding-top: 20px;
+    // border: 3px solid rgb(67, 64, 245);
+    // border-radius: 10px;
 }
 
 .projects-container {
@@ -116,21 +118,25 @@ box-shadow: 3px 4px 5px 0px rgba(0,0,0,0.75);
 }
 
 .bio {
-    align-self: flex-start;
-    margin-top: 30px;
-    margin-right: 20px;
-    flex: 1 0;
-    height: inherit;
-    display: flex;
-    flex-direction: row;
+    border: 2px solid #ccc;
+    margin-left: 30px;
+    border-radius: 20px;
+    background-color: white;
+    // align-self: flex-start;
+    // margin-top: 30px;
+    // margin-right: 20px;
+    // flex: 1 0;
+    // height: inherit;
+    // display: flex;
+    // flex-direction: row;
 
     & span {
         font-weight: bold;
     }
 
     &__extra-info {
-        flex: 1 0 0;
-        text-align: left;
+        // flex: 1 0 0;
+        // text-align: left;
         padding: 10px;
     }
 
@@ -147,6 +153,7 @@ box-shadow: 3px 4px 5px 0px rgba(0,0,0,0.75);
 
     & p {
         line-height: 1.3;
+        text-align: left;
 
     }
 
@@ -156,11 +163,12 @@ box-shadow: 3px 4px 5px 0px rgba(0,0,0,0.75);
     // }
 }
 
+
 .skills-tag-container{
     display: flex;
     flex-wrap: wrap;
     padding: 10px;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 .groups, .collaborate, .interests {
@@ -180,10 +188,14 @@ box-shadow: 3px 4px 5px 0px rgba(0,0,0,0.75);
 }
 
 .main-area {
-    margin: 20px;
-    border: 3px solid #4340f5;
-    border-radius: 10px;
-    background-color: aliceblue;
+    margin: 60px 20px;
+    padding-top: 20px;
+    border: 2px solid #ccc;
+    border-radius: 20px;
+    background-color: white; 
+    & h1 {
+        font-weight: bold;
+    }
 }
 
 .projects h2 {
@@ -205,4 +217,11 @@ box-shadow: 3px 4px 5px 0px rgba(0,0,0,0.75);
 .col {
     flex-grow: 0 !important;
     margin-top: 20px;
+}
+
+.profile-meetup-card {
+    margin: 0 auto 20px auto;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+
 }

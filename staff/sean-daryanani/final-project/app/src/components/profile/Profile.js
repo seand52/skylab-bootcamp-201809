@@ -8,6 +8,7 @@ import Modalpage from '../modal/Modalpage'
 import SkillsTag from '../skills-tag/SkillsTag'
 import { withRouter, Link } from 'react-router-dom'
 
+
 import Meetings from '../meetings/Meetings'
 
 class Profile extends Component {
@@ -40,6 +41,7 @@ class Profile extends Component {
 
     sendProfileUpdate = (city, github, bio, skills) => {
         const { id } = this.props
+        debugger
         return logic.updateProfile(id, city, github, bio, skills)
             .then(() => logic.retrieveUserProfile(id))
             .then(res => {
@@ -72,8 +74,8 @@ class Profile extends Component {
         if (user) {
             if (showProjects === 'my projects') {
                 return <h1>{user.name}'s projects</h1>
-            } 
-            else if (showProjects==='collab projects') {
+            }
+            else if (showProjects === 'collab projects') {
                 return <h1>Projects with pending collaborators</h1>
             } else {
                 return <h1>Upcoming Meetings</h1>
@@ -107,43 +109,48 @@ class Profile extends Component {
 
 
         return <div className="profile-page-container">
-            <section className="profile-top-area">
-                <ProfileCard uploadImage={this.handleUpload} showCollabProjects={this.handleShowCollabProjects} user={user} myProjects={ownProjects} projectsStarted={this.handleshowOwnProjects} collabProjects={collabProjects} userId={userId} profileImage={image} meetings={this.handleUpComingMeetings} numberOfMeetings={upComingMeetings.length} />
+            <div className="row">
+                <section className="profile-top-area  col-4">
+                    <ProfileCard uploadImage={this.handleUpload} showCollabProjects={this.handleShowCollabProjects} user={user} myProjects={ownProjects} projectsStarted={this.handleshowOwnProjects} collabProjects={collabProjects} userId={userId} profileImage={image} meetings={this.handleUpComingMeetings} numberOfMeetings={upComingMeetings.length} />
 
-                <section className="bio">
-                    <div className="bio__extra-info">
-                        <p><span>Bio</span>:{user && user.bio}</p>
-                        <span>Github:</span> <a href="https://github.com">{user && user.githubProfile}</a>
-                        {user && (user.id === userId) && <Modalpage user={user} updateProfile={this.sendProfileUpdate} />}
-                    </div>
-                    <div className="bio__interests">
-                        <h2>Interests</h2>
-                        <div className="skills-tag-container">
-                            {user && user.skills.map((skill, index) => <SkillsTag searchTag={this.handleSearchTag} skill={skill} key={index} />)}
+                    <section className="bio col-12">
+                        <div className="bio__extra-info col-12">
+                            <p><span>Bio</span>:{user && user.bio}</p>
+                            <p><span>Github:</span> <a href="https://github.com">{user && user.githubProfile}</a></p>
+                            <div className="bio__interests">
+                                <h2>Interests</h2>
+                                <div className="skills-tag-container">
+                                    {user && user.skills.map((skill, index) => <SkillsTag searchTag={this.handleSearchTag} skill={skill} key={index} />)}
+                                </div>
+                            </div>
+                            {user && (user.id === userId) && <Modalpage className="testt" user={user} updateProfile={this.sendProfileUpdate} />}
                         </div>
-                    </div>
+                    </section>
+
                 </section>
 
-            </section>
+                <section className="main-area col-7">
+                    <div className="main-area__title">
+                        {this.renderTitle()}
 
-            <section className="main-area">
-                <div className="main-area__title">
-                    {this.renderTitle()}
+                    </div>
+                    <div className="main-area__projects">
+                        {ownProjects && (showProjects === 'my projects') && ownProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
+                        {collabProjects && (showProjects === 'collab projects') && collabProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
+                        {upComingMeetings && (showProjects === 'meetings') && upComingMeetings.map((meeting, index) => {
+                            return (<div className="profile-meetup-card col-md-8" key={index}>
+                                <p><b>Description</b>: {meeting.description}</p>
+                                <p><b>Project: </b><Link to={`/project/${meeting.project.id}`}>{meeting.project.name}</Link></p>
+                                <p><b>Location</b>: {meeting.location}</p>
+                                <p><b>Date</b>: {meeting.realDate.toString()}</p>
+                                <p>Attending: {meeting.attending.length}</p>
 
-                </div>
-                <div className="main-area__projects">
-                    {ownProjects && (showProjects === 'my projects') && ownProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
-                    {collabProjects && (showProjects === 'collab projects') && collabProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
-                    {upComingMeetings && (showProjects === 'meetings') && upComingMeetings.map((meeting, index) => {
-                        return (<div key={index}>
-                            <p>{meeting.location}</p>
-                            <p>{meeting.date}</p>
-                            <Link to={`/project/${meeting.project.id}`}><p>{meeting.project.name}</p></Link>
-                        </div>)
-                    })}
+                            </div>)
+                        })}
 
-                </div>
-            </section>
+                    </div>
+                </section>
+            </div>
         </div>
     }
 

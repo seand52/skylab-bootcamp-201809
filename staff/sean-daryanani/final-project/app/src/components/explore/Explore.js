@@ -73,10 +73,16 @@ class Explore extends Component {
         this.setState({ cityQuery: city })
 
     }
-    handleSubmit = event => {
 
+    onSearchNameQueryChange = event => {
+        const searchQuery = event.target.value
+        this.setState({searchQuery})
+    }
+
+    handleSubmit = event => {
+        debugger
         event.preventDefault()
-        
+
         const { searchQuery, cityQuery } = this.state
         let skillsArray = []
 
@@ -104,30 +110,41 @@ class Explore extends Component {
         this.props.history.push(`/explore/${searchQuery}`)
     }
     render() {
-        return <div>
-            <div className="explore-container">
-                <div className="filters">
-                    <div>
-                        <Searchbar searchQuery={this.queryListen} />
+        return <div className="explore-container">
+            <header className="explore-header col-12">
+                <h2><b>Find a project</b></h2>
+                <h4>X projects nearby</h4>
+                <div className="searchbar-container col-6">
+                    <div className="explore-search-form">
+                    <form onSubmit={this.handleSubmit}>
+                        <label className="explore-search-form__label">
+                            <input onChange={this.onSearchNameQueryChange} className="explore-searchbar" type="text" placeholder="Search by project name" aria-label="Search" />
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </label>
+                        </form>
                     </div>
+                </div>
+            </header>
+            <div className="main-explore-area row">
+                <div className="filters col-3">
+
                     <h1>What are you looking to learn?</h1>
                     <div className='filter-skills'>
-                        <form onSubmit={this.handleSubmit}>
+                        
                             {skills.map(skill => <Checkbox label={skill} handleCheckboxChange={this.toggleCheckbox} key={skill} selected={this.selectedCheckboxes} />)}
                             <h1>Filter by city</h1>
-                            <input onChange={this.onCityFilterChange} type="text" />
-                            <Button type="submit" color="primary">Search now</Button>
-                        </form>
+                            <input className="search-city-input" onChange={this.onCityFilterChange} type="text" />
                     </div>
 
                 </div>
-                <div className="search-area">
+                <div className="search-area col-8">
                     {/* <div className="search-results"> */}
                     {this.state.searchResults && this.state.searchResults.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
                     {/* </div> */}
                 </div>
             </div>
         </div>
+
     }
 }
 

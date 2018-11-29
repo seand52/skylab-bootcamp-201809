@@ -5,7 +5,7 @@ import { Button } from 'mdbreact'
 const Landing = props => {
     return (
         <div>
-            <div className="top-area">
+            <div className="top-area-landing">
                 <div className="img-container">
                     <div className="title-container">
                         <h1>SocialDev</h1>
