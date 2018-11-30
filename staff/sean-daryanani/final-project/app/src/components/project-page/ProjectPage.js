@@ -254,12 +254,12 @@ class ProjectPage extends Component {
             <header className="project-top-section row">
                 <div className="project-image-container col-3">
                     <img src={project ? project.projectImage : null} />
-                    <form encType="multipart/form-data" onSubmit={this.uploadImage}>
+                    {project && ((this.props.userId === project.owner.id)) && <form encType="multipart/form-data" onSubmit={this.uploadImage}>
                         <label className="profileImage-upload">
                             <input className="uploadImage-input" type="file" name="avatar" onChange={this.uploadImage} />
                             Edit image
                                 </label>
-                    </form>
+                    </form>}
                 </div>
 
 

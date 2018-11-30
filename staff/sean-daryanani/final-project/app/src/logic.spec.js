@@ -214,20 +214,22 @@ describe('projects', () => {
         let name, email, username, password, description, skills, beginnerFriendly, maxMembers
 
         beforeEach(async () => {
-            user = new User({ name: 'John24', email: 'do24124e@gmail.com', username: 'jd124124', password: '12124143' })
+            user = new User({ name: 'pep', email: 'pep@gmail.com', username: 'pep', password: 'pep' })
             await user.save()
+            debugger
             await logic.authenticate(user.username, user.password)
+
         })
 
         it('should succeed on correct data', async () => {
 
             debugger
-            await logic.addNewProject('test', 'test', 'test', 'test', '8')
+            await logic.addNewProject('test', 'test', ['skill1', 'skill2', 'skill3'], 'test', '8', 'barcelona')
 
             const projects = await Project.find()
 
             const [project] = projects
-
+            debugger
             expect(project.name).to.equal(name)
 
             expect(project.description).to.equal(description)

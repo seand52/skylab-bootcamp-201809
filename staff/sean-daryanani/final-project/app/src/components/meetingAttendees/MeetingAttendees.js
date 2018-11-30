@@ -7,13 +7,23 @@ class MeetingAttendees extends Component {
     }
 
     componentWillReceiveProps(props) {
-        logic.retrieveMeetingInfo(props.meetingId)
-        .then(res => this.setState({meeting: res}))
+        try {
+
+            logic.retrieveMeetingInfo(props.meetingId)
+            .then(res => this.setState({meeting: res}))
+        } catch(err) {
+            console.error(err)
+        }
     }
 
     componentDidMount() {
-        logic.retrieveMeetingInfo(this.props.meetingId)
-        .then(res => this.setState({meeting: res}))
+        try {
+
+            logic.retrieveMeetingInfo(this.props.meetingId)
+            .then(res => this.setState({meeting: res}))
+        } catch(err) {
+            console.error(err)
+        }
     }
 
     render() {

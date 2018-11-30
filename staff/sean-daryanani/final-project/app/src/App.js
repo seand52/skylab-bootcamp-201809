@@ -12,6 +12,7 @@ import Profile from './components/profile/Profile'
 import ProjectPage from './components/project-page/ProjectPage'
 import CreateMeeting from './components/create-meetings/CreateMeeting'
 import Navbarpage from './components/navbar/Navbar'
+import Footer from './components/footer/Footer'
 
 
 logic.url = 'http://localhost:5000/api'
@@ -106,6 +107,7 @@ class App extends Component {
 
           <Route path="/create-event/:id" render={props => logic.loggedIn ? <CreateMeeting userId={userId} id={props.match.params.id} /> : <Redirect to="/" />} />
         </Switch>
+        <Route path="/" render={() => <Footer />} />
 
         {error && <Error message={error} />}
         

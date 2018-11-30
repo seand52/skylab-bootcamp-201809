@@ -15,8 +15,8 @@ const skills = [
 class UpdateProfileForm extends Component {
 
     state = {
-        city:   this.props.user ? this.props.user.city : '',
-        githubProfile: this.props.user ? this.props.user.githubProfile: '',
+        city: this.props.user ? this.props.user.city : '',
+        githubProfile: this.props.user ? this.props.user.githubProfile : '',
         bio: this.props.user ? this.props.user.bio : '',
         skills: []
     }
@@ -28,15 +28,19 @@ class UpdateProfileForm extends Component {
             const { city, githubProfile, bio } = props.user
 
             this.setState({ city, githubProfile, bio })
-        } 
+        }
 
     }
-   
+
     componentWillMount = () => {
-
+        const { user } = this.props
         this.selectedCheckboxes = new Set();
+        if (user) {
+            user.skills.forEach(item => this.selectedCheckboxes.add(item) )
+        }
+        debugger
 
-    }    
+    }
 
     handleSubmit = event => {
 
@@ -48,11 +52,11 @@ class UpdateProfileForm extends Component {
 
             skillsArray.push(checkbox)
         }
-        const {city, githubProfile, bio} = this.state
+        const { city, githubProfile, bio } = this.state
 
         this.props.updateProfile(this.state.city, this.state.githubProfile, this.state.bio, skillsArray)
 
-  
+
 
     }
 
@@ -105,7 +109,7 @@ class UpdateProfileForm extends Component {
 
                 {skills.map(skill => <Checkbox label={skill} handleCheckboxChange={this.toggleCheckbox} key={skill} selected={this.selectedCheckboxes} />)}
 
-                <Button  type="submit" color="primary">Save changes</Button>
+                <Button type="submit" color="primary">Save changes</Button>
             </form>
         </div>
     }

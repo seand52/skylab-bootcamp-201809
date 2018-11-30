@@ -19,7 +19,13 @@ const logic = {
         }
 
     },
-
+    /**
+     * Registers a user
+     * @param {string} name 
+     * @param {string} email 
+     * @param {string} username 
+     * @param {string} password 
+     */
     registerUser(name, email, username, password) {
         if (typeof name !== 'string') throw TypeError(`${name} is not a string`)
         if (typeof email !== 'string') throw TypeError(`${email} is not a string`)
@@ -44,7 +50,11 @@ const logic = {
                 if (res.error) throw Error(res.error)
             })
     },
-
+    /**
+     * Allow a user to log in
+     * @param {string} username 
+     * @param {string} password 
+     */
     authenticate(username, password) {
         if (typeof username !== 'string') throw TypeError(`${username} is not a string`)
         if (typeof password !== 'string') throw TypeError(`${password} is not a string`)
@@ -82,7 +92,9 @@ const logic = {
     get userId() {
         return this._userId
     },
-
+    /**
+     * User logout
+     */
     logout() {
         this._userId = null
         this._token = null
@@ -90,7 +102,10 @@ const logic = {
         sessionStorage.removeItem('userId')
         sessionStorage.removeItem('token')
     },
-
+    /**
+     * Retrieves the user profile
+     * @param {*} id 
+     */
     retrieveUserProfile(id) {
 
         return fetch(`${this.url}/user-profile/${id || this._userId}`, {
@@ -109,7 +124,14 @@ const logic = {
             })
     },
 
-
+    /**
+     * 
+     * @param {skills} id 
+     * @param {skills} city 
+     * @param {skills} githubProfile 
+     * @param {skills} bio 
+     * @param {Array} skills 
+     */
     updateProfile(id, city, githubProfile, bio, skills) {
         if (typeof city !== 'string') throw TypeError(`${city} is not a string`)
         if (typeof githubProfile !== 'string') throw TypeError(`${githubProfile} is not a string`)
@@ -136,7 +158,10 @@ const logic = {
             })
     },
 
-
+    /**
+     * Lists own projects
+     * @param {string} id 
+     */
     listOwnProjects(id) {
 
         return fetch(`${this.url}/users/projects/${id || this._userId}`, {
@@ -153,6 +178,10 @@ const logic = {
             })
     },
 
+    /**
+     * Lists projects a user is collaborating in
+     * @param {string} id 
+     */
     listCollaboratingProjects(id) {
 
         return fetch(`${this.url}/users/${id || this._userId}/collaborating`, {
@@ -169,6 +198,10 @@ const logic = {
             })
     },
 
+    /**
+     * Saves a project
+     * @param {string} projectId 
+     */
     saveProject(projectId) {
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
         return fetch(`${this.url}/users/${this._userId}/projects/${projectId}/save`, {
@@ -185,6 +218,10 @@ const logic = {
             })
     },
 
+    /**
+     * Removes a saved project 
+     * @param {string} projectId 
+     */
     removeSavedProject(projectId) {
         return fetch(`${this.url}/users/${this._userId}/projects/${projectId}/save`, {
             method: 'DELETE',
@@ -199,7 +236,9 @@ const logic = {
             })
     },
 
-
+    /**
+     * Lists saved projects for a user
+     */
     listSavedProjects() {
         return fetch(`${this.url}/users/${this._userId}/projects/save`, {
             method: 'GET',
@@ -215,6 +254,15 @@ const logic = {
             })
     },
 
+    /**
+     * Adds a new project
+     * @param {string} name 
+     * @param {string} description 
+     * @param {Array} skills 
+     * @param {string} beginnerFriendly 
+     * @param {string} maxMembers 
+     * @param {string} location 
+     */
     addNewProject(name, description, skills, beginnerFriendly, maxMembers, location) {
         if (typeof name !== 'string') throw TypeError(`${name} is not a string`)
         if (typeof description !== 'string') throw TypeError(`${description} is not a string`)
@@ -225,7 +273,7 @@ const logic = {
         if (!description.trim()) throw Error('description is empty or blank')
         if (!beginnerFriendly.trim()) throw Error('beginnerFriendly is empty or blank')
         if (!maxMembers.trim()) throw Error('maxMembers is empty or blank')
-
+        debugger
 
         return fetch(`${this.url}/users/${this._userId}/projects`, {
             method: 'POST',
@@ -238,8 +286,9 @@ const logic = {
         })
             .then(res => res.json())
             .then(res => {
-
+debugger
                 if (res.error) throw Error(res.error)
+                
             })
     },
 
@@ -260,6 +309,10 @@ const logic = {
     //         })
     // },
 
+    /**
+     * Filters a project based on a user query
+     * @param {string} query 
+     */
     filterProjects(query) {
 
         if (typeof query !== 'string') throw TypeError(`${query} is not a string`)
@@ -278,7 +331,10 @@ const logic = {
             })
 
     },
-
+    /**
+     * Retrieves information of a given project
+     * @param {string} projectid 
+     */
     retrieveProjectInfo(projectid) {
 
         if (typeof projectid !== 'string') throw TypeError(`${projectid} is not a string`)
@@ -297,6 +353,10 @@ const logic = {
             })
     },
 
+    /**
+     * Lists the meetings that belong to a project
+     * @param {string} projectid 
+     */
     listProjectMeetings(projectid) {
         if (typeof projectid !== 'string') throw TypeError(`${projectid} is not a string`)
         if (!projectid.trim()) throw Error('projectid is empty or blank')
@@ -319,6 +379,10 @@ const logic = {
             })
     },
 
+    /**
+     * Allows user to attend meetings
+     * @param {string} meetingId 
+     */
     attendMeetings(meetingId) {
         if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
         if (!meetingId.trim()) throw Error('meetingId is empty or blank')
@@ -336,6 +400,10 @@ const logic = {
             })
     },
 
+    /**
+     * Retrieves upcoming meetings for a user
+     * @param {string} id 
+     */
     userUpcomingMeetings(id) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (!id.trim()) throw Error('id is empty or blank')
@@ -357,6 +425,12 @@ const logic = {
 
     },
 
+    /**
+     *  Handles the collaboration decision for a project
+     * @param {string} projectid 
+     * @param {string} decision 
+     * @param {string} collaboratorId 
+     */
     handleCollaboration(projectid, decision, collaboratorId) {
         if (typeof decision !== 'string') throw TypeError(`${decision} is not a string`)
         if (!decision.trim()) throw Error('decision is empty or blank')
@@ -376,6 +450,11 @@ const logic = {
             })
     },
 
+    /**
+     * Removes a collaborator from a project
+     * @param {*} collaboratorId 
+     * @param {*} projectId 
+     */    
     removeCollaborator(collaboratorId, projectId) {
         if (typeof collaboratorId !== 'string') throw TypeError(`${collaboratorId} is not a string`)
         if (!collaboratorId.trim()) throw Error('collaboratid is empty or blank')
@@ -396,7 +475,10 @@ const logic = {
                 if (res.error) throw Error(res.error)
             })
     },
-
+    /**
+     * Retrieves projects that have pending collaborators
+     * @param {string} id 
+     */
     retrievePendingCollaboratorProjects(id) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (!id.trim()) throw Error('id is empty or blank')
@@ -414,7 +496,10 @@ const logic = {
                 return res.data
             })
     },
-
+    /**
+     * Delete meeting 
+     * @param {string} meetingId 
+     */
     deleteMeeting(meetingId) {
 
         return fetch(`${this.url}/users/${this._userId}/projects/meetings/${meetingId}`, {
@@ -430,7 +515,10 @@ const logic = {
                 if (res.error) throw Error(res.error)
             })
     },
-
+    /**
+     * Attend meeting
+     * @param {string} meetingId 
+     */
     attendMeeting(meetingId) {
         if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
         if (!meetingId.trim()) throw Error('meetingId is empty or blank')
@@ -447,7 +535,10 @@ const logic = {
                 if (res.error) throw Error(res.error)
             })
     },
-
+    /**
+     * Retrieve info of a meeting
+     * @param {string} meetingId 
+     */
     retrieveMeetingInfo(meetingId) {
         if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
         if (!meetingId.trim()) throw Error('meetingId is empty or blank')
@@ -465,7 +556,10 @@ const logic = {
             })
 
     },
-
+    /**
+     * Leave a meeting
+     * @param {string} meetingId 
+     */
     unAttendMeeting(meetingId) {
         if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
         if (!meetingId.trim()) throw Error('meetingId is empty or blank')
@@ -482,7 +576,11 @@ const logic = {
                 if (res.error) throw Error(res.error)
             })
     },
-
+    /**
+     * Delete a project
+     * @param {string} userId 
+     * @param {string} projectId 
+     */
     deleteProject(userId, projectId) {
         if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
@@ -503,6 +601,11 @@ const logic = {
                 if (res.error) throw Error(res.error)
             })
     },
+
+    /**
+     * Leave a project
+     * @param {string} projectId 
+     */
     leaveProject(projectId) {
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
 
@@ -522,7 +625,11 @@ const logic = {
             })
     },
 
-
+    /**
+     * Request to collaborate in a project
+     * @param {*} projectId 
+     * @param {*} collaboratorId 
+     */
     requestCollaboration(projectId, collaboratorId) {
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
         if (typeof collaboratorId !== 'string') throw TypeError(`${collaboratorId} is not a string`)
@@ -547,6 +654,14 @@ const logic = {
 
     },
 
+    /**
+     * Adds a meeting
+     * @param {string} userId 
+     * @param {string} projectId 
+     * @param {string} startDate 
+     * @param {string} location 
+     * @param {string} description 
+     */
     addMeeting(userId, projectId, startDate, location, description) {
         if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
@@ -580,7 +695,10 @@ const logic = {
     },
 
 
-
+    /**
+     * Adds a profile image
+     * @param {file} file 
+     */
     addProfileImage(file) {
         let avatar = new FormData()
         
@@ -599,6 +717,11 @@ const logic = {
                })
     },
 
+    /**
+     * Add a project image
+     * @param {string} file 
+     * @param {string} projectId 
+     */
     addProjectImage(file, projectId) {
         let avatar = new FormData()
 

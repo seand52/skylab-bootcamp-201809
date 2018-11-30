@@ -24,47 +24,73 @@ class Profile extends Component {
 
     componentDidMount() {
         const { id } = this.props
-        Promise.all([logic.retrieveUserProfile(id), logic.retrievePendingCollaboratorProjects(id), logic.listOwnProjects(id), logic.retrieveProfileImage(id)])
-            .then(res => {
-                this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2], image: res[3] })
-            })
+        try {
+
+            Promise.all([logic.retrieveUserProfile(id), logic.retrievePendingCollaboratorProjects(id), logic.listOwnProjects(id), logic.retrieveProfileImage(id)])
+                .then(res => {
+                    this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2], image: res[3] })
+                })
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     componentWillReceiveProps(props) {
 
         const { id } = props
-        Promise.all([logic.retrieveUserProfile(id), logic.retrievePendingCollaboratorProjects(id), logic.listOwnProjects(id)])
-            .then(res => {
-                this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2] })
-            })
+        try {
+
+            Promise.all([logic.retrieveUserProfile(id), logic.retrievePendingCollaboratorProjects(id), logic.listOwnProjects(id)])
+                .then(res => {
+                    this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2] })
+                })
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     sendProfileUpdate = (city, github, bio, skills) => {
         const { id } = this.props
         debugger
-        return logic.updateProfile(id, city, github, bio, skills)
-            .then(() => logic.retrieveUserProfile(id))
-            .then(res => {
-                this.setState({ user: res })
-            })
+        try {
+
+            return logic.updateProfile(id, city, github, bio, skills)
+                .then(() => logic.retrieveUserProfile(id))
+                .then(res => {
+                    this.setState({ user: res })
+                })
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     handleShowCollabProjects = () => {
         const { id } = this.props
-        return logic.retrievePendingCollaboratorProjects(id)
-            .then(res => this.setState({ collabProjects: res, showProjects: 'collab projects' }))
+        try {
+            return logic.retrievePendingCollaboratorProjects(id)
+                .then(res => this.setState({ collabProjects: res, showProjects: 'collab projects' }))
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     handleshowOwnProjects = () => {
         const { id } = this.props
-        return logic.listOwnProjects(id)
-            .then(res => this.setState({ ownProjects: res, showProjects: 'my projects' }))
+        try {
+            return logic.listOwnProjects(id)
+                .then(res => this.setState({ ownProjects: res, showProjects: 'my projects' }))
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     handleUpComingMeetings = (id) => {
-
-        return logic.userUpcomingMeetings(id)
-            .then(result => this.setState({ upComingMeetings: result, showProjects: 'meetings' }))
+        try {
+            return logic.userUpcomingMeetings(id)
+                .then(result => this.setState({ upComingMeetings: result, showProjects: 'meetings' }))
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     renderTitle = () => {
@@ -94,7 +120,7 @@ class Profile extends Component {
     }
 
     handleUpload = event => {
-
+        
         return logic.addProfileImage(event.target.files[0])
             .then(image => {
 
@@ -102,7 +128,8 @@ class Profile extends Component {
                     .then(res => {
 
                         debugger
-                        this.setState({user: res})}, () => console.log('finished setstate'))
+                        this.setState({ user: res })
+                    }, () => console.log('finished setstate'))
             })
     }
 

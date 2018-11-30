@@ -217,7 +217,11 @@ const logic = {
             await project.save()
         })()
     },
-
+    /**
+     * 
+     * @param {string} userId 
+      @param {string} projectId 
+     */
     deleteProject(userId, projectId) {
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
         if (!projectId.trim()) throw new ValueError('projectId is empty or blank')
@@ -568,7 +572,11 @@ const logic = {
 
     },
 
-
+    /**
+     * Allows a user to leave a project
+     * @param {string} id 
+     * @param {string} projectId 
+     */
     leaveProject(id, projectId) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
