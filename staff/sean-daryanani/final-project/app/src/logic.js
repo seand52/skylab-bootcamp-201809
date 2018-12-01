@@ -259,21 +259,21 @@ const logic = {
      * @param {string} name 
      * @param {string} description 
      * @param {Array} skills 
-     * @param {string} beginnerFriendly 
      * @param {string} maxMembers 
      * @param {string} location 
      */
-    addNewProject(name, description, skills, beginnerFriendly, maxMembers, location) {
+    addNewProject(name, description, skills, maxMembers, location) {
         if (typeof name !== 'string') throw TypeError(`${name} is not a string`)
         if (typeof description !== 'string') throw TypeError(`${description} is not a string`)
-        if (typeof beginnerFriendly !== 'string') throw TypeError(`${beginnerFriendly} is not a string`)
+        if (!(skills instanceof Array)) throw TypeError(`${skills} is not an array`)
         if (typeof maxMembers !== 'string') throw TypeError(`${maxMembers} is not a string`)
+        if (typeof location !== 'string') throw TypeError(`${location} is not a string`)
 
         if (!name.trim()) throw Error('name is empty or blank')
         if (!description.trim()) throw Error('description is empty or blank')
-        if (!beginnerFriendly.trim()) throw Error('beginnerFriendly is empty or blank')
         if (!maxMembers.trim()) throw Error('maxMembers is empty or blank')
-        debugger
+        if (!location.trim()) throw Error('location is empty or blank')
+
 
         return fetch(`${this.url}/users/${this._userId}/projects`, {
             method: 'POST',
@@ -282,7 +282,7 @@ const logic = {
                 'Authorization': `Bearer ${this._token}`
 
             },
-            body: JSON.stringify({ name, description, skills, beginnerFriendly, maxMembers, location })
+            body: JSON.stringify({ name, description, skills, maxMembers, location })
         })
             .then(res => res.json())
             .then(res => {

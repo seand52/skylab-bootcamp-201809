@@ -6,8 +6,13 @@
 }
 
 .home-page-container {
-  height: 100vh;
+  min-height: 100vh;
   background-color: #f5f0f0;
+}
+
+.no-projects-text {
+  text-align: center;
+  width: 100%;
 }
 
 .react-tabs {

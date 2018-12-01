@@ -103,6 +103,8 @@ class ProjectPage extends Component {
             return logic.leaveProject(id)
                 .then(() => logic.retrieveProjectInfo(this.props.id))
                 .then(res => this.setState({ project: res }))
+                .then(() => logic.listProjectMeetings(this.props.id))
+                .then(res => this.setState({meetings: res}))
         } catch (err) {
             console.error(err)
         }

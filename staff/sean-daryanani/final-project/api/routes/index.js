@@ -109,12 +109,12 @@ router.patch('/user-profile/:id', [bearerTokenParser, jwtVerifier, jsonBodyParse
 router.post('/users/:id/projects', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
 
-        const { sub, params: { id }, body: { name, description, skills, beginnerFriendly, maxMembers, location } } = req
+        const { sub, params: { id }, body: { name, description, skills, maxMembers, location } } = req
 
 
         if (id !== sub) throw Error('token sub does not match user id')
 
-        return logic.addNewProject(id, name, description, skills, beginnerFriendly, maxMembers, location)
+        return logic.addNewProject(id, name, description, skills, maxMembers, location)
             .then(() => res.json({
                 message: 'project added'
             }))

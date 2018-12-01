@@ -1,5 +1,6 @@
 import React from 'react'
 import './profile-card.css'
+import {Badge} from 'mdbreact'
 
 const ProfileCard = props => {
     const { user, myProjects, collabProjects, showCollabProjects, projectsStarted, uploadImage, userId, profileImage, meetings, numberOfMeetings } = props
@@ -32,13 +33,13 @@ const ProfileCard = props => {
                 </div>
                 <div className='bottom-area'>
                     <button onClick={projectsStarted} type="button" className="profile-card-button" id="first-button" >
-                        Projects started <span className="projects-badge">{myProjects ? myProjects.length : 0}</span>
+                        Projects started <br/> <Badge color="light-blue" pill >{myProjects ? myProjects.length : 0}</Badge>
                     </button>
                     {(userId===user.id) && <button onClick={showCollabProjects} type="button" className="profile-card-button" >
-                        Collaborations <span className="projects-badge">{collabProjects ? collabProjects.length : 0}</span>
+                        Projects with pending Collaborators <br/> <Badge color="light-blue" pill >{collabProjects ? collabProjects.length : 0}</Badge>
                     </button>}
                     <button onClick={() => meetings(user.id)} type="button" className="profile-card-button" id="last-button" >
-                        Upcoming Meetings <span className="projects-badge">{numberOfMeetings ? numberOfMeetings : 0}</span>
+                        Upcoming Meetings <br/> <Badge color="light-blue" pill >{numberOfMeetings ? numberOfMeetings : 0}</Badge>
                     </button>
 
                 </div>

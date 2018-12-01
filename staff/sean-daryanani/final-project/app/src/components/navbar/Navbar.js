@@ -7,24 +7,32 @@ import './navbar.css'
 class Navbarpage extends React.Component {
     state = {
         isOpen: false,
-        pendingCollaborators: false,
+        selected: {
+            home: false,
+            explore: false,
+            profile: false
+        }
+
     };
 
 
     onLogoClick = () => this.props.history.push('/home')
 
     onHomeClick = () => {
-        this.setState({ isOpen: !this.state.isOpen }, () => this.props.history.push('/home'))
+        if (this.state.isOpen) this.setState({ isOpen: !this.state.isOpen}, () => this.props.history.push('/home'))
+        else this.props.history.push('/home')
     }
 
     onExploreClick = () => {
-        this.setState({ isOpen: !this.state.isOpen }, () => this.props.history.push('/explore'))
+        if (this.state.isOpen) this.setState({ isOpen: !this.state.isOpen}, () => this.props.history.push('/explore'))
+        else this.props.history.push('/explore')
     }
 
 
     onProfileClick = () => {
-        this.setState({isOpen:!this.state.isOpen} , () =>  this.props.history.push(`/profile/${this.props.userId}`))
-       
+        if (this.state.isOpen) this.setState({ isOpen: !this.state.isOpen}, () => this.props.history.push(`/profile/${this.props.userId}`))
+        else this.props.history.push(`/profile/${this.props.userId}`)
+
     }
 
     handleLogout = () => {
@@ -34,24 +42,55 @@ class Navbarpage extends React.Component {
     }
 
     // componentDidMount() {
-    //     console.log('did mount dong stuff')
-    //     if (this.props.userId) {
-    //         logic.retrievePendingCollaboratorProjects(this.props.userId)
-    //             .then(res => this.setState({ pendingCollaborators: res.length }))
+    //     const newSelected = {
+    //         home: true,
+    //         explore: false,
+    //         profile: false
     //     }
+    //     this.setState({selected: newSelected})
+
     // }
 
-    // componentWillReceiveProps(props) {
-    //     console.log('wil receive props dong stuff')
-    //     if (props.userId) {
-    //         logic.retrievePendingCollaboratorProjects(props.userId)
-    //             .then(res => this.setState({ pendingCollaborators: res.length }))
-    //     }
-    // }
+    componentWillReceiveProps(props) {
+        debugger
+        if (props.location.pathname.indexOf('home') >= 0) {
+            let newSelected = {
+                home: true,
+                explore: false,
+                profile: false
+            }
+            this.setState({ selected: newSelected })
+        }
+        else if (props.location.pathname.indexOf('explore') >= 0) {
+            let newSelected = {
+                home: false,
+                explore: true,
+                profile: false
+            }
+            this.setState({ selected: newSelected })
+        }
+        else if (props.location.pathname.indexOf('profile') >= 0) {
+            let newSelected = {
+                home: false,
+                explore: false,
+                profile: true
+            }
+            this.setState({ selected: newSelected })
+        }
+        else {
+            let newSelected = {
+                home: false,
+                explore: false,
+                profile: false
+            }
+            this.setState({ selected: newSelected })
+        }
+    }
 
     toggleCollapse = () => this.setState({ isOpen: !this.state.isOpen })
 
     render() {
+        const { selected, isOpen } = this.state
         return (
 
             <Navbar color="indigo" dark expand="md">
@@ -63,18 +102,18 @@ class Navbarpage extends React.Component {
                 />
                 <Collapse
                     id="navbarCollapse3"
-                    isOpen={this.state.isOpen}
+                    isOpen={isOpen}
                     navbar
                 >
                     <NavbarNav>
                         <NavItem>
-                            <button onClick={this.onHomeClick} className="navbar__button" type="button">Home</button>
+                            <button onClick={this.onHomeClick} className={selected.home ? 'navbar__button-selected' : 'navbar__button'} type="button">Home</button>
                         </NavItem>
                         <NavItem >
-                            <button onClick={this.onExploreClick} className="navbar__button" type="button">Explore</button>
+                            <button onClick={this.onExploreClick} className={selected.explore ? 'navbar__button-selected' : 'navbar__button'} type="button">Explore</button>
                         </NavItem>
                         <NavItem >
-                            <button onClick={this.onProfileClick} className="navbar__button" type="button">Profile</button>
+                            <button onClick={this.onProfileClick} className={selected.profile ? 'navbar__button-selected' : 'navbar__button'} type="button">Profile</button>
                         </NavItem>
                         {/* <NavItem >
                             <p>{this.state.pendingCollaborators && this.state.pendingCollaborators}</p>

@@ -12,7 +12,11 @@ const skills = [
     'PHP',
     'React',
     'Angular',
-    'Vue'
+    'Vue',
+    'SQL',
+    'Mongoose',
+    'Ruby',
+    'Swift',
 ]
 
 class CreateProject extends Component {
@@ -41,10 +45,9 @@ class CreateProject extends Component {
         const { name, description, maxMembers, location } = this.state
 
         try {
-            logic.addNewProject(name, description, skillsArray, 'true', maxMembers, location)
-                .then(() => {
-                    this.setState({ error: false, toggleSuccess: !this.state.toggleSuccess })
-                })
+            return logic.addNewProject(name, description, skillsArray, maxMembers, location)
+                .then(() => this.setState({ error: false, toggleSuccess: !this.state.toggleSuccess }))
+                .then(() => this.props.backToMyProject())
         } catch (err) {
             this.setState({ error: true })
         }

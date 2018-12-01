@@ -27,11 +27,6 @@ const Project = new Schema({
 
     },
 
-    beginnerFriendly: {
-        type: String,
-        required: true
-    },
-
     maxMembers: {
         type: String,
         required: true

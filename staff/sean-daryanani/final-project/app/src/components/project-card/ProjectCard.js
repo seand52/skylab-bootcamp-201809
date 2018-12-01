@@ -23,8 +23,8 @@ const ProjectCard = props => {
                         <CardText>
                         {project.description}
                         </CardText>
-                        {project.skills.map((skill, index) => <SkillsTag searchTag={searchTag} key={index} skill={skill} pill/>)}
-
+                        <p>Location: {project.location}</p>
+                        {project.skills.map((skill, index) => <SkillsTag searchTag={searchTag} key={index} skill={skill} pill/>)}                        
                         <Link to={`/project/${project.id}`}><Button type="button" >View Project</Button></Link>
 
                     </CardBody>

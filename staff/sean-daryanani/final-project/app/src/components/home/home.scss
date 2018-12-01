@@ -7,12 +7,17 @@
 }
 
 .home-page-container {
-  height: 100vh;
+  min-height: 100vh;
   background-color: rgb(245, 240, 240)
 }
 
 .create-project-form-section {
 
+}
+
+.no-projects-text {
+  text-align: center;
+  width: 100%;
 }
 
 

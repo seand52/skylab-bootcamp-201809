@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Checkbox from '../checkbox/Checkbox'
 import { Button } from 'mdbreact'
+import './updateprofileform.css'
 
 const skills = [
     'Java',
@@ -10,7 +11,11 @@ const skills = [
     'PHP',
     'React',
     'Angular',
-    'Vue'
+    'Vue',
+    'SQL',
+    'Mongoose',
+    'Ruby',
+    'Swift',
 ]
 class UpdateProfileForm extends Component {
 
@@ -106,8 +111,9 @@ class UpdateProfileForm extends Component {
                 <label>Bio</label>
 
                 <textarea onChange={this.onBioChange} defaultValue={bio} className="form-control rounded-0" id="exampleFormControlTextarea2" rows="3"></textarea>
-
+                <div className="update-profile-checkboxes-display">
                 {skills.map(skill => <Checkbox label={skill} handleCheckboxChange={this.toggleCheckbox} key={skill} selected={this.selectedCheckboxes} />)}
+                </div>
 
                 <Button type="submit" color="primary">Save changes</Button>
             </form>

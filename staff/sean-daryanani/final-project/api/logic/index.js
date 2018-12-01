@@ -187,22 +187,19 @@ const logic = {
      * @param {string}name 
      * @param {string}description 
      * @param {Array}skills 
-     * @param {string}beginnerFriendly 
      * @param {string}maxMembers 
      */
-    addNewProject(id, name, description, skills, beginnerFriendly, maxMembers, location) {
+    addNewProject(id, name, description, skills, maxMembers, location) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof name !== 'string') throw TypeError(`${name} is not a string`)
         if (typeof description !== 'string') throw TypeError(`${description} is not a string`)
         if (!(skills instanceof Array)) throw TypeError(`${skill} is not an array`)
-        if (typeof beginnerFriendly !== 'string') throw TypeError(`${beginnerFriendly} is not a string`)
         if (typeof maxMembers !== 'string') throw TypeError(`${maxMembers} is not a string`)
         if (typeof location !== 'string') throw TypeError(`${location} is not a string`)
 
         if (!id.trim()) throw new ValueError('id is empty or blank')
         if (!name.trim()) throw new ValueError('name is empty or blank')
         if (!description.trim()) throw new ValueError('description is empty or blank')
-        if (!beginnerFriendly.trim()) throw new ValueError('beginnerFriendly is empty or blank')
         if (!maxMembers.trim()) throw new ValueError('maxMembers is empty or blank')
         if (!location.trim()) throw new ValueError('location is empty or blank')
 
@@ -212,7 +209,7 @@ const logic = {
 
             if (!user) throw new NotFoundError(`user with id ${id} not found`)
 
-            const project = new Project({ name, description, skills, beginnerFriendly, maxMembers, owner: user.id, location })
+            const project = new Project({ name, description, skills, maxMembers, owner: user.id, location })
 
             await project.save()
         })()
@@ -552,7 +549,8 @@ const logic = {
                 name: true,
                 description: true,
                 projectImage: true,
-                skills: true
+                skills: true,
+                location: true
             }
             const projects = await Project.find({ owner: user.id, pendingCollaborators: { "$exists": true, $not: { $size: 0 } } }, keepFields).lean()
 
@@ -594,6 +592,13 @@ const logic = {
                 { _id: projectId },
                 {
                     $pull: { collaborators: user.id },
+                }
+            )
+
+            await Meeting.updateOne(
+                {project: projectId},
+                {
+                    $pull: {attending: user.id}
                 }
             )
 
@@ -827,7 +832,9 @@ const logic = {
                 name: true,
                 description: true,
                 projectImage: true,
-                skills: true
+                skills: true,
+                location: true
+
             }
             const projects = await Project.find(queryObject, keepFields).lean()
 

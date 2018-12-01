@@ -5,7 +5,7 @@ import "react-tabs/style/react-tabs.css";
 import logic from '../../logic'
 import ProjectCard from '../project-card/ProjectCard'
 import CreateProject from '../create-project/CreateProject'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 
 class Home extends Component {
     state = {
@@ -19,6 +19,12 @@ class Home extends Component {
     componentDidMount() {
         logic.listOwnProjects()
             .then(res => this.setState({ ownProjects: res }))
+    }
+
+    sendToMyProjects = () => {
+        return logic.listOwnProjects()
+        .then(res => this.setState({ ownProjects: res, tabIndex: 0 }))
+
     }
 
     handleTabChange = tabIndex => {
@@ -65,24 +71,24 @@ class Home extends Component {
 
                 <TabPanel>
                     <div className="home-myprojects-display">
-                        {ownProjects && ownProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
+                        {ownProjects && (ownProjects.length ? ownProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">You don't have any projects. Start searching <Link to='/explore'>now</Link></p>)} 
                     </div>
                 </TabPanel>
 
                 <TabPanel>
                     <div className="home-collaborations-display">
-                        {collabProjects && collabProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
+                        {collabProjects && (collabProjects.length ? collabProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">You don't have any projects. Start searching <Link to='/explore'>now</Link></p>)}
                     </div>
                 </TabPanel>
 
                 <TabPanel>
                     <div className="home-savedprojects-display">
-                        {savedProjects && savedProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
+                        {savedProjects && (savedProjects.length ?  savedProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">You don't have any projects. Start searching <Link to='/explore'>now</Link></p>)}
                     </div>
                 </TabPanel>
 
                 <TabPanel>
-                    <CreateProject/>
+                    <CreateProject backToMyProject={this.sendToMyProjects}/>
                 </TabPanel>
             </Tabs>
         </div>

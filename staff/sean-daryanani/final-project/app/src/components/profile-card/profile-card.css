@@ -32,6 +32,13 @@
   overflow: hidden;
 }
 
+@supports (object-fit: cover) {
+  .profile-img-container img {
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+  }
+}
 .uploadImage-input {
   display: none;
 }
@@ -80,13 +87,6 @@
 
 .badge {
   background-color: blue !important;
-}
-
-.projects-badge {
-  border: 1px solid #ccc;
-  background-color: aliceblue;
-  width: 5%;
-  padding: 2px;
 }
 
 /*# sourceMappingURL=profile-card.css.map */

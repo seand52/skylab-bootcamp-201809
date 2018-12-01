@@ -382,7 +382,7 @@ describe('logic', () => {
 
         describe('projects', () => {
             describe('add a project ', () => {
-                let user, name, description, skills, beginnerFriendly, maxMembers, location
+                let user, name, description, skills, maxMembers, location
 
                 beforeEach(async () => {
                     user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
@@ -390,7 +390,6 @@ describe('logic', () => {
                     name = `text-${Math.random()}`
                     description = `text-${Math.random()}`
                     skills = [`text-${Math.random()}`, `text-${Math.random()}`, `text-${Math.random()}`]
-                    beginnerFriendly = 'true'
                     maxMembers = `${Math.random()}`
                     location = 'barcelona'
 
@@ -398,7 +397,7 @@ describe('logic', () => {
                 })
 
                 it('should succeed on correct data', async () => {
-                    const res = await logic.addNewProject(user.id, name, description, skills, beginnerFriendly, maxMembers, location)
+                    const res = await logic.addNewProject(user.id, name, description, skills, maxMembers, location)
 
                     expect(res).to.be.undefined
 
@@ -411,8 +410,6 @@ describe('logic', () => {
                     expect(project.description).to.equal(description)
 
                     expect(JSON.stringify(project.skills)).to.equal(JSON.stringify(skills))
-
-                    expect(project.beginnerFriendly).to.equal(beginnerFriendly)
 
                     expect(project.maxMembers).to.equal(maxMembers)
                     expect(project.currentMembers).to.equal(1)
@@ -543,16 +540,18 @@ describe('logic', () => {
             })
 
             describe('leave a project (stop being collaborator)', () => {
-                let user, user2, project
+                let user, user2, project, meeting1
 
                 beforeEach(async () => {
                     user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
                     user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '123' })
                     project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, collaborators: [user2.id] })
+                    meeting1 = new Meeting({ project: project.id, date: Date.now(), location: 'barcelona', attending:[user2.id] })
 
                     await user.save()
                     await user2.save()
                     await project.save()
+                    await meeting1.save()
                 })
 
                 it('should succeed on correct data', async () => {
@@ -562,6 +561,11 @@ describe('logic', () => {
                     const _project = await Project.findById(project.id)
 
                     expect(_project.collaborators.length).to.equal(0)
+
+                    const _meeting = await Meeting.findById(meeting1.id)
+
+                    expect (_meeting.attending.length).to.equal(0)
+
                 })
             })
 
@@ -1176,7 +1180,7 @@ describe('logic', () => {
                 await logic.insertProfileImage(user.id, file)
 
                 const _user = await User.findById(user.id)
-                debugger
+
                 expect(_user.profileImage).not.to.equal('https://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg')
 
             })

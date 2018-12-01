@@ -16,7 +16,11 @@ const skills = [
     'PHP',
     'React',
     'Angular',
-    'Vue'
+    'Vue',
+    'SQL',
+    'Mongoose',
+    'Ruby',
+    'Swift',
 ]
 
 class Explore extends Component {
@@ -112,14 +116,12 @@ class Explore extends Component {
     render() {
         return <div className="explore-container">
             <header className="explore-header col-12">
-                <h2><b>Find a project</b></h2>
-                <h4>X projects nearby</h4>
                 <div className="searchbar-container col-6">
                     <div className="explore-search-form">
                     <form onSubmit={this.handleSubmit}>
                         <label className="explore-search-form__label">
-                            <input onChange={this.onSearchNameQueryChange} className="explore-searchbar" type="text" placeholder="Search by project name" aria-label="Search" />
-                            <button type="submit" className="btn btn-primary">Search</button>
+                            <input onChange={this.onSearchNameQueryChange} className="input-group-text explore-searchbar" type="text" placeholder="Search by project name" aria-label="Search" />
+                            <button type="submit" className="explore-search-button">Search</button>
                         </label>
                         </form>
                     </div>

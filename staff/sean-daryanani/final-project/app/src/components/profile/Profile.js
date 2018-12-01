@@ -26,9 +26,9 @@ class Profile extends Component {
         const { id } = this.props
         try {
 
-            Promise.all([logic.retrieveUserProfile(id), logic.retrievePendingCollaboratorProjects(id), logic.listOwnProjects(id), logic.retrieveProfileImage(id)])
+            Promise.all([logic.retrieveUserProfile(id), logic.retrievePendingCollaboratorProjects(id), logic.listOwnProjects(id), logic.retrieveProfileImage(id), logic.userUpcomingMeetings(id)])
                 .then(res => {
-                    this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2], image: res[3] })
+                    this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2], image: res[3], upComingMeetings: res[4] })
                 })
         } catch (err) {
             console.log(err)
@@ -86,6 +86,7 @@ class Profile extends Component {
 
     handleUpComingMeetings = (id) => {
         try {
+            debugger
             return logic.userUpcomingMeetings(id)
                 .then(result => this.setState({ upComingMeetings: result, showProjects: 'meetings' }))
         } catch (err) {
@@ -166,9 +167,11 @@ class Profile extends Component {
 
                     </div>
                     <div className="main-area__projects">
-                        {ownProjects && (showProjects === 'my projects') && ownProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
-                        {collabProjects && (showProjects === 'collab projects') && collabProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />)}
-                        {upComingMeetings && (showProjects === 'meetings') && upComingMeetings.map((meeting, index) => {
+                        {ownProjects && (showProjects === 'my projects') && (ownProjects.length ? ownProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">You don't have any projects, start one <Link to='/home'>now</Link></p>)}
+
+                        {collabProjects && (showProjects === 'collab projects') && (collabProjects.length ? collabProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />): <p className="no-projects-text">No pending collaborators</p>)}
+
+                        {upComingMeetings && (showProjects === 'meetings') && (upComingMeetings.length ? upComingMeetings.map((meeting, index) => {
                             return (<div className="profile-meetup-card col-md-8" key={index}>
                                 <p><b>Description</b>: {meeting.description}</p>
                                 <p><b>Project: </b><Link to={`/project/${meeting.project.id}`}>{meeting.project.name}</Link></p>
@@ -177,7 +180,7 @@ class Profile extends Component {
                                 <p>Attending: {meeting.attending.length}</p>
 
                             </div>)
-                        })}
+                        }) : <p className="no-projects-text">No upcoming meetings</p>)}
 
                     </div>
                 </section>

@@ -5,3 +5,15 @@
     color: white;
     cursor: pointer;
 }
+
+.navbar__button-selected {
+    background: none;
+    border-bottom: 1px solid white !important;
+    border: none;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+}
+
+.navbar__button:focus {outline:0;} 
+.navbar__button-selected:focus {outline:0;} 
