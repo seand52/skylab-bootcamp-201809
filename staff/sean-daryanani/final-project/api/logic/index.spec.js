@@ -1,7 +1,7 @@
 const { mongoose, models: { User, Project, Meeting } } = require('data')
 const logic = require('.')
 const fs = require('fs')
-const { AlreadyExistsError, ValueError } = require('../errors')
+const { AlreadyExistsError, ValueError, AuthError, NotFoundError } = require('../errors')
 const { expect } = require('chai')
 const MONGO_URL = 'mongodb://localhost:27017/socialdev-test'
 
@@ -55,6 +55,30 @@ describe('logic', () => {
                 expect(() => logic.registerUser('   \t\n', email, username, password)).to.throw(ValueError, 'name is empty or blank')
             })
 
+            it('should fail on empty email', () => {
+                expect(() => logic.registerUser(name, '', username, password)).to.throw(ValueError, 'email is empty or blank')
+            })
+
+            it('should fail on blank email', () => {
+                expect(() => logic.registerUser(name, '   \t\n', username, password)).to.throw(ValueError, 'email is empty or blank')
+            })
+
+
+            it('should fail on empty username email', () => {
+                expect(() => logic.registerUser(name, email, '', password)).to.throw(ValueError, 'username is empty or blank')
+            })
+            it('should fail on blank username', () => {
+                expect(() => logic.registerUser(name, email, '     ', password)).to.throw(ValueError, 'username is empty or blank')
+            })
+
+            it('should fail on empty username email', () => {
+                expect(() => logic.registerUser(name, email, username, '')).to.throw(ValueError, 'password is empty or blank')
+            })
+            it('should fail on blank username', () => {
+                expect(() => logic.registerUser(name, email, username, '        ')).to.throw(ValueError, 'password is empty or blank')
+            })
+
+
         })
 
         describe('authenticate', () => {
@@ -80,6 +104,19 @@ describe('logic', () => {
             it('should fail on undefined username', () => {
                 expect(() => logic.authenticateUser(undefined, user.password)).to.throw(TypeError, 'undefined is not a string')
             })
+
+            it('should fail on undefined passowrd', () => {
+                expect(() => logic.authenticateUser(user.username, undefined)).to.throw(TypeError, 'undefined is not a string')
+            })
+
+            it('should fail on blank username', () => {
+                expect(() => logic.authenticateUser('', user.password)).to.throw(ValueError, 'username is empty or blank')
+            })
+
+            it('should fail on blank passowrd', () => {
+                expect(() => logic.authenticateUser(user.username, '')).to.throw(ValueError, 'password is empty or blank')
+            })
+
 
 
         }),
@@ -115,6 +152,18 @@ describe('logic', () => {
                     expect(username).to.equal(user.username)
                     expect(password).to.be.undefined
                 })
+
+                it('should undefined id', () => {
+                    expect(() => logic.retrieveUser(undefined)).to.throw(TypeError, 'undefined is not a string')
+                })
+
+                it('should blank id', () => {
+                    expect(() => logic.retrieveUser('')).to.throw(ValueError, 'id is empty or blank')
+                })
+
+                it('should empty id', () => {
+                    expect(() => logic.retrieveUser('   ')).to.throw(ValueError, 'id is empty or blank')
+                })
             }),
 
             describe('retrieve additional profile info', () => {
@@ -147,6 +196,18 @@ describe('logic', () => {
                     expect(city).to.equal(user.city)
 
 
+                })
+
+                it('should undefined id', () => {
+                    expect(() => logic.retrieveProfileInfo(undefined)).to.throw(TypeError, 'undefined is not a string')
+                })
+
+                it('should blank id', () => {
+                    expect(() => logic.retrieveProfileInfo('')).to.throw(ValueError, 'id is empty or blank')
+                })
+
+                it('should empty id', () => {
+                    expect(() => logic.retrieveProfileInfo('   ')).to.throw(ValueError, 'id is empty or blank')
                 })
             }),
 
@@ -357,25 +418,33 @@ describe('logic', () => {
 
             })
 
-            // it('should insert a photo into a profile)', async () => {
+            it('should fail undefined id', () => {
+                expect(() => logic.updateProfile(undefined, user.bio, user.githubProfile, user.city, user.skills)).to.throw(TypeError, 'undefined is not a string')
+            })
+            it('should  failundefined bio', () => {
+                expect(() => logic.updateProfile(user.id, undefined, user.githubProfile, user.city, user.skills)).to.throw(TypeError, 'undefined is not a string')
+            })
 
-            //     const { profileImage } = user
+            it('should fail undefined github profile', () => {
+                expect(() => logic.updateProfile(user.id, user.bio, undefined, user.city, user.skills)).to.throw(TypeError, 'undefined is not a string')
+            })
 
-            //     expect(profileImage).to.equal('https://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg')
+            it('should fail undefined city', () => {
+                expect(() => logic.updateProfile(user.id, user.bio, user.githubProfile, undefined, user.skills)).to.throw(TypeError, 'undefined is not a string')
+            })
 
-            //     const newPhoto = 'iVBORw0KGgoAAAANSUhEUgAAAQMAAADCCAMAAAB6zFdcAAAA4VBMVEX///8DWoC0tLQAVX3q7vEASnbwklexsbHW1tbJv7oFTnmPoqmswMx8nrIDXIH9mVK0hmALUobwkFL1vJ33xqzg4OCwtru2s7D0kE/ykVQAUXkARHAAQW4AU3sAOWgAMmPL2eH0+Prk7fFNc5DU4eeLrL4AMmW+0tybscHd6e7uhET/+/kgXIBwlKv63MnviEh2l602d5ZKf5ymwM4kaItghJ+0z9pAZoeTucksVXo+a4qhuMZoiaF0oLa2yNJKgZ3QtqF+mrb0sYvxmGLMvrZ+qbzyp334zbbynmrtfzj859x4D9NwAAAIxUlEQVR4nO2ca2ObOBaGYYkys9pYu+N2Oy0CDLYJtoNjJzF247jubLpNJv3/P2jQpOUigS0IELuc91sIEvCgy3ukgxUFBAKBQCAQCAQCgUAgEAgEAoFAIFBlunybq1+PTCdlGbyZvc9Udzb7/d0vR6X/lmbQPc3Wh/e/v/vHUQkYVMJgNpnMZpNZixl0n7r3j5eXb/58mrWVQXfy5uL5wOWXp3Yy6J5eRkcuHiatZDC7TBy6eJi1kMHTferYZfdDCxl8Sx27uJ+1jsHsC3fwcdI6Bk8P3MHLFjK45w62kMEE2sHp7JQ7+LZ9DIR54aF988LphPMHsxb6g9PJY7IZfGmjTzz98PR4ESHotjNeCEPnh28XIYaLb4/vJ+2MG8NHnnQf3rx9e/9l9r6t6wesKcyYoj9byQDWE4+fwQvW1v+dq///87hUmsEf/8nVv45Mv5Zl8L/fcoWPS+isLIOOpv4k0oABMFCBARMwAAZMwAAYMAEDYMAEDIABEzAABkzAABgwAQNgwAQMgAETMAAGTMfDgNRW8/EwoKiumo+GAfp6ZdF6qj4SBoQuFMULMKrjokfCQDW27Jre3Ed65QPDkTDAi+/f3w1Hi8qveyQM6Ci67ker6sqPg4G+Gv64rONX3hmOgwHqxM3AaOl4cOtFzSDArWRA6Ofoqks964SXYXktBggXOLkXN4Op6BZJscpEvQoDDd26U+mhjaBFdFHbNMVi+tf5iyi8AgOCjcBWxqusVp0p6ya+qGiXCQ0cZ7sytNId4hUYWOYdMzw3luRNYxL9PoGjieA0Yxz+Z9yhtCyExhlgazp+ruBKcpZL+CM3g1vPff6ffWWVfCsNMzDRIGrYfSzTG4juR/5IUcVuT69iQj4t1SGaZEBU6rv9uIY7Q6YU6jg/CmR0H1O34wqHc1xmbGyQAcHW9dBJ1HASSCyLaCl/JPwbucl7cjzfKt4UG'
+            it('should fail if id is not found', async () => {
 
+                try {
+                    await logic.updateProfile('12345', user.bio, user.githubProfile, user.city, user.skills)
 
-            //     await logic.insertPhoto(user.id, newPhoto)
+                    expect(true).to.be.false
+                } catch (err) {
+                    expect(err).to.be.instanceof(NotFoundError)
+                    expect(err.message).to.equal(`user with id 12345 not found`)
+                }
 
-            //     const _users= User.find()
-
-            //     const [_user] = _users
-
-            //     expect(_user.profileImage).to.equal(newPhoto)
-
-            // })
-
+            })
 
 
         })
@@ -417,6 +486,63 @@ describe('logic', () => {
                     expect(project.owner.toString()).to.equal(user.id)
                 })
 
+                it('should fail undefined user id', () => {
+                    expect(() => logic.addNewProject(undefined, name, description, skills, maxMembers, location).to.throw(TypeError, 'undefined is not a string'))
+                })
+
+                it('should fail undefined user name', () => {
+                    expect(() => logic.addNewProject(user.id, undefined, description, skills, maxMembers, location).to.throw(TypeError, 'undefined is not a string'))
+                })
+                it('should fail undefined user description', () => {
+                    expect(() => logic.addNewProject(user.id, name, undefined, skills, maxMembers, location).to.throw(TypeError, 'undefined is not a string'))
+                })
+
+                it('should fail undefined user maxMembers', () => {
+                    expect(() => logic.addNewProject(user.id, name, description, skills, undefined, location).to.throw(TypeError, 'undefined is not a string'))
+                })
+
+                it('should fail undefined location', () => {
+                    expect(() => logic.addNewProject(user.id, name, description, skills, maxMembers, undefined).to.throw(TypeError, 'undefined is not a string'))
+                })
+
+                it('should fail blank user id', () => {
+                    expect(() => logic.addNewProject('', name, description, skills, maxMembers, location).to.throw(ValueError, 'id is empty or blank'))
+                })
+
+                it('should fail blank user name', () => {
+                    expect(() => logic.addNewProject(user.id, '', description, skills, maxMembers, location).to.throw(ValueError, 'name is empty or blank'))
+                })
+                it('should fail blank user description', () => {
+                    expect(() => logic.addNewProject(user.id, name, '', skills, maxMembers, location).to.throw(ValueError, 'description is empty or blank'))
+                })
+
+                it('should fail blank user maxMembers', () => {
+                    expect(() => logic.addNewProject(user.id, name, description, skills, '', location).to.throw(ValueError, 'maxMembers is empty or blank'))
+                })
+
+                it('should fail blank location', () => {
+                    expect(() => logic.addNewProject(user.id, name, description, skills, maxMembers, '').to.throw(ValueError, 'location is empty or blank'))
+                })
+
+                it('should fail empty user id', () => {
+                    expect(() => logic.addNewProject('      \n', name, description, skills, maxMembers, location).to.throw(ValueError, 'id is empty or blank'))
+                })
+
+                it('should fail empty user name', () => {
+                    expect(() => logic.addNewProject(user.id, '      \n', description, skills, maxMembers, location).to.throw(ValueError, 'name is empty or blank'))
+                })
+                it('should fail empty user description', () => {
+                    expect(() => logic.addNewProject(user.id, name, '      \n', skills, maxMembers, location).to.throw(ValueError, 'description is empty or blank'))
+                })
+
+                it('should fail empty user maxMembers', () => {
+                    expect(() => logic.addNewProject(user.id, name, description, skills, '      \n', location).to.throw(ValueError, 'maxMembers is empty or blank'))
+                })
+
+                it('should fail empty location', () => {
+                    expect(() => logic.addNewProject(user.id, name, description, skills, maxMembers, '      \n').to.throw(ValueError, 'location is empty or blank'))
+                })
+
                 // TODO other test cases
             })
 
@@ -454,6 +580,30 @@ describe('logic', () => {
 
 
 
+                })
+
+                it('should fail undefined user id', () => {
+                    expect(() => logic.deleteProject(undefined, project.id).to.throw(TypeError, 'undefined is not a string'))
+                })
+
+                it('should fail undefined project id', () => {
+                    expect(() => logic.deleteProject(user.id, undefined).to.throw(TypeError, 'undefined is not a string'))
+                })
+
+                it('should fail on empty user id', () => {
+                    expect(() => logic.deleteProject('', project.id).to.throw(ValueError, 'userId is empty or blank'))
+                })
+
+                it('should fail on empty user id', () => {
+                    expect(() => logic.deleteProject(user.id, '').to.throw(ValueError, 'projectId is empty or blank'))
+                })
+
+                it('should fail on blank user id', () => {
+                    expect(() => logic.deleteProject('    \n', project.id).to.throw(ValueError, 'userId is empty or blank'))
+                })
+
+                it('should fail on blank user id', () => {
+                    expect(() => logic.deleteProject(user.id, '   \n').to.throw(ValueError, 'projectId is empty or blank'))
                 })
 
 
@@ -506,14 +656,32 @@ describe('logic', () => {
                     expect(projects.length).to.equal(2)
 
                     expect(projects.name).to.equal
-
-
-
-
-
                 })
 
-                // TODO other test cases
+                it('should fail on undefined user id', () => {
+                    expect(() => logic.saveProject(undefined, project.id).to.throw(ValueError, 'undefined is not a string'))
+                })
+
+                it('should fail on undefined user id', () => {
+                    expect(() => logic.saveProject(user.id, undefined).to.throw(ValueError, 'undefined is not a string'))
+                })
+
+                it('should fail on empty user id', () => {
+                    expect(() => logic.saveProject('', project.id).to.throw(ValueError, 'userId is empty or blank'))
+                })
+
+                it('should fail on empty user id', () => {
+                    expect(() => logic.saveProject(user.id, '').to.throw(ValueError, 'projectId is empty or blank'))
+                })
+
+                it('should fail on blank user id', () => {
+                    expect(() => logic.saveProject('    \n', project.id).to.throw(ValueError, 'userId is empty or blank'))
+                })
+
+                it('should fail on blank user id', () => {
+                    expect(() => logic.saveProject(user.id, '   \n').to.throw(ValueError, 'projectId is empty or blank'))
+                })
+
             })
 
             describe('remove a project from saved', () => {
@@ -537,6 +705,29 @@ describe('logic', () => {
                     expect(_user2.savedProjects.length).to.equal(0)
 
                 })
+                it('should fail on undefined user id', () => {
+                    expect(() => logic.removeSavedProject(undefined, project.id).to.throw(ValueError, 'undefined is not a string'))
+                })
+
+                it('should fail on undefined user id', () => {
+                    expect(() => logic.removeSavedProject(user.id, undefined).to.throw(ValueError, 'undefined is not a string'))
+                })
+
+                it('should fail on empty user id', () => {
+                    expect(() => logic.removeSavedProject('', project.id).to.throw(ValueError, 'userId is empty or blank'))
+                })
+
+                it('should fail on empty user id', () => {
+                    expect(() => logic.removeSavedProject(user.id, '').to.throw(ValueError, 'projectId is empty or blank'))
+                })
+
+                it('should fail on blank user id', () => {
+                    expect(() => logic.removeSavedProject('    \n', project.id).to.throw(ValueError, 'userId is empty or blank'))
+                })
+
+                it('should fail on blank user id', () => {
+                    expect(() => logic.removeSavedProject(user.id, '   \n').to.throw(ValueError, 'projectId is empty or blank'))
+                })
             })
 
             describe('leave a project (stop being collaborator)', () => {
@@ -546,7 +737,7 @@ describe('logic', () => {
                     user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
                     user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '123' })
                     project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, collaborators: [user2.id] })
-                    meeting1 = new Meeting({ project: project.id, date: Date.now(), location: 'barcelona', attending:[user2.id] })
+                    meeting1 = new Meeting({ project: project.id, date: Date.now(), location: 'barcelona', attending: [user2.id] })
 
                     await user.save()
                     await user2.save()
@@ -564,8 +755,32 @@ describe('logic', () => {
 
                     const _meeting = await Meeting.findById(meeting1.id)
 
-                    expect (_meeting.attending.length).to.equal(0)
+                    expect(_meeting.attending.length).to.equal(0)
 
+                })
+
+                it('should fail on undefined user id', () => {
+                    expect(() => logic.leaveProject(undefined, project.id).to.throw(ValueError, 'undefined is not a string'))
+                })
+
+                it('should fail on undefined user id', () => {
+                    expect(() => logic.leaveProject(user.id, undefined).to.throw(ValueError, 'undefined is not a string'))
+                })
+
+                it('should fail on empty user id', () => {
+                    expect(() => logic.leaveProject('', project.id).to.throw(ValueError, 'userId is empty or blank'))
+                })
+
+                it('should fail on empty user id', () => {
+                    expect(() => logic.leaveProject(user.id, '').to.throw(ValueError, 'projectId is empty or blank'))
+                })
+
+                it('should fail on blank user id', () => {
+                    expect(() => logic.leaveProject('    \n', project.id).to.throw(ValueError, 'userId is empty or blank'))
+                })
+
+                it('should fail on blank user id', () => {
+                    expect(() => logic.leaveProject(user.id, '   \n').to.throw(ValueError, 'projectId is empty or blank'))
                 })
             })
 
@@ -666,6 +881,16 @@ describe('logic', () => {
 
                 })
 
+                it('should fail on undefined user id', () => {
+                    expect(() => logic.listOwnProjects(undefined).to.throw(ValueError, 'undefined is not a string'))
+                })
+                it('should fail on blank user id', () => {
+                    expect(() => logic.listOwnProjects('').to.throw(ValueError, 'id is empty or blank'))
+                })
+                it('should fail on empty user id', () => {
+                    expect(() => logic.listOwnProjects('    \n').to.throw(ValueError, 'id is empty or blank'))
+                })
+
             })
 
             describe('query projects', () => {
@@ -691,12 +916,12 @@ describe('logic', () => {
                     await project5.save()
                 })
 
-                 false && it('should successfuly query for projects based on a query', async () => {
+                it('should successfuly query for projects based on a query', async () => {
 
                     const query = 'q=MONGOOSE&f=&c='
 
-                    const projects = await logic.filterProjects(query)
-             
+                    const projects = await logic.filterProjects(query, user.id)
+
                     expect(projects.length).to.equal(1)
 
                     const [_project1, _project2, _project3] = projects
@@ -706,22 +931,46 @@ describe('logic', () => {
 
                     const query = 'q=&f=react+javascript&c=Barcelona'
 
-                    const projects = await logic.filterProjects(query)
+                    const projects = await logic.filterProjects(query, user.id)
 
                     expect(projects.length).to.equal(3)
 
                     const [_project1, _project2, _project3] = projects
                 })
 
-                 it('should successfuly filter results based on skills', async () => {
+                it('should successfuly filter results based on skills', async () => {
 
                     const query = 'q=&f=javascript'
-                
-                    const projects = await logic.filterProjects(query)
+
+                    const projects = await logic.filterProjects(query, user.id)
 
                     expect(projects.length).to.equal(5)
 
                     const [_project1, _project2, _project3] = projects
+                })
+
+                it('should fail on undefined query', () => {
+                    expect(() => logic.filterProjects(undefined, user.id).to.throw(ValueError, 'undefined is not a string'))
+                })
+
+                it('should fail on undefined user id', () => {
+                    expect(() => logic.filterProjects('q=&f=javascript', undefined).to.throw(ValueError, 'undefined is not a string'))
+                })
+
+                it('should fail on empty query', () => {
+                    expect(() => logic.filterProjects('', user.id).to.throw(ValueError, 'query is empty or blank'))
+                })
+
+                it('should fail on empty user id', () => {
+                    expect(() => logic.filterProjects('q=&f=javascript', '').to.throw(ValueError, 'userId is empty or blank'))
+                })
+
+                it('should fail on blank query', () => {
+                    expect(() => logic.filterProjects('    \n', user.id).to.throw(ValueError, 'query is empty or blank'))
+                })
+
+                it('should fail on blank user id', () => {
+                    expect(() => logic.filterProjects('q=&f=javascript', '   \n').to.throw(ValueError, 'userId is empty or blank'))
                 })
             })
 
@@ -746,7 +995,7 @@ describe('logic', () => {
                     const { name, description, skills, beginnerFriendly, maxMembers, owner } = project
 
                     const _project = await logic.retrieveProjectInfo(project.id, user2.id)
-                        
+
 
                     expect(_project.name).to.equal(name)
                     expect(_project.description).to.equal(description)
@@ -755,6 +1004,30 @@ describe('logic', () => {
                     expect(_project.maxMembers).to.equal(maxMembers)
                     expect(_project.currentMembers).to.equal(1)
 
+                })
+
+                it('should fail on undefined user id', () => {
+                    expect(() => logic.retrieveProjectInfo(undefined, project.id).to.throw(ValueError, 'undefined is not a string'))
+                })
+
+                it('should fail on undefined user id', () => {
+                    expect(() => logic.retrieveProjectInfo(user.id, undefined).to.throw(ValueError, 'undefined is not a string'))
+                })
+
+                it('should fail on empty user id', () => {
+                    expect(() => logic.retrieveProjectInfo('', project.id).to.throw(ValueError, 'userId is empty or blank'))
+                })
+
+                it('should fail on empty user id', () => {
+                    expect(() => logic.retrieveProjectInfo(user.id, '').to.throw(ValueError, 'projectId is empty or blank'))
+                })
+
+                it('should fail on blank user id', () => {
+                    expect(() => logic.retrieveProjectInfo('    \n', project.id).to.throw(ValueError, 'userId is empty or blank'))
+                })
+
+                it('should fail on blank user id', () => {
+                    expect(() => logic.retrieveProjectInfo(user.id, '   \n').to.throw(ValueError, 'projectId is empty or blank'))
                 })
             })
 
@@ -824,7 +1097,7 @@ describe('logic', () => {
 
                     await logic.requestCollaboration(user2.id, project.id)
 
-                    await logic.handleCollaboration(user.id, user2.id, project.id, 'reject')
+                    await logic.handleCollaboration(user.id, user2.id, project.id, decision)
 
                     const _projects = await Project.find()
 
@@ -835,6 +1108,49 @@ describe('logic', () => {
                     expect(_project.collaborators.length).to.equal(0)
 
 
+                })
+
+                it('it should remove a user from pending collaborators if he cancels his request', async () => {
+
+                    expect(project.owner.toString()).to.equal(user.id.toString())
+
+                    await logic.requestCollaboration(user2.id, project.id)
+
+                    await logic.cancelCollaborationRequest(user2.id, project.id)
+
+                    const _projects = await Project.find()
+
+                    const [_project] = _projects
+
+                    expect(_project.pendingCollaborators.length).to.equal(0)
+
+                    expect(_project.collaborators.length).to.equal(0)
+
+
+                })
+
+                it('should fail on undefined user id', () => {
+                    expect(() => logic.requestCollaboration(undefined, project.id).to.throw(ValueError, 'undefined is not a string'))
+                })
+
+                it('should fail on undefined user id', () => {
+                    expect(() => logic.requestCollaboration(user2.id, undefined).to.throw(ValueError, 'undefined is not a string'))
+                })
+
+                it('should fail on empty user id', () => {
+                    expect(() => logic.requestCollaboration('', project.id).to.throw(ValueError, 'userId is empty or blank'))
+                })
+
+                it('should fail on empty user id', () => {
+                    expect(() => logic.requestCollaboration(user2.id, '').to.throw(ValueError, 'projectId is empty or blank'))
+                })
+
+                it('should fail on blank user id', () => {
+                    expect(() => logic.requestCollaboration('    \n', project.id).to.throw(ValueError, 'userId is empty or blank'))
+                })
+
+                it('should fail on blank user id', () => {
+                    expect(() => logic.requestCollaboration(user2.id, '   \n').to.throw(ValueError, 'projectId is empty or blank'))
                 })
 
 
@@ -891,6 +1207,19 @@ describe('logic', () => {
 
         })
 
+
+        it('should fail on undefined user id', () => {
+            expect(() => logic.retrievePendingCollaboratorProjects(undefined).to.throw(TypeError, 'undefined is not a string'))
+        })
+
+        it('should fail on blank user id', () => {
+            expect(() => logic.retrievePendingCollaboratorProjects('').to.throw(ValueError, 'undefined is not a string'))
+        })
+
+        it('should fail on empty user id', () => {
+            expect(() => logic.retrievePendingCollaboratorProjects   ('       \n').to.throw(ValueError, 'userId is empty or blank'))
+        })
+
         describe('should remove a collaborator from a project', () => {
             let user, project, user2, user3
 
@@ -918,9 +1247,43 @@ describe('logic', () => {
                 expect(_project.collaborators.length).to.equal(1)
                 expect(_project.collaborators[0].toString()).to.equal(user3.id.toString())
 
-                
+
 
             })
+
+
+        it('should fail on undefined user id', () => {
+            expect(() => logic.removeCollaboratorFromProject(undefined, user2.id, project.id).to.throw(TypeError, 'undefined is not a string'))
+        })
+
+        it('should fail on undefined user2 id', () => {
+            expect(() => logic.removeCollaboratorFromProject(user.id, undefined, project.id).to.throw(TypeError, 'undefined is not a string'))
+        })
+        it('should fail on undefined project id', () => {
+            expect(() => logic.removeCollaboratorFromProject(user.id, user2.id, undefined).to.throw(TypeError, 'undefined is not a string'))
+        })
+
+        it('should fail on blank user id', () => {
+            expect(() => logic.removeCollaboratorFromProject('', user2.id, project.id).to.throw(ValueError, 'id is empty or blank'))
+        })
+
+        it('should fail on blank user2 id', () => {
+            expect(() => logic.removeCollaboratorFromProject(user.id, '', project.id).to.throw(ValueError, 'collabId is empty or blank'))
+        })
+        it('should fail on blank project id', () => {
+            expect(() => logic.removeCollaboratorFromProject(user.id, user2.id, '').to.throw(ValueError, 'projectId is empty or blank'))
+        })
+
+        it('should fail on empty user id', () => {
+            expect(() => logic.removeCollaboratorFromProject('      \n', user2.id, project.id).to.throw(ValueError, 'id is empty or blank'))
+        })
+
+        it('should fail on empty user2 id', () => {
+            expect(() => logic.removeCollaboratorFromProject(user.id, '    \n', project.id).to.throw(ValueError, 'collabId is empty or blank'))
+        })
+        it('should fail on empty project id', () => {
+            expect(() => logic.removeCollaboratorFromProject(user.id, user2.id, '    \n').to.throw(ValueError, 'projectId is empty or blank'))
+        })
         })
 
     })
@@ -960,6 +1323,49 @@ describe('logic', () => {
 
             })
 
+            it('should fail on undefined user id', () => {
+                expect(() => logic.addMeeting(undefined, project.id, date, 'barcelona', 'test description').to.throw(TypeError, 'undefined is not a string'))
+            })
+            it('should fail on undefined project id', () => {
+                expect(() => logic.addMeeting(user.id, undefined, date, 'barcelona', 'test description').to.throw(TypeError, 'undefined is not a string'))
+            })
+    
+            it('should fail on undefined city', () => {
+                expect(() => logic.addMeeting(user.id, project.id, date, undefined, 'test description').to.throw(TypeError, 'undefined is not a string'))
+            })
+            it('should fail on undefined description', () => {
+                expect(() => logic.addMeeting(user.id, project.id, date, 'barcelona', undefined).to.throw(TypeError, 'undefined is not a string'))
+            })
+
+            it('should fail on blank user id', () => {
+                expect(() => logic.addMeeting('', project.id, date, 'barcelona', 'test description').to.throw(ValueError, 'id is empty or blank'))
+            })
+            it('should fail on blank project id', () => {
+                expect(() => logic.addMeeting(user.id, '', date, 'barcelona', 'test description').to.throw(ValueError, 'projectId is empty or blank'))
+            })
+        
+            it('should fail on blank city', () => {
+                expect(() => logic.addMeeting(user.id, project.id, date, '', 'test description').to.throw(ValueError, 'city is empty or blank'))
+            })
+            it('should fail on blank description', () => {
+                expect(() => logic.addMeeting(user.id, project.id, date, 'barcelona', '').to.throw(ValueError, 'description is empty or blank'))
+            })
+            it('should fail on empty user id', () => {
+                expect(() => logic.addMeeting('     \n', project.id, date, 'barcelona', 'test description').to.throw(ValueError, 'id is empty or blank'))
+            })
+            it('should fail on empty project id', () => {
+                expect(() => logic.addMeeting(user.id, '     \n', date, 'barcelona', 'test description').to.throw(ValueError, 'projectId is empty or blank'))
+            })
+        
+            it('should fail on empty city', () => {
+                expect(() => logic.addMeeting(user.id, project.id, date, '     \n', 'test description').to.throw(ValueError, 'city is empty or blank'))
+            })
+            it('should fail on empty description', () => {
+                expect(() => logic.addMeeting(user.id, project.id, date, 'barcelona', '     \n').to.throw(ValueError, 'description is empty or blank'))
+            })
+            
+
+
             it('should succeed on deleting event', async () => {
                 const date = Date.now()
 
@@ -975,16 +1381,15 @@ describe('logic', () => {
 
 
                 expect(_meeting.location).to.equal('barcelona')
-
-                await logic.deleteMeeting(_meeting.id)
+                debugger
+                await logic.deleteMeeting(_meeting.id, user.id)
 
                 const _meetings = await Meeting.find()
 
                 expect(_meetings.length).to.equal(0)
-
-
-
             })
+
+   
 
             describe('list meetings ', () => {
                 let project2, meeting1, meeting2, meeting3
@@ -1030,6 +1435,17 @@ describe('logic', () => {
 
                 })
 
+                it('should fail on undefined project id', () => {
+                    expect(() => logic.listProjectMeetings(undefined).to.throw(TypeError, 'undefined is not a string'))
+                })
+                it('should fail on blank project id', () => {
+                    expect(() => logic.listProjectMeetings('').to.throw(ValueError, 'projectId is empty or blank'))
+                })
+                it('should fail on blank project id', () => {
+                    expect(() => logic.listProjectMeetings('        \n').to.throw(ValueError, 'projectId is empty or blank'))
+                })
+           
+
                 it('should retrieve information on a specific meeting', async () => {
 
                     const meeting = await logic.retrieveMeetingInfo(meeting1.id)
@@ -1043,6 +1459,16 @@ describe('logic', () => {
                     expect(typeof meeting.attending[0].id).to.equal('string')
 
 
+                })
+
+                it('should fail on undefined meeting id', () => {
+                    expect(() => logic.retrieveMeetingInfo(undefined).to.throw(TypeError, 'undefined is not a string'))
+                })
+                it('should fail on blank project id', () => {
+                    expect(() => logic.retrieveMeetingInfo('').to.throw(ValueError, 'meetingId is empty or blank'))
+                })
+                it('should fail on blank project id', () => {
+                    expect(() => logic.retrieveMeetingInfo('        \n').to.throw(ValueError, 'meetingId is empty or blank'))
                 })
 
             })
@@ -1075,8 +1501,26 @@ describe('logic', () => {
                     expect(meeting.attending.length).to.equal(1)
 
                     expect(meeting.attending[0].toString()).to.equal(user2.id)
+                })
 
-
+                it('should fail on undefined user id', () => {
+                    expect(() => logic.attendMeeting(undefined, meeting1.id).to.throw(TypeError, 'undefined is not a string'))
+                })
+                it('should fail on undefined user id', () => {
+                    expect(() => logic.attendMeeting(user2.id, undefined).to.throw(TypeError, 'undefined is not a string'))
+                })
+      
+                it('should fail on blank user id', () => {
+                    expect(() => logic.attendMeeting('', meeting1.id).to.throw(TypeError, 'id is empty or blank'))
+                })
+                it('should fail on blank meeting', () => {
+                    expect(() => logic.attendMeeting(user2.id, '').to.throw(TypeError, 'meetingId is empty o rblank'))
+                })
+                it('should fail on empty user id', () => {
+                    expect(() => logic.attendMeeting('      \n', meeting1.id).to.throw(TypeError, 'id is empty or blank'))
+                })
+                it('should fail on blank meeting id', () => {
+                    expect(() => logic.attendMeeting(user2.id, '      \n').to.throw(TypeError, 'meetingId is empty o rblank'))
                 })
 
             })
@@ -1107,10 +1551,25 @@ describe('logic', () => {
                     const meeting = await Meeting.findById(meeting1.id)
 
                     expect(meeting.attending.length).to.equal(0)
-
-
-
-
+                })
+                it('should fail on undefined user id', () => {
+                    expect(() => logic.unAttendMeeting(undefined, meeting1.id).to.throw(TypeError, 'undefined is not a string'))
+                })
+                it('should fail on undefined user id', () => {
+                    expect(() => logic.unAttendMeeting(user2.id, undefined).to.throw(TypeError, 'undefined is not a string'))
+                })
+      
+                it('should fail on blank user id', () => {
+                    expect(() => logic.unAttendMeeting('', meeting1.id).to.throw(TypeError, 'id is empty or blank'))
+                })
+                it('should fail on blank meeting', () => {
+                    expect(() => logic.unAttendMeeting(user2.id, '').to.throw(TypeError, 'meetingId is empty o rblank'))
+                })
+                it('should fail on empty user id', () => {
+                    expect(() => logic.unAttendMeeting('      \n', meeting1.id).to.throw(TypeError, 'id is empty or blank'))
+                })
+                it('should fail on blank meeting id', () => {
+                    expect(() => logic.unAttendMeeting(user2.id, '      \n').to.throw(TypeError, 'meetingId is empty o rblank'))
                 })
 
             })
@@ -1159,9 +1618,17 @@ describe('logic', () => {
                 expect(_meeting2.location).to.equal('bilbao')
 
             })
-
+            it('should fail on undefined user id', () => {
+                expect(() => logic.attendMeeting(undefined).to.throw(TypeError, 'undefined is not a string'))
+            })
+            it('should fail on blank user id', () => {
+                expect(() => logic.attendMeeting('').to.throw(TypeError, 'id is empty or blank'))
+            })
+            it('should fail on empty user id', () => {
+                expect(() => logic.attendMeeting('       \n').to.throw(TypeError, 'id is empty or blank'))
+            })
         })
-        describe('photo ', () => {
+        false && describe('photo ', () => {
             let user, user2, project, project2, meeting1, meeting2, meeting3
 
             beforeEach(async () => {

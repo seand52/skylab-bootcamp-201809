@@ -10,6 +10,22 @@
   min-height: 100vh;
 }
 
+.edit-profile-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.edit-button-container {
+  text-align: right;
+}
+
+.bio-paragraph {
+  border-top: 1px solid gray;
+  padding-top: 10px;
+}
+
 .edit {
   text-align: right;
   padding-right: 10px;
@@ -91,6 +107,13 @@
   margin-left: 30px;
   border-radius: 20px;
   background-color: white;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+}
+@media only screen and (max-width: 576px) {
+  .bio {
+    margin-left: 0px;
+    margin-top: 15px;
+  }
 }
 .bio span {
   font-weight: bold;
@@ -137,6 +160,7 @@
 }
 
 .main-area {
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
   margin: 60px 20px;
   padding-top: 20px;
   border: 2px solid #ccc;

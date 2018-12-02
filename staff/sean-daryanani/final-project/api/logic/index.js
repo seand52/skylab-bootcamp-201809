@@ -2,6 +2,7 @@ const { models: { User, Project, Meeting } } = require('data')
 const { AlreadyExistsError, AuthError, NotAllowedError, NotFoundError, ValueError } = require('../errors')
 const validate = require('../utils/validate')
 const cloudinary = require('cloudinary')
+
 cloudinary.config({
     cloud_name: 'dql7wn1ej',
     api_key: '853219916242289',
@@ -220,8 +221,10 @@ const logic = {
       @param {string} projectId 
      */
     deleteProject(userId, projectId) {
+        if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
         if (!projectId.trim()) throw new ValueError('projectId is empty or blank')
+        if (!userId.trim()) throw new ValueError('userId is empty or blank')
 
 
         return (async () => {
@@ -233,8 +236,6 @@ const logic = {
             await project.remove()
 
             await Meeting.deleteMany({ project: projectId })
-
-
 
 
         })()
@@ -287,6 +288,8 @@ const logic = {
 
         return (async () => {
             const user = await User.findById(id).lean()
+
+            if (!user) throw new NotFoundError(`user with id ${id} not found`)
 
             let projects = await Project.find({ collaborators: user._id }).lean()
 
@@ -347,7 +350,7 @@ const logic = {
         return (async () => {
 
             const project = await Project.findById(projectId)
-
+            if (!project) throw new NotFoundError(`project with id ${projectId} not found`)
             await User.updateOne({ _id: id }, { $push: { savedProjects: project._id } })
 
         })()
@@ -366,6 +369,8 @@ const logic = {
         return (async () => {
 
             const user = await User.findById(id).populate('savedProjects').lean().exec()
+
+            if (!user) throw new NotFoundError(`user with id ${id} not found`)
 
             const savedProjects = user.savedProjects
 
@@ -396,9 +401,9 @@ const logic = {
 
         return (async () => {
             const project = await Project.findById(projectId)
-
+            if (!project) throw new NotFoundError(`project with id ${projectId} not found`)
             const user = await User.findById(id)
-
+            if (!user) throw new NotFoundError(`user with id ${id} not found`)
             await User.updateOne({ _id: user._id }, { $pull: { savedProjects: project._id } })
 
         })()
@@ -461,8 +466,6 @@ const logic = {
             project.viewerSkills = user.skills
             project.viewerSavedProjects = user.savedProjects
 
-
-
             return project
 
         })()
@@ -483,12 +486,32 @@ const logic = {
         return (async () => {
 
             const user = await User.findById(id)
+            if (!user) throw new NotFoundError(`user with id ${id} not found`)
+            const project = await Project.findById(projectId)
+            if (!project) throw new NotFoundError(`user with id ${projectId} not found`)
+            if (parseInt(project.maxMembers) === project.currentMembers) throw Error('project capacity is full')
+
+            await Project.updateOne({ _id: projectId }, { $push: { pendingCollaborators: user._id } })
+
+        })()
+    },
+
+    cancelCollaborationRequest(id, projectId) {
+        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+
+        if (!id.trim()) throw new ValueError('id is empty or blank')
+        if (!projectId.trim()) throw new ValueError('projectId is empty or blank')
+
+        return (async () => {
+
+            const user = await User.findById(id)
 
             const project = await Project.findById(projectId)
 
             if (parseInt(project.maxMembers) === project.currentMembers) throw Error('project capacity is full')
 
-            await Project.updateOne({ _id: projectId }, { $push: { pendingCollaborators: user._id } })
+            await Project.updateOne({ _id: projectId }, { $pull: { pendingCollaborators: user._id } })
 
         })()
     },
@@ -524,6 +547,12 @@ const logic = {
                         $inc: { currentMembers: 1 }
                     }
                 )
+                await User.updateOne(
+                    { _id: collabId },
+                    {
+                        $pull: { savedProjects: projectId }
+                    }
+                )
             } else {
 
                 await Project.updateOne(
@@ -545,6 +574,7 @@ const logic = {
         return (async () => {
 
             const user = await User.findById(id)
+
             const keepFields = {
                 name: true,
                 description: true,
@@ -596,9 +626,9 @@ const logic = {
             )
 
             await Meeting.updateOne(
-                {project: projectId},
+                { project: projectId },
                 {
-                    $pull: {attending: user.id}
+                    $pull: { attending: user.id }
                 }
             )
 
@@ -620,8 +650,11 @@ const logic = {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
         if (typeof description !== 'string') throw TypeError(`${description} is not a string`)
+        if (typeof location !== 'string') throw TypeError(`${location} is not a string`)
 
         if (!id.trim()) throw new ValueError('id is empty or blank')
+        if (!location.trim()) throw new ValueError('location is empty or blank')
+        if (!description.trim()) throw new ValueError('description is empty or blank')
         if (!projectId.trim()) throw new ValueError('projectId is empty or blank')
 
         if (new Date() > date) throw Error('cannot create a meeting in the past')
@@ -633,6 +666,8 @@ const logic = {
 
             if (!project) throw new NotFoundError(`project with id ${projectId} not found`)
 
+            if (project.owner.toString()!==id) throw new Error(`not the owner of the project`)
+
             const meeting = new Meeting({ project: project.id, date, location, attending: [user._id], description: description })
 
             await meeting.save()
@@ -643,15 +678,24 @@ const logic = {
      * 
      * @param {string} meetingId 
      */
-    deleteMeeting(meetingId) {
+    deleteMeeting(meetingId, userId) {
+        if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
+
+        if (!userId.trim()) throw new ValueError('userId is empty or blank')
+
         if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
+
         if (!meetingId.trim()) throw new ValueError('meetingId is empty or blank')
 
         return (async () => {
 
             const meeting = await Meeting.findById(meetingId)
+            debugger
+            if (!meeting) throw new NotFoundError(`meeting with id ${meetingId} not found`)
 
-            if (!meeting) throw new NotFoundError(`meeting with id ${id} not found`)
+            const project = await Project.findById(meeting.project)
+
+            if (project.owner.toString()!==userId) throw new Error('not the owner of the project')
 
             await meeting.remove()
 
@@ -789,9 +833,12 @@ const logic = {
     },
 
 
-    filterProjects(query) {
+    filterProjects(query, userId) {
 
         if (typeof query !== 'string') throw TypeError(`${query} is not a string`)
+        if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
+        if (!query.trim()) throw new ValueError('query is empty or blank')
+        if (!userId.trim()) throw new ValueError('userId is empty or blank')
 
         const queryObject = {
             name: { $regex: '' },
@@ -833,14 +880,17 @@ const logic = {
                 description: true,
                 projectImage: true,
                 skills: true,
-                location: true
+                location: true,
+                collaborators: true,
+                owner: true
 
             }
             const projects = await Project.find(queryObject, keepFields).lean()
+            const user = await User.findById(userId)
 
             projects.forEach(project => {
                 project.id = project._id.toString()
-
+                project.userSavedProjects = user.savedProjects
                 delete project._id
 
                 return project

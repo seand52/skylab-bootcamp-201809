@@ -3,9 +3,14 @@
     margin: 30px;
     text-align: center;
     flex: 0 0 2;
+
+    @media only screen and (max-width: 576px) {
+    margin: 0;
+    }
 }
 
 .top-area {
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -54,7 +59,7 @@ display: none;
 }
 
 .bottom-area {
-
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
     background-color: white;
     display: flex;
     flex-direction: column;

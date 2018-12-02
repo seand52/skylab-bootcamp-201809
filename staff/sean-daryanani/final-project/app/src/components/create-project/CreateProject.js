@@ -108,7 +108,7 @@ class CreateProject extends Component {
     render() {
         return <div className="newproject-container">
             <div className="row">
-                <section className="create-project-form-section  col-8 form-group">
+                <section className="create-project-form-section col-8 form-group">
                     <form className="create-project-form" onSubmit={this.handleSubmit}>
                         <label className="create-project__name-label">What will your project's name be?</label>
 
@@ -147,7 +147,7 @@ class CreateProject extends Component {
 
                 </section>
 
-                <aside className="rules col-4">
+                {/* <aside className="rules col-4">
                     <p><b>Remember to keep in mind the following:</b></p>
                     <ul className="list-group">
                         <li className="list-group-item">Arrange real, in-person sessions</li>
@@ -156,7 +156,7 @@ class CreateProject extends Component {
                         <li className="list-group-item">Put your members first</li>
                         <li className="list-group-item">Vestibulum at eros</li>
                     </ul>
-                </aside>
+                </aside> */}
             </div>
         </div>
 

@@ -1,5 +1,5 @@
 global.sessionStorage = require('sessionstorage')
-
+// const validate = require('./utils/validate')
 const logic = {
     _userId: sessionStorage.getItem('userId') || null,
     _token: sessionStorage.getItem('token') || null,
@@ -118,7 +118,7 @@ const logic = {
             .then(res => {
                 if (res.error) throw Error(res.error)
 
-                res.data.joinDate = logic._changeDate(res.data.joinDate, 'profile')
+                // res.data.joinDate = logic._changeDate(res.data.joinDate, 'profile')
 
                 return res.data
             })
@@ -133,14 +133,13 @@ const logic = {
      * @param {Array} skills 
      */
     updateProfile(id, city, githubProfile, bio, skills) {
-        if (typeof city !== 'string') throw TypeError(`${city} is not a string`)
-        if (typeof githubProfile !== 'string') throw TypeError(`${githubProfile} is not a string`)
-        if (typeof bio !== 'string') throw TypeError(`${bio} is not a string`)
-        if (!(skills instanceof Array)) throw TypeError(`${skills} is not a string`)
-
-        if (!city.trim()) throw Error('city is empty or blank')
-        if (!githubProfile.trim()) throw Error('githubProfile is empty or blank')
-        if (!bio.trim()) throw Error('bio is empty or blank')
+        // validate([
+        //     { key: 'id', value: id, type: String },
+        //     { key: 'bio', value: bio, type: String, optional: true },
+        //     { key: 'githubProfile', value: githubProfile, type: String, optional: true },
+        //     { key: 'city', value: city, type: String, optional: true },
+        //     { key: 'skills', value: skills, type: Array, optional: true }
+        // ])
 
 
         return fetch(`${this.url}/user-profile/${id}`, {
@@ -223,6 +222,7 @@ const logic = {
      * @param {string} projectId 
      */
     removeSavedProject(projectId) {
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
         return fetch(`${this.url}/users/${this._userId}/projects/${projectId}/save`, {
             method: 'DELETE',
             headers: {
@@ -416,10 +416,7 @@ debugger
             .then(res => res.json())
             .then(res => {
                 if (res.error) throw Error(res.error)
-                res.data.forEach(item => {
-                    item.realDate = new Date(item.date)
-                    item.listDate = logic._changeDate(item.date, 'meeting')
-                })
+
                 return res.data
             })
 
@@ -639,6 +636,30 @@ debugger
 
         return fetch(`${this.url}/users/${this._userId}/projects/${projectId}/collaborator`, {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+
+            },
+            body: JSON.stringify({ collaboratorId })
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+            })
+
+
+    },
+
+    cancelCollaborationRequest(projectId, collaboratorId) {
+        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+        if (typeof collaboratorId !== 'string') throw TypeError(`${collaboratorId} is not a string`)
+
+        if (!projectId.trim()) throw Error('projectId is empty or blank')
+        if (!collaboratorId.trim()) throw Error('collaboratorId is empty or blank')
+
+        return fetch(`${this.url}/users/${this._userId}/projects/${projectId}/collaborator`, {
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
                 'Authorization': `Bearer ${this._token}`

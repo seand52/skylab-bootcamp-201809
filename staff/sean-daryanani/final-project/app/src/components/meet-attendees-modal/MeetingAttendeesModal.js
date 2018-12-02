@@ -23,7 +23,7 @@ class MeetingAttendeesModal extends Component {
 
         return (
             <Container>
-                <Button onClick={toggle}>View Attendees</Button>
+                <Button color="blue" onClick={toggle}>View Attendees</Button>
                 <Modal isOpen={modal} toggle={toggle}>
                     <ModalHeader toggle={toggle}>View Attendees</ModalHeader>
                     <ModalBody>

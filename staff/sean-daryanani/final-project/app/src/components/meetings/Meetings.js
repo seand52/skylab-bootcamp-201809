@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button } from 'mdbreact'
-
+import Moment from 'react-moment'
 const Meetings = props => {
 
 
@@ -10,23 +10,23 @@ const Meetings = props => {
         return (
             <div className="meeting-actions row">
                 <div className="meeting-details col-8">
-                    <p><span>Date</span>: {meeting.listDate}</p>
+                    <p><span>Date</span>: <Moment format="DD/MM/YYYY">{meeting.date}</Moment></p>
+                    <p><span>Time</span>: <Moment format="HH:mm">{meeting.date}</Moment></p>
 
                     <p><span>Description</span>: {meeting.description}</p>
 
                     <p><span>Location</span>: {meeting.location}</p>
                 </div>
                 <div className="meeting-buttons col-3">
-                    {project && (!(userId === project.owner.id)) && (!meeting.attending.includes(userId)) && (project.collaborators.find(item => item.id===userId)!==undefined) ? <Button type="button" onClick={() => attendMeeting(meeting.id)}>Attend</Button> : null}
+                    {project && (!(userId === project.owner.id)) && (!meeting.attending.includes(userId)) && (project.collaborators.find(item => item.id === userId) !== undefined) ? <Button color="blue" type="button" onClick={() => attendMeeting(meeting.id)}>Attend</Button> : null}
 
 
                     {project && (!(userId === project.owner.id)) && (meeting.attending.includes(userId)) ? (
                         <div>
-                            <p>You have already signed up. Can't attend the meeting? Click here </p>
-                            <Button onClick={() => unAttendMeeting(meeting.id)} type="button">Can't go</Button>
+                            <Button color="red" onClick={() => unAttendMeeting(meeting.id)} type="button">Cancel Attendance</Button>
                         </div>
                     ) : null}
-                    {project && (userId === project.owner.id) ? <button className="delete-meeting-button" onClick={() => deleteMeeting(meeting.id)}><i className="fa fa-remove" aria-hidden="true"></i></button> : null}
+
                 </div>
 
             </div>

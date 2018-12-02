@@ -14,8 +14,7 @@
     "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.1",
     "react-tabs": "^2.3.0",
-    "sessionstorage": "^0.1.0",
-    "sweetalert2": "^7.29.2"
+    "sessionstorage": "^0.1.0"
   },
   "scripts": {
     "start": "react-scripts start",

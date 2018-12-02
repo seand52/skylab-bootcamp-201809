@@ -52,7 +52,7 @@ class Navbarpage extends React.Component {
     // }
 
     componentWillReceiveProps(props) {
-        debugger
+
         if (props.location.pathname.indexOf('home') >= 0) {
             let newSelected = {
                 home: true,

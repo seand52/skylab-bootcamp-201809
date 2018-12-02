@@ -45,7 +45,7 @@ class CreateMeeting extends Component {
     }
 
     render() {
-        return <div className="create-meeting-container">
+        return <div className="create-meeting-container col-sm-11 col-md-7">
             <form onSubmit={this.handleSubmit}>
                 <label>What is the main goal of this meeting?</label>
 

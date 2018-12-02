@@ -95,11 +95,11 @@ class App extends Component {
 
           <Route path="/login" render={() => !logic.loggedIn ? <Login onLogin={this.handleLogin} onSkipToRegister={this.handleSkipToRegister} /> : <Redirect to="/home" />} />
 
-          <Route path="/home" render={() => logic.loggedIn ? <Home /> : <Redirect to="/" />} />
+          <Route path="/home" render={() => logic.loggedIn ? <Home userId={userId} /> : <Redirect to="/" />} />
 
-          <Route path="/explore/:query" render={props => logic.loggedIn ? <Explore query={props.match.params.query} /> : <Redirect to="/explore" />} />
+          <Route path="/explore/:query" render={props => logic.loggedIn ? <Explore userId={userId} query={props.match.params.query} /> : <Redirect to="/explore" />} />
 
-          <Route path="/explore" render={() => logic.loggedIn ? <Explore /> : <Redirect to="/" />} />
+          <Route path="/explore" render={() => logic.loggedIn ? <Explore userId={userId} /> : <Redirect to="/" />} />
 
           <Route path="/project/:id" render={props => logic.loggedIn ? <ProjectPage userId={userId} id={props.match.params.id} /> : <Redirect to="/" />} />
 

@@ -16,6 +16,7 @@ class ProjectPage extends Component {
         meetings: null,
         user: null,
         projectImage: null,
+        commonInterestToggle: false,
     }
     componentDidMount() {
         try {
@@ -104,7 +105,7 @@ class ProjectPage extends Component {
                 .then(() => logic.retrieveProjectInfo(this.props.id))
                 .then(res => this.setState({ project: res }))
                 .then(() => logic.listProjectMeetings(this.props.id))
-                .then(res => this.setState({meetings: res}))
+                .then(res => this.setState({ meetings: res }))
         } catch (err) {
             console.error(err)
         }
@@ -114,6 +115,19 @@ class ProjectPage extends Component {
         const { id, userId } = this.props
         try {
             return logic.requestCollaboration(id, userId)
+                .then(() => logic.retrieveProjectInfo(this.props.id))
+                .then(res => this.setState({ project: res }))
+                .catch((err) => console.error(err))
+
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    handleCancelCollaboration = () => {
+        const { id, userId } = this.props
+        try {
+            return logic.cancelCollaborationRequest(id, userId)
                 .then(() => logic.retrieveProjectInfo(this.props.id))
                 .then(res => this.setState({ project: res }))
                 .catch((err) => console.error(err))
@@ -173,18 +187,18 @@ class ProjectPage extends Component {
 
             if (project.collaborators.some(item => item.id === userId)) {
                 return (< div className="project-page-new-meeting">
-                    <Button onClick={this.handleLeaveProject}>Leave project</Button>
+                    <Button color="red" onClick={this.handleLeaveProject}>Leave project</Button>
                 </div>)
             } else if (!project.collaborators.some(item => item.id === userId) && !(project.pendingCollaborators.some(item => item.id === userId))) {
                 return (
                     < div className="project-page-new-meeting">
-                        <Button onClick={this.handleRequestCollaboration}>Collaborate now</Button>
+                        <Button color="blue" onClick={this.handleRequestCollaboration}>Collaborate now</Button>
                     </div>
                 )
             } else {
                 return (
-                    < div className="project-page-request-collaborate">
-                        <p>Your collaboration request is pending</p>
+                    <div className="project-page-request-collaborate">
+                        <Button color="red" onClick={this.handleCancelCollaboration}>Cancel collaboration request</Button>
                     </div>
                 )
             }
@@ -210,6 +224,10 @@ class ProjectPage extends Component {
 
     }
 
+    toggleCommonInterests = () => {
+        this.setState({ commonInterestToggle: !this.state.commonInterestToggle })
+    }
+
     uploadImage = event => {
         try {
 
@@ -230,11 +248,13 @@ class ProjectPage extends Component {
         if (project) {
             if (project.viewerSavedProjects.includes(id) && !project.collaborators.some(item => item.id === userId)) {
                 return (<div className="project-page-new-meeting">
-                    <Button onClick={this.handleUnFollowProjects}>Unfollow</Button>
+                    <button className="common-interests-display" onClick={this.handleUnFollowProjects}><i className="fa fa-heart" aria-hidden="true"></i></button>
+                    <p>Project saved</p>
                 </div>)
             } else if (!(project.viewerSavedProjects.includes(id)) && !project.collaborators.some(item => item.id === userId)) {
                 return (< div className="project-page-new-meeting">
-                    <Button onClick={this.handleSaveProject}>Save Project</Button>
+                    <button className="common-interests-display" onClick={this.handleSaveProject}><i className="fa fa-heart-o" aria-hidden="true"></i></button>
+                    <p>Save project</p>
                 </div>)
             }
         }
@@ -250,11 +270,12 @@ class ProjectPage extends Component {
     }
 
     render() {
-        const { project, meetings, projectImage } = this.state
+        const { project, meetings, projectImage, commonInterestToggle } = this.state
 
         return <div className="project-page-container">
             <header className="project-top-section row">
-                <div className="project-image-container col-3">
+                <div className="project-image-container col-md-3">
+                <h1 className="project-name-mobile">{project && project.name}</h1>
                     <img src={project ? project.projectImage : null} />
                     {project && ((this.props.userId === project.owner.id)) && <form encType="multipart/form-data" onSubmit={this.uploadImage}>
                         <label className="profileImage-upload">
@@ -265,30 +286,30 @@ class ProjectPage extends Component {
                 </div>
 
 
-                <div className="project-page-header-additional-info col-4" align="center">
-                    <h1>{project && project.name}</h1>
+                <div className="project-page-header-additional-info col-md-4" align="center">
+                    <h1 className="project-name">{project && project.name}</h1>
                     <div className="owner-photo-and-extra-info row">
-                        <div className="extrainfo-image-container col-3">
+                        <div className="extrainfo-image-container col-md-3 col-xs-12">
                             <img className="extrainfo__image-profile" src={project && project.owner.profileImage} alt="profile" />
                         </div>
-                        <div className="owner-name-and-email col-9">
+                        <div className="owner-name-and-email col-md-9">
                             <span>Hosted by</span><p className="project-page-header-additional-info__user-link" onClick={this.clickProfileName}>{project && project.owner.name}</p>
                             <span>Host email:</span>{project && project.owner.email}
                         </div>
                     </div>
                 </div>
 
-                <div className="project-page-header-collab-and-favourites col-5">
+                <div className="project-page-header-collab-and-favourites col-md-5">
                     {project && (!(this.props.userId === project.owner.id)) && this.renderCollabButtons()}
                     {project && (!(this.props.userId === project.owner.id)) && this.renderFavouritesButtons()}
 
 
                     {project && (this.props.userId === project.owner.id) ? < div className="project-page-new-meeting">
-                        <Button onClick={this.handleAddNewEvent}>Add a new event</Button>
+                        <Button color="blue" onClick={this.handleAddNewEvent}>Add a new event</Button>
                     </div> : null}
 
                     {project && (this.props.userId === project.owner.id) ? < div className="project-page-new-meeting">
-                        <Button color="unique" onClick={this.handleDeleteProject}>Delete project</Button>
+                        <Button color="red" onClick={this.handleDeleteProject}>Delete project</Button>
                     </div> : null}
                 </div>
 
@@ -297,22 +318,27 @@ class ProjectPage extends Component {
             </header>
             <section className="project-page-main-section-container">
                 <div className="row">
-                    <section className="project-page-project-info col-5">
+                    <section className="project-page-project-info col-md-5">
                         <h2>Project Details</h2>
-                        <p>Beginner Friendly: {(project && project.beginnerFriendly === 'true') ? 'yes' : 'no'}</p>
+                        <h3>Location</h3>
+                        <p>{project && project.location}</p>
                         <h3>Description</h3>
                         <p>{project && project.description}</p>
                         <h3>Tech stack used</h3>
                         {project && project.skills.map((skill, index) => <SkillsTag searchTag={this.handleSearchTag} key={index} skill={skill} viewerSkills={project.viewerSkills} />)}
-                        <p>{this.calculateCommonInterests()}</p>
+                        <button onClick={this.toggleCommonInterests} className="common-interests-display"><i className="fa fa-question-circle" aria-hidden="true"></i></button><p>{commonInterestToggle && this.calculateCommonInterests()}</p>
                     </section>
-                    <section className="project-page-meetings col-6">
+                    <section className="project-page-meetings col-md-6">
                         <h2>Upcoming Meetings</h2>
                         {meetings && meetings.sort((a, b) => a.realDate - b.realDate).map((meeting, index) => {
                             return (
-                                <div className="individual-meeting-container col-10 offset-1" key={index}>
-                                    <Meetings unAttendMeeting={this.handleUnAttendMeeting} attendMeeting={this.handleAttendMeeting} deleteMeeting={this.handleDeleteMeeting} userId={this.props.userId} key={index} meeting={meeting} project={project} />
-                                    <MeetingAttendeesModal clickName={this.clickProfileName} meetingId={meeting.id} />
+                                <div className="individual-meeting-container col-md-10" key={index}>
+                                    <Meetings unAttendMeeting={this.handleUnAttendMeeting} attendMeeting={this.handleAttendMeeting} userId={this.props.userId} key={index} meeting={meeting} project={project} />
+                                   
+                                        <MeetingAttendeesModal clickName={this.clickProfileName} meetingId={meeting.id} />
+                                        {(project.owner.id===this.props.userId) && <Button onClick={() => this.handleDeleteMeeting(meeting.id)} color="red">Delete</Button>}
+                                   
+
                                 </div>)
                         })}
                     </section>
@@ -320,7 +346,7 @@ class ProjectPage extends Component {
 
 
                 <div className="current-and-pending-collaborators row">
-                    <section className="project-page-collaborators col-5">
+                    <section className="project-page-collaborators col-md-5">
                         <h1>Current Collaborators</h1>
                         <div className="project-page-collaborators-display row">
 
@@ -330,7 +356,7 @@ class ProjectPage extends Component {
                             <Collapsible clickName={this.clickProfileName} accept={this.acceptCollabHandle} reject={this.rejectCollabHandle} pendingCollabs={project.pendingCollaborators} />
                         </section> : null}
                     </section>
-                    <section className="project-page-collaborators col-6">
+                    <section className="project-page-collaborators col-md-6">
                         <h1>Comments</h1>
                         Comments in development :)
                     </section>

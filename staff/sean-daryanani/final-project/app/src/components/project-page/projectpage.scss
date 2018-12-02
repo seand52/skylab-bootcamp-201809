@@ -7,7 +7,7 @@
 
 
 .project-image-container {
-    width: 300px;
+    width: 200px;
     & img {
         display: block;
         width: 100%;
@@ -16,11 +16,19 @@
 }
 
 .extrainfo-image-container {
-
+    width: 100px;
+    @media only screen and (max-width: 765px) {
+        text-align: left;
+    }
     & .extrainfo__image-profile {
-        width: 100px;
+        width: 100%;
+        height: auto;
         border-radius: 50%;
         overflow: hidden;
+        @media only screen and (max-width: 765px) {
+            height: 100px;
+            width: 100px;
+        }
     }
 }
 
@@ -42,11 +50,6 @@
 .owner-name-and-email {
     text-align: left;
 }
-
-.owner-name-and-email{
-
-}
-
 
 .project-page-header-additional-info {
     & span {
@@ -76,6 +79,9 @@
 
 .project-page-main-section-container {
     height: 100vh;
+    @media only screen and (max-width: 800px) {
+        height: auto;
+    }
     background-color: rgb(245, 240, 240);
     box-shadow:  inset 0px 7px 3px -3px rgba(50, 50, 50, 0.75);
 }
@@ -83,6 +89,7 @@
 
 
 .project-page-project-info {
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
     margin-left: 25px;
     margin-top: 20px;
     height: 400px;
@@ -90,9 +97,30 @@
     border: 2px solid #ccc;
     border-radius: 20px;
     background-color: white;
+    @media only screen and (max-width: 576px) {
+        margin-left: 20px;
+        margin-top: 20px;
+        margin-right: 20px;
+        margin-bottom: 20px;
+    }
+
+    & h2 {
+        font-weight: bold;
+    }
+
+    & h3 {
+        font-weight: 500;
+    }
+}
+
+.common-interests-display {
+    background: none;
+    border: none;
+    cursor: pointer;
 }
 
 .project-page-meetings {
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
     margin-top: 20px;
     margin-left: 40px;
     height: 400px;
@@ -100,6 +128,15 @@
     border: 2px solid #ccc;
     border-radius: 20px;
     background-color: white;
+    @media only screen and (max-width: 576px) {
+        margin-left: 20px;
+        margin-right: 20px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    & h2 {
+        font-weight: bold;
+    }
 }
 
 
@@ -128,8 +165,12 @@
 .individual-meeting-container {
 margin-top: 20px;
 margin-bottom: 20px;
+margin-left: 8.33%;
 border: 2px solid #ccc;
 border-radius: 20px;
+@media only screen and (max-width: 576px) {
+    margin-left: 0;
+}
 }
 
 .collapse {
@@ -140,15 +181,38 @@ border-radius: 20px;
 .project-page-collaborators-display {
 
     margin-bottom: 20px;
+    & h1 {
+        font-weight: bold;
+    }
 
 }
 
 .project-page-collaborators {
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
     margin-top: 20px;
     margin-left: 30px;
-
     padding: 20px;
     border: 2px solid #ccc;
     border-radius: 20px;
     background-color: white;
+    @media only screen and (max-width: 576px) {
+        margin: 20px;
+    }
+    & h1 {
+        font-weight: bold;
+    }
+}
+
+.project-name-mobile {
+    display: none;
+    @media only screen and (max-width: 765px) {
+        display: block;
+    }
+}
+
+.project-name {
+    display: block;
+    @media only screen and (max-width: 765px) {
+        display: none;
+    }
 }

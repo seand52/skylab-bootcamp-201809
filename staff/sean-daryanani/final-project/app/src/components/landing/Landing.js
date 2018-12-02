@@ -10,8 +10,8 @@ const Landing = props => {
                     <div className="title-container">
                         <h1>SocialDev</h1>
                         <div className="buttons-container">
-                            <Button onClick={props.onLoginClick} >Login</Button>
-                            <Button onClick={props.onRegisterClick}>Register</Button>
+                            <Button color="primary" onClick={props.onLoginClick} >Login</Button>
+                            <Button color="primary" onClick={props.onRegisterClick}>Register</Button>
                         </div>
                     </div>
                 </div>

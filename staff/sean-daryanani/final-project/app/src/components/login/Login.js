@@ -37,9 +37,9 @@ class Login extends Component {
         return <div className="background-container">
             <section className="form-container">
                 <form className="form" onSubmit={this.handleSubmit}>
-                    <input className="form__input" placeholder="username" type="text" onChange={this.handleUsernameChange} />
-                    <input className="form__input" placeholder="password" type="password" onChange={this.handlePasswordChange} />
-                    <Button type="submit">Log in</Button>
+                    <input className="input-group-text form__input" placeholder="username" type="text" onChange={this.handleUsernameChange} />
+                    <input className="input-group-text form__input" placeholder="password" type="password" onChange={this.handlePasswordChange} />
+                    <Button color="blue" type="submit">Log in</Button>
                 </form>
                 <p className="go-back">Don't have an account? <button onClick={this.props.onSkipToRegister} className="go-back__button"  type="button">Sign up</button></p>
             </section>

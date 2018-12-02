@@ -13,8 +13,8 @@ class Modalpage extends Component {
 
     }
 
-    toggle = () => {    
-        debugger
+    toggle = () => {
+
         this.setState({
 
             modal: !this.state.modal
@@ -29,7 +29,9 @@ class Modalpage extends Component {
 
         return (
             <Container>
-                <Button onClick={toggle}>Edit Profile</Button>
+                <div className="edit-button-container">
+                    <button className="edit-profile-button" onClick={toggle}><i className="fa fa-edit" aria-hidden="true"></i> Edit profile</button>
+                </div>
                 <Modal isOpen={modal} toggle={toggle}>
                     <ModalHeader toggle={toggle}>Edit Profile</ModalHeader>
                     <ModalBody>

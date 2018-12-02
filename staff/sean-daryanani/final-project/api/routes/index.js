@@ -252,6 +252,22 @@ router.post('/users/:id/projects/:projectid/collaborator', [bearerTokenParser, j
     }, res)
 })
 
+router.delete('/users/:id/projects/:projectid/collaborator', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+
+        const { sub, params: { id, projectid }, body: { collaboratorId } } = req
+
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.cancelCollaborationRequest(collaboratorId, projectid)
+            .then(() => res.json({
+                message: 'collaborator added to pending list'
+            }))
+
+    }, res)
+})
+
 router.patch('/users/:id/projects/:projectid/collaborator', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
 
@@ -306,7 +322,7 @@ router.post('/users/:id/projects/:projectid/meetings', [bearerTokenParser, jwtVe
     routeHandler(() => {
 
         const { sub, params: { id, projectid }, body: { startDate, location, description } } = req
-        debugger
+
         if (id !== sub) throw Error('token sub does not match user id')
 
         return logic.addMeeting(id, projectid, startDate, location, description)
@@ -357,7 +373,7 @@ router.delete('/users/:id/projects/meetings/:meetingid', [bearerTokenParser, jwt
 
         if (id !== sub) throw Error('token sub does not match user id')
 
-        return logic.deleteMeeting(meetingid)
+        return logic.deleteMeeting(meetingid, id)
             .then(() => res.json({
                 message: 'meeting has been deleted'
             }))
@@ -433,7 +449,7 @@ router.get('/users/:id/projects/filter/:query', [bearerTokenParser, jwtVerifier,
 
         if (id !== sub) throw Error('token sub does not match user id')
 
-        return logic.filterProjects(query)
+        return logic.filterProjects(query, id)
             .then(projects => res.json({
                 data: projects
             })
@@ -527,7 +543,7 @@ router.get('/users/:id/projects/:projectid/photos', [bearerTokenParser, jwtVerif
     routeHandler(() => {
 
         const { params: { id, projectid, width, height }, sub } = req
-        debugger
+
         return logic.returnProjectPageImages(projectid)
         .then(img => res.json({
             data: img

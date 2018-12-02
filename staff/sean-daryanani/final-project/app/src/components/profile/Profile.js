@@ -7,6 +7,8 @@ import ProjectCard from '../project-card/ProjectCard'
 import Modalpage from '../modal/Modalpage'
 import SkillsTag from '../skills-tag/SkillsTag'
 import { withRouter, Link } from 'react-router-dom'
+import Moment from 'react-moment'
+
 
 
 import Meetings from '../meetings/Meetings'
@@ -51,7 +53,7 @@ class Profile extends Component {
 
     sendProfileUpdate = (city, github, bio, skills) => {
         const { id } = this.props
-        debugger
+
         try {
 
             return logic.updateProfile(id, city, github, bio, skills)
@@ -86,7 +88,7 @@ class Profile extends Component {
 
     handleUpComingMeetings = (id) => {
         try {
-            debugger
+
             return logic.userUpcomingMeetings(id)
                 .then(result => this.setState({ upComingMeetings: result, showProjects: 'meetings' }))
         } catch (err) {
@@ -127,8 +129,6 @@ class Profile extends Component {
 
                 return logic.retrieveUserProfile(this.props.id)
                     .then(res => {
-
-                        debugger
                         this.setState({ user: res })
                     }, () => console.log('finished setstate'))
             })
@@ -142,12 +142,14 @@ class Profile extends Component {
 
         return <div className="profile-page-container">
             <div className="row">
-                <section className="profile-top-area  col-4">
+                <section className="profile-top-area col-xs-12  col-md-4">
                     <ProfileCard uploadImage={this.handleUpload} showCollabProjects={this.handleShowCollabProjects} user={user} myProjects={ownProjects} projectsStarted={this.handleshowOwnProjects} collabProjects={collabProjects} userId={userId} profileImage={image} meetings={this.handleUpComingMeetings} numberOfMeetings={upComingMeetings.length} />
 
                     <section className="bio col-12">
                         <div className="bio__extra-info col-12">
-                            <p><span>Bio</span>:{user && user.bio}</p>
+                        {user && (user.id === userId) && <Modalpage className="testt" user={user} updateProfile={this.sendProfileUpdate} />}
+
+                            <p className="bio-paragraph"><span>Bio</span>:{user && user.bio}</p>
                             <p><span>Github:</span> <a href="https://github.com">{user && user.githubProfile}</a></p>
                             <div className="bio__interests">
                                 <h2>Interests</h2>
@@ -155,13 +157,13 @@ class Profile extends Component {
                                     {user && user.skills.map((skill, index) => <SkillsTag searchTag={this.handleSearchTag} skill={skill} key={index} />)}
                                 </div>
                             </div>
-                            {user && (user.id === userId) && <Modalpage className="testt" user={user} updateProfile={this.sendProfileUpdate} />}
+                           
                         </div>
                     </section>
 
                 </section>
 
-                <section className="main-area col-7">
+                <section className="main-area col-xs-12 col-md-7">
                     <div className="main-area__title">
                         {this.renderTitle()}
 
@@ -176,7 +178,7 @@ class Profile extends Component {
                                 <p><b>Description</b>: {meeting.description}</p>
                                 <p><b>Project: </b><Link to={`/project/${meeting.project.id}`}>{meeting.project.name}</Link></p>
                                 <p><b>Location</b>: {meeting.location}</p>
-                                <p><b>Date</b>: {meeting.realDate.toString()}</p>
+                                <p><b>Date</b>: <Moment format="DD/MM/YYYY HH:mm">{meeting.date}</Moment></p>
                                 <p>Attending: {meeting.attending.length}</p>
 
                             </div>)

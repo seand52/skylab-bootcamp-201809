@@ -1,4 +1,5 @@
 const logic = require('./logic.js')
+
 const { expect } = require('chai')
 require('isomorphic-fetch')
 const { mongoose, models: { User, Project, Meeting } } = require('data')
@@ -38,6 +39,40 @@ describe('logic', () => {
                 }
 
             })
+            it('should fail on undefined name', () => {
+                expect(() => logic.registerUser(undefined, email, username, password)).to.throw(TypeError, 'undefined is not a string')
+            })
+
+            it('should fail on empty name', () => {
+                expect(() => logic.registerUser('', email, username, password)).to.throw(Error, 'name is empty or blank')
+            })
+
+            it('should fail on blank name', () => {
+                expect(() => logic.registerUser('   \t\n', email, username, password)).to.throw(Error, 'name is empty or blank')
+            })
+
+            it('should fail on empty email', () => {
+                expect(() => logic.registerUser(name, '', username, password)).to.throw(Error, ' is an invalid email')
+            })
+
+            it('should fail on blank email', () => {
+                expect(() => logic.registerUser(name, '   \t\n', username, password)).to.throw(Error, ' is an invalid email')
+            })
+
+
+            it('should fail on empty username email', () => {
+                expect(() => logic.registerUser(name, email, '', password)).to.throw(Error, 'username is empty or blank')
+            })
+            it('should fail on blank username', () => {
+                expect(() => logic.registerUser(name, email, '     ', password)).to.throw(Error, 'username is empty or blank')
+            })
+
+            it('should fail on empty username email', () => {
+                expect(() => logic.registerUser(name, email, username, '')).to.throw(Error, 'password is empty or blank')
+            })
+            it('should fail on blank username', () => {
+                expect(() => logic.registerUser(name, email, username, '        ')).to.throw(Error, 'password is empty or blank')
+            })
         })
         describe('login', () => {
             describe('with existing user', () => {
@@ -56,6 +91,22 @@ describe('logic', () => {
                     await logic.authenticate(username, password)
 
                     expect(true).to.be.true
+                })
+
+                it('should fail on undefined username', () => {
+                    expect(() => logic.authenticate(undefined, password)).to.throw(TypeError, 'undefined is not a string')
+                })
+    
+                it('should fail on undefined passowrd', () => {
+                    expect(() => logic.authenticate(username, undefined)).to.throw(TypeError, 'undefined is not a string')
+                })
+    
+                it('should fail on blank username', () => {
+                    expect(() => logic.authenticate('', password)).to.throw(Error, 'username is empty or blank')
+                })
+    
+                it('should fail on blank passowrd', () => {
+                    expect(() => logic.authenticate(username, '')).to.throw(Error, 'password is empty or blank')
                 })
             })
 
@@ -83,7 +134,7 @@ describe('logic', () => {
                 expect(logic._token).to.equal(null)
             })
 
-            // TODO other test cases
+
         })
 
         describe('retrieve user', () => {
@@ -113,136 +164,221 @@ describe('logic', () => {
             })
         })
 
-        // describe('update user profile', () => {
-        //     let user
+        describe('update user profile', () => {
+            let user
 
-        //     beforeEach(() => (user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })).save())
+            beforeEach(async () => {
+                user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
 
-        //     it('should update on correct data and password', async () => {
-        //         const { id, bio, githubProfile, city } = user
+                await user.save()
+                await logic.authenticate(user.username, user.password)
 
-        //         const newBio = `${bio}-${Math.random()}`
-        //         const newGithubProfile = `${githubProfile}-${Math.random()}`
-        //         const newCity = `${city}-${Math.random()}`
-        //         const newSkills = ['react', 'mongoose', 'javascript']
+        })
+
+            it('should update on correct data and password', async () => {
+                const { id, bio, githubProfile, city } = user
+
+                const newBio = `${bio}-${Math.random()}`
+                const newGithubProfile = `${githubProfile}-${Math.random()}`
+                const newCity = `${city}-${Math.random()}`
+                const newSkills = ['react', 'mongoose', 'javascript']
 
 
-        //         const res = await logic.updateProfile(id, newCity, newGithubProfile, newBio, newSkills)
+                const res = await logic.updateProfile(id, newCity, newGithubProfile, newBio, newSkills)
 
-        //         expect(res).to.be.undefined
+                expect(res).to.be.undefined
 
-        //         const _users = await User.find()
+                const _users = await User.find()
 
-        //         const [_user] = _users
+                const [_user] = _users
 
-        //         expect(_user.bio).to.equal(newBio)
+                expect(_user.bio).to.equal(newBio)
 
-        //         expect(_user.githubProfile).to.equal(newGithubProfile)
-        //         expect(_user.city).to.equal(newCity)
-        //         expect(newSkills.length).to.equal(3)
+                expect(_user.githubProfile).to.equal(newGithubProfile)
+                expect(_user.city).to.equal(newCity)
+                expect(newSkills.length).to.equal(3)
 
-        //     })
+            })
 
-        // it('should update on correct bio (and other fields null)', async () => {
-        //     const { id, bio, githubProfile, city, skills } = user
+            it('should fail undefined id', () => {
+                expect(() => logic.updateProfile(undefined, 'barcelona', 'github', 'newbio', 'newskills')).to.throw(TypeError, 'undefined is not a string')
+            })
+            it('should  failundefined bio', () => {
+                expect(() => logic.updateProfile(user.id, undefined, 'github', 'newbio', 'newskills')).to.throw(TypeError, 'undefined is not a string')
+            })
 
-        //     const newBio = `${bio}-${Math.random()}`
+            it('should fail undefined github profile', () => {
+                expect(() => logic.updateProfile(user.id, 'barcelona', undefined, 'newbio', 'newskills')).to.throw(TypeError, 'undefined is not a string')
+            })
 
-        //     const res = await logic.updateProfile(id, null, null, newBio, null)
+            it('should fail undefined city', () => {
+                expect(() => logic.updateProfile(user.id, 'barcelona', 'github', undefined, 'newskills')).to.throw(TypeError, 'undefined is not a string')
+            })
+            it('should fail undefined city', () => {
+                expect(() => logic.updateProfile(user.id, 'barcelona', 'github', 'newbio', undefined)).to.throw(TypeError, 'undefined is not a string')
+            })
 
-        //     expect(res).to.be.undefined
 
-        //     const _users = await User.find()
+            it('should update on correct bio (and other fields null)', async () => {
+                const { id, bio, githubProfile, city, skills } = user
 
-        //     const [_user] = _users
+                const newBio = `${bio}-${Math.random()}`
 
-        //     expect(_user.bio).to.equal(newBio)
+                const res = await logic.updateProfile(id, null, null, newBio, null)
 
-        //     expect(_user.githubProfile).to.equal(githubProfile)
-        //     expect(_user.city).to.equal(city)
-        //     expect(JSON.stringify(_user.skills)).to.equal(JSON.stringify(skills))
+                expect(res).to.be.undefined
 
-        // })
+                const _users = await User.find()
 
-        // it('should update on correct githubProfile (and other fields null)', async () => {
-        //     const { id, bio, githubProfile, city, skills } = user
+                const [_user] = _users
 
-        //     const newGithubProfile = `${githubProfile}-${Math.random()}`
+                expect(_user.bio).to.equal(newBio)
 
-        //     const res = await logic.updateProfile(id, bio, newGithubProfile, null, null)
+                expect(_user.githubProfile).to.equal(githubProfile)
+                expect(_user.city).to.equal(city)
+                expect(JSON.stringify(_user.skills)).to.equal(JSON.stringify(skills))
 
-        //     expect(res).to.be.undefined
+            })
 
-        //     const _users = await User.find()
+            it('should update on correct githubProfile (and other fields null)', async () => {
+                const { id, bio, githubProfile, city, skills } = user
 
-        //     const [_user] = _users
+                const newGithubProfile = `${githubProfile}-${Math.random()}`
 
-        //     expect(_user.githubProfile).to.equal(newGithubProfile)
+                const res = await logic.updateProfile(id, city, newGithubProfile, null, null)
 
-        //     expect(_user.bio).to.equal(bio)
-        //     expect(_user.city).to.equal(city)
-        //     expect(JSON.stringify(_user.skills)).to.equal(JSON.stringify(skills))
+                expect(res).to.be.undefined
 
-        // })
+                const _users = await User.find()
 
-        // it('should update on correct city (and other fields null)', async () => {
-        //     const { id, bio, githubProfile, city, skills } = user
+                const [_user] = _users
 
-        //     const newCity = `${city}-${Math.random()}`
+                expect(_user.githubProfile).to.equal(newGithubProfile)
 
-        //     const res = await logic.updateProfile(id, bio, githubProfile, newCity, null)
+                expect(_user.bio).to.equal(bio)
+                expect(_user.city).to.equal(city)
+                expect(JSON.stringify(_user.skills)).to.equal(JSON.stringify(skills))
 
-        //     expect(res).to.be.undefined
+            })
 
-        //     const _users = await User.find()
+            it('should update on correct city (and other fields null)', async () => {
+                const { id, bio, githubProfile, city, skills } = user
+                debugger
+                const newCity = `${city}-${Math.random()}`
 
-        //     const [_user] = _users
+                const res = await logic.updateProfile(id, newCity, githubProfile, bio, null)
 
-        //     expect(_user.city).to.equal(newCity)
+                expect(res).to.be.undefined
 
-        //     expect(_user.bio).to.equal(bio)
-        //     expect(_user.githubProfile).to.equal(githubProfile)
-        //     expect(JSON.stringify(_user.skills)).to.equal(JSON.stringify(skills))
+                const _users = await User.find()
 
-        // })
-    })
+                const [_user] = _users
+                debugger
+                expect(_user.city).to.equal(newCity)
+
+                expect(_user.bio).to.equal(bio)
+                expect(_user.githubProfile).to.equal(githubProfile)
+                expect(JSON.stringify(_user.skills)).to.equal(JSON.stringify(skills))
+
+            })
+        })
+})
 
 })
 
 describe('projects', () => {
     describe('add a project', () => {
-        let name, email, username, password, description, skills, beginnerFriendly, maxMembers
+        let name, email, username, password, description, skills, beginnerFriendly, maxMembers, location
 
         beforeEach(async () => {
             user = new User({ name: 'pep', email: 'pep@gmail.com', username: 'pep', password: 'pep' })
             await user.save()
-            debugger
+
             await logic.authenticate(user.username, user.password)
+            name ='test'
+            description = 'test'
+            skills = ['skill1', 'skill2', 'skill3']
+            location = 'barcelona'
 
         })
 
         it('should succeed on correct data', async () => {
 
-            debugger
-            await logic.addNewProject('test', 'test', ['skill1', 'skill2', 'skill3'], 'test', '8', 'barcelona')
+
+            await logic.addNewProject('test', 'test', ['skill1', 'skill2', 'skill3'], '8', 'barcelona')
 
             const projects = await Project.find()
 
             const [project] = projects
-            debugger
+
             expect(project.name).to.equal(name)
 
             expect(project.description).to.equal(description)
 
             expect(JSON.stringify(project.skills)).to.equal(JSON.stringify(skills))
 
-            expect(project.beginnerFriendly).to.equal(beginnerFriendly)
-
 
             expect(project.currentMembers).to.equal(1)
 
 
 
+        })
+
+        it('should fail undefined user id', () => {
+            expect(() => logic.addNewProject(undefined, name, description, skills, maxMembers, location).to.throw(TypeError, 'undefined is not a string'))
+        })
+
+        it('should fail undefined user name', () => {
+            expect(() => logic.addNewProject(user.id, undefined, description, skills, maxMembers, location).to.throw(TypeError, 'undefined is not a string'))
+        })
+        it('should fail undefined user description', () => {
+            expect(() => logic.addNewProject(user.id, name, undefined, skills, maxMembers, location).to.throw(TypeError, 'undefined is not a string'))
+        })
+
+        it('should fail undefined user maxMembers', () => {
+            expect(() => logic.addNewProject(user.id, name, description, skills, undefined, location).to.throw(TypeError, 'undefined is not a string'))
+        })
+
+        it('should fail undefined location', () => {
+            expect(() => logic.addNewProject(user.id, name, description, skills, maxMembers, undefined).to.throw(TypeError, 'undefined is not a string'))
+        })
+
+        it('should fail blank user id', () => {
+            expect(() => logic.addNewProject('', name, description, skills, maxMembers, location).to.throw(ValueError, 'id is empty or blank'))
+        })
+
+        it('should fail blank user name', () => {
+            expect(() => logic.addNewProject(user.id, '', description, skills, maxMembers, location).to.throw(ValueError, 'name is empty or blank'))
+        })
+        it('should fail blank user description', () => {
+            expect(() => logic.addNewProject(user.id, name, '', skills, maxMembers, location).to.throw(ValueError, 'description is empty or blank'))
+        })
+
+        it('should fail blank user maxMembers', () => {
+            expect(() => logic.addNewProject(user.id, name, description, skills, '', location).to.throw(ValueError, 'maxMembers is empty or blank'))
+        })
+
+        it('should fail blank location', () => {
+            expect(() => logic.addNewProject(user.id, name, description, skills, maxMembers, '').to.throw(ValueError, 'location is empty or blank'))
+        })
+
+        it('should fail empty user id', () => {
+            expect(() => logic.addNewProject('      \n', name, description, skills, maxMembers, location).to.throw(ValueError, 'id is empty or blank'))
+        })
+
+        it('should fail empty user name', () => {
+            expect(() => logic.addNewProject(user.id, '      \n', description, skills, maxMembers, location).to.throw(ValueError, 'name is empty or blank'))
+        })
+        it('should fail empty user description', () => {
+            expect(() => logic.addNewProject(user.id, name, '      \n', skills, maxMembers, location).to.throw(ValueError, 'description is empty or blank'))
+        })
+
+        it('should fail empty user maxMembers', () => {
+            expect(() => logic.addNewProject(user.id, name, description, skills, '      \n', location).to.throw(ValueError, 'maxMembers is empty or blank'))
+        })
+
+        it('should fail empty location', () => {
+            expect(() => logic.addNewProject(user.id, name, description, skills, maxMembers, '      \n').to.throw(ValueError, 'location is empty or blank'))
         })
 
     })
@@ -309,6 +445,7 @@ describe('projects', () => {
 
 
         })
+
 
         it('should succeed on listing all projects where user a collaborator', async () => {
             const user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '123' })
@@ -381,6 +518,16 @@ describe('projects', () => {
 
         })
 
+        it('should fail on undefined user id', () => {
+            expect(() => logic.saveProject(undefined).to.throw(TypeError, 'undefined is not a string'))
+        })
+        it('should fail on undefined user id', () => {
+            expect(() => logic.saveProject('').to.throw(ValueError, ' is empty or blank'))
+        })
+        it('should fail on undefined user id', () => {
+            expect(() => logic.saveProject('    \n').to.throw(ValueError, ' is empty or blank'))
+        })
+
         it('should succeed on listing saved projects', async () => {
             project2 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id })
             project3 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id })
@@ -427,11 +574,16 @@ describe('projects', () => {
             const _user = await User.findById(user.id)
 
             expect(_user.savedProjects.length).to.equal(0)
+        })
 
-
-
-
-
+        it('should fail on undefined user id', () => {
+            expect(() => logic.removeSavedProject(undefined).to.throw(TypeError, 'undefined is not a string'))
+        })
+        it('should fail on undefined user id', () => {
+            expect(() => logic.removeSavedProject('').to.throw(ValueError, ' is empty or blank'))
+        })
+        it('should fail on undefined user id', () => {
+            expect(() => logic.removeSavedProject('    \n').to.throw(ValueError, ' is empty or blank'))
         })
     })
 
@@ -443,7 +595,7 @@ describe('projects', () => {
 
             await user.save()
 
-            logic.authenticate(user.username, user.password)
+            await logic.authenticate(user.username, user.password)
 
             project = new Project({ name: 'react', description: 'testdescription1', skills: ['react', 'mongoose', 'javascript'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, location: 'Barcelona' })
 
@@ -484,6 +636,22 @@ describe('projects', () => {
 
             const [_project1, _project2, _project3] = projects
         })
+
+        it('should fail on undefined query', () => {
+            expect(() => logic.filterProjects(undefined, user.id).to.throw(ValueError, 'undefined is not a string'))
+        })
+
+    
+        it('should fail on empty query', () => {
+            expect(() => logic.filterProjects('', user.id).to.throw(ValueError, ' is empty or blank'))
+        })
+
+      
+
+        it('should fail on blank query', () => {
+            expect(() => logic.filterProjects('    \n', user.id).to.throw(ValueError, ' is empty or blank'))
+        })
+
     })
 
     describe('retrieve project info', () => {
@@ -517,8 +685,23 @@ describe('projects', () => {
 
         })
 
+        it('should fail on undefined query', () => {
+            expect(() => logic.retrieveProjectInfo(undefined).to.throw(ValueError, 'undefined is not a string'))
+        })
+
+    
+        it('should fail on empty query', () => {
+            expect(() => logic.retrieveProjectInfo('', user.id).to.throw(ValueError, ' is empty or blank'))
+        })
+
+      
+
+        it('should fail on blank query', () => {
+            expect(() => logic.retrieveProjectInfo('    \n', user.id).to.throw(ValueError, ' is empty or blank'))
+        })
+
         describe('Request collaboration', () => {
-            let user, user2, project
+            let user, user2, project, project38
 
             beforeEach(async () => {
                 Project.deleteMany()
@@ -526,18 +709,20 @@ describe('projects', () => {
 
                 user2 = new User({ name: 'John2', email: 'doe21241@gmail.com', username: 'jd21241421', password: '123' })
 
-                project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
+                project = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], maxMembers: '5', owner: user.id })
+
+                project38 = new Project({ name: 'testasdf1', description: 'testdescriasdfption1', skills: ['react1', 'mongoose1', 'javascript1'], maxMembers: '4', owner: user.id })
 
                 await user.save()
                 await user2.save()
                 await project.save()
-                logic.authenticate(user.username, user.password)
+                await logic.authenticate(user.username, user.password)
             })
 
             it('should add user2 into pending collaborators list', async () => {
                 expect(project.owner.toString()).to.equal(user.id.toString())
 
-                const res = await logic.requestCollaboration(project.id, user2.id)
+                await logic.requestCollaboration(project.id, user2.id)
 
                 const _projects = await Project.find()
 
@@ -579,8 +764,8 @@ describe('projects', () => {
                 const decision = 'reject'
 
                 expect(project.owner.toString()).to.equal(user.id.toString())
-
-                await logic.requestCollaboration(user2.id, project.id)
+                debugger
+                await logic.requestCollaboration(user2.id, project38.id)
 
                 await logic.handleCollaboration(project.id, decision, user2.id)
 
@@ -593,6 +778,30 @@ describe('projects', () => {
                 expect(_project.collaborators.length).to.equal(0)
 
 
+            })
+
+            it('should fail on undefined user id', () => {
+                expect(() => logic.requestCollaboration(undefined, project38.id).to.throw(ValueError, 'undefined is not a string'))
+            })
+
+            it('should fail on undefined user id', () => {
+                expect(() => logic.requestCollaboration(user2.id, undefined).to.throw(ValueError, 'undefined is not a string'))
+            })
+
+            it('should fail on empty user id', () => {
+                expect(() => logic.requestCollaboration('', project38.id).to.throw(ValueError, 'userId is empty or blank'))
+            })
+
+            it('should fail on empty user id', () => {
+                expect(() => logic.requestCollaboration(user2.id, '').to.throw(ValueError, 'projectId is empty or blank'))
+            })
+
+            it('should fail on blank user id', () => {
+                expect(() => logic.requestCollaboration('    \n', project38.id).to.throw(ValueError, 'userId is empty or blank'))
+            })
+
+            it('should fail on blank user id', () => {
+                expect(() => logic.requestCollaboration(user2.id, '   \n').to.throw(ValueError, 'projectId is empty or blank'))
             })
 
 
@@ -630,10 +839,29 @@ describe('projects', () => {
 
             expect(_meetings.length).to.equal(0)
 
+        })
+        it('should fail undefined user id', () => {
+            expect(() => logic.deleteProject(undefined, project.id).to.throw(TypeError, 'undefined is not a string'))
+        })
 
+        it('should fail undefined project id', () => {
+            expect(() => logic.deleteProject(user.id, undefined).to.throw(TypeError, 'undefined is not a string'))
+        })
 
+        it('should fail on empty user id', () => {
+            expect(() => logic.deleteProject('', project.id).to.throw(ValueError, 'userId is empty or blank'))
+        })
 
+        it('should fail on empty user id', () => {
+            expect(() => logic.deleteProject(user.id, '').to.throw(ValueError, 'projectId is empty or blank'))
+        })
 
+        it('should fail on blank user id', () => {
+            expect(() => logic.deleteProject('    \n', project.id).to.throw(ValueError, 'userId is empty or blank'))
+        })
+
+        it('should fail on blank user id', () => {
+            expect(() => logic.deleteProject(user.id, '   \n').to.throw(ValueError, 'projectId is empty or blank'))
         })
 
 
@@ -661,6 +889,19 @@ describe('projects', () => {
 
             expect(_project.collaborators.length).to.equal(0)
         })
+
+        it('should fail on undefined project id', () => {
+            expect(() => logic.leaveProject(undefined).to.throw(ValueError, 'undefined is not a string'))
+        })
+
+        it('should fail on undefined user id', () => {
+            expect(() => logic.leaveProject('').to.throw(ValueError, ' is not a string'))
+        })
+
+        it('should fail on empty user id', () => {
+            expect(() => logic.leaveProject('       \n').to.throw(ValueError, ' is empty or blank'))
+        })
+
     })
 
     describe('meetings', () => {
@@ -695,9 +936,19 @@ describe('projects', () => {
                 expect(meeting.attending.length).to.equal(1)
 
                 expect(meeting.attending[0].toString()).to.equal(user2.id)
-
-
             })
+
+            it('should fail on undefined meeting id', () => {
+                expect(() => logic.attendMeeting(undefined).to.throw(TypeError, 'undefined is not a string'))
+            })
+            it('should fail on blank meeting id', () => {
+                expect(() => logic.attendMeeting('').to.throw(Error, ' is not empty or blank'))
+            })
+  
+            it('should fail on empty user id', () => {
+                expect(() => logic.attendMeeting('     \n').to.throw(Error, 'id is empty or blank'))
+            })
+
 
             it('should succeed on deleting event', async () => {
                 const date = new Date()
@@ -722,9 +973,18 @@ describe('projects', () => {
 
                 expect(_meetings.length).to.equal(2)
 
-
-
             })
+            it('should fail on undefined meeting id', () => {
+                expect(() => logic.deleteMeeting(undefined).to.throw(TypeError, 'undefined is not a string'))
+            })
+            it('should fail on blank meeting id', () => {
+                expect(() => logic.deleteMeeting('').to.throw(Error, ' is not empty or blank'))
+            })
+  
+            it('should fail on empty user id', () => {
+                expect(() => logic.deleteMeeting('     \n').to.throw(Error, 'id is empty or blank'))
+            })
+
 
         })
 
@@ -770,6 +1030,17 @@ describe('projects', () => {
                 expect(_meeting1.location).to.equal('bilbao')
                 expect(_meeting2.location).to.equal('bilbao')
 
+            })
+
+            it('should fail on undefined user id', () => {
+                expect(() => logic.userUpcomingMeetings(undefined).to.throw(TypeError, 'undefined is not a string'))
+            })
+            it('should fail on blank user id', () => {
+                expect(() => logic.userUpcomingMeetings('').to.throw(Error, ' is not empty or blank'))
+            })
+  
+            it('should fail on empty user id', () => {
+                expect(() => logic.userUpcomingMeetings('     \n').to.throw(Error, 'id is empty or blank'))
             })
 
         })
@@ -820,6 +1091,17 @@ describe('projects', () => {
 
             })
 
+            it('should fail on undefined project id', () => {
+                expect(() => logic.listProjectMeetings(undefined).to.throw(TypeError, 'undefined is not a string'))
+            })
+            it('should fail on blank project id', () => {
+                expect(() => logic.listProjectMeetings('').to.throw(Error, ' is not empty or blank'))
+            })
+  
+            it('should fail on empty project id', () => {
+                expect(() => logic.listProjectMeetings('     \n').to.throw(Error, 'id is empty or blank'))
+            })
+
             it('should retrieve information on a specific meeting', async () => {
 
                 const meeting = await logic.retrieveMeetingInfo(meeting1.id)
@@ -865,10 +1147,17 @@ describe('projects', () => {
                 const meeting = await Meeting.findById(meeting1.id)
 
                 expect(meeting.attending.length).to.equal(0)
+            })
 
-
-
-
+            it('should fail on undefined meeting id', () => {
+                expect(() => logic.unAttendMeeting(undefined).to.throw(TypeError, 'undefined is not a string'))
+            })
+            it('should fail on blank meeting id', () => {
+                expect(() => logic.unAttendMeeting('').to.throw(Error, ' is not empty or blank'))
+            })
+  
+            it('should fail on empty meeting id', () => {
+                expect(() => logic.unAttendMeeting('     \n').to.throw(Error, 'id is empty or blank'))
             })
 
         })
