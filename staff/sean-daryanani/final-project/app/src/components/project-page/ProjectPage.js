@@ -9,7 +9,7 @@ import CollaboratorCard from '../collaborator-card/CollaboratorCard'
 import { withRouter } from 'react-router-dom'
 import SkillsTag from '../skills-tag/SkillsTag'
 import MeetingAttendeesModal from '../meet-attendees-modal/MeetingAttendeesModal'
-
+import Error from '../error/Error'
 class ProjectPage extends Component {
     state = {
         project: null,
@@ -17,17 +17,19 @@ class ProjectPage extends Component {
         user: null,
         projectImage: null,
         commonInterestToggle: false,
+        error: false
     }
     componentDidMount() {
         try {
             return logic.retrieveProjectInfo(this.props.id)
-                .then(res => this.setState({ project: res }))
+                .then(res => this.setState({ project: res, error: false }))
                 .then(() => logic.listProjectMeetings(this.props.id))
-                .then(res => this.setState({ meetings: res }))
+                .then(res => this.setState({ meetings: res, error: false }))
                 .then(() => logic.retrieveProjectImage(this.props.userId, this.props.id))
-                .then(res => this.setState({ projectImage: res }))
+                .then(res => this.setState({ projectImage: res, error: false }))
+                .catch(err => this.setState({ error: err.message }))
         } catch (err) {
-            console.error(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -36,9 +38,10 @@ class ProjectPage extends Component {
 
             return logic.handleCollaboration(this.state.project.id, 'accept', id)
                 .then(() => logic.retrieveProjectInfo(this.props.id))
-                .then(res => this.setState({ project: res }))
+                .then(res => this.setState({ project: res, error: false }))
+                .catch(err => this.setState({ error: err.message }))
         } catch (err) {
-            console.error(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -47,9 +50,10 @@ class ProjectPage extends Component {
 
             return logic.handleCollaboration(this.state.project.id, 'reject', id)
                 .then(() => logic.retrieveProjectInfo(this.props.id))
-                .then(res => this.setState({ project: res }))
+                .then(res => this.setState({ project: res, error: false }))
+                .catch(err => this.setState({ error: err.message }))
         } catch (err) {
-            console.error(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -58,9 +62,10 @@ class ProjectPage extends Component {
 
             return logic.deleteMeeting(meetingId)
                 .then(() => logic.listProjectMeetings(this.props.id))
-                .then(res => this.setState({ meetings: res }))
+                .then(res => this.setState({ meetings: res, error: false }))
+                .catch(err => this.setState({ error: err.message }))
         } catch (err) {
-            console.error(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -69,9 +74,10 @@ class ProjectPage extends Component {
 
             return logic.attendMeeting(meetingId)
                 .then(() => logic.listProjectMeetings(this.props.id))
-                .then(res => this.setState({ meetings: res }))
+                .then(res => this.setState({ meetings: res, error: false }))
+                .catch(err => this.setState({ error: err.message }))
         } catch (err) {
-            console.error(err)
+            this.setState({ error: err.message })
         }
 
     }
@@ -80,9 +86,10 @@ class ProjectPage extends Component {
         try {
             return logic.unAttendMeeting(meetingId)
                 .then(() => logic.listProjectMeetings(this.props.id))
-                .then(res => this.setState({ meetings: res }))
+                .then(res => this.setState({ meetings: res, error: false }))
+                .catch(err => this.setState({ error: err.message }))
         } catch (err) {
-            console.error(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -92,8 +99,9 @@ class ProjectPage extends Component {
             const { userId, id } = this.props
             return logic.deleteProject(userId, id)
                 .then(() => this.props.history.push('/home'))
+                .catch(err => this.setState({ error: err.message }))
         } catch (err) {
-            console.error(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -103,11 +111,12 @@ class ProjectPage extends Component {
 
             return logic.leaveProject(id)
                 .then(() => logic.retrieveProjectInfo(this.props.id))
-                .then(res => this.setState({ project: res }))
+                .then(res => this.setState({ project: res, error: false }))
                 .then(() => logic.listProjectMeetings(this.props.id))
-                .then(res => this.setState({ meetings: res }))
+                .then(res => this.setState({ meetings: res, error: false }))
+                .catch(err => this.setState({ error: err.message }))
         } catch (err) {
-            console.error(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -116,11 +125,11 @@ class ProjectPage extends Component {
         try {
             return logic.requestCollaboration(id, userId)
                 .then(() => logic.retrieveProjectInfo(this.props.id))
-                .then(res => this.setState({ project: res }))
-                .catch((err) => console.error(err))
+                .then(res => this.setState({ project: res, error: false }))
+                .catch((err) => this.setState({ error: err.message }))
 
         } catch (err) {
-            console.error(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -129,11 +138,11 @@ class ProjectPage extends Component {
         try {
             return logic.cancelCollaborationRequest(id, userId)
                 .then(() => logic.retrieveProjectInfo(this.props.id))
-                .then(res => this.setState({ project: res }))
-                .catch((err) => console.error(err))
+                .then(res => this.setState({ project: res, error: false }))
+                .catch((err) => this.setState({ error: err.message }))
 
         } catch (err) {
-            console.error(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -143,9 +152,10 @@ class ProjectPage extends Component {
 
             return logic.saveProject(id, userId)
                 .then(() => logic.retrieveProjectInfo(id))
-                .then(res => this.setState({ project: res }))
+                .then(res => this.setState({ project: res, error: false }))
+                .catch(err => this.setState({ error: err.message }))
         } catch (err) {
-            console.error(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -155,9 +165,10 @@ class ProjectPage extends Component {
 
             return logic.removeSavedProject(id, userId)
                 .then(() => logic.retrieveProjectInfo(id))
-                .then(res => this.setState({ project: res }))
+                .then(res => this.setState({ project: res, error: false }))
+                .catch(err => this.setState({ error: err.message }))
         } catch (err) {
-            console.error(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -173,9 +184,10 @@ class ProjectPage extends Component {
 
             return logic.removeCollaborator(collaboratorId, this.props.id)
                 .then(() => logic.retrieveProjectInfo(this.props.id))
-                .then(res => this.setState({ project: res }))
+                .then(res => this.setState({ project: res, error: false }))
+                .catch(err => this.setState({ error: err.message }))
         } catch (err) {
-            console.error(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -234,10 +246,11 @@ class ProjectPage extends Component {
             return logic.addProjectImage(event.target.files[0], this.props.id)
                 .then(() => {
                     return logic.retrieveProjectInfo(this.props.id)
-                        .then(res => this.setState({ project: res }))
+                        .then(res => this.setState({ project: res, error: false }))
+                        .catch(err => this.setState({ error: err.message }))
                 })
         } catch (err) {
-            console.error(err)
+            this.setState({ error: err.message })
         }
 
     }
@@ -270,12 +283,12 @@ class ProjectPage extends Component {
     }
 
     render() {
-        const { project, meetings, projectImage, commonInterestToggle } = this.state
+        const { project, meetings, commonInterestToggle } = this.state
 
         return <div className="project-page-container">
             <header className="project-top-section row">
                 <div className="project-image-container col-md-3">
-                <h1 className="project-name-mobile">{project && project.name}</h1>
+                    <h1 className="project-name-mobile">{project && project.name}</h1>
                     <img src={project ? project.projectImage : null} />
                     {project && ((this.props.userId === project.owner.id)) && <form encType="multipart/form-data" onSubmit={this.uploadImage}>
                         <label className="profileImage-upload">
@@ -334,10 +347,10 @@ class ProjectPage extends Component {
                             return (
                                 <div className="individual-meeting-container col-md-10" key={index}>
                                     <Meetings unAttendMeeting={this.handleUnAttendMeeting} attendMeeting={this.handleAttendMeeting} userId={this.props.userId} key={index} meeting={meeting} project={project} />
-                                   
-                                        <MeetingAttendeesModal clickName={this.clickProfileName} meetingId={meeting.id} />
-                                        {(project.owner.id===this.props.userId) && <Button onClick={() => this.handleDeleteMeeting(meeting.id)} color="red">Delete</Button>}
-                                   
+
+                                    <MeetingAttendeesModal clickName={this.clickProfileName} meetingId={meeting.id} />
+                                    {(project.owner.id === this.props.userId) && <Button onClick={() => this.handleDeleteMeeting(meeting.id)} color="red">Delete</Button>}
+
 
                                 </div>)
                         })}
@@ -364,7 +377,7 @@ class ProjectPage extends Component {
 
 
             </section>
-
+            {this.state.error && <Error message={this.state.error} />}
         </div>
     }
 }

@@ -8,7 +8,7 @@ import Modalpage from '../modal/Modalpage'
 import SkillsTag from '../skills-tag/SkillsTag'
 import { withRouter, Link } from 'react-router-dom'
 import Moment from 'react-moment'
-
+import Error from '../error/Error'
 
 
 import Meetings from '../meetings/Meetings'
@@ -21,7 +21,8 @@ class Profile extends Component {
         collabProjects: false,
         upComingMeetings: false,
         showProjects: 'my projects',
-        image: false
+        image: false,
+        error: false
     }
 
     componentDidMount() {
@@ -30,10 +31,11 @@ class Profile extends Component {
 
             Promise.all([logic.retrieveUserProfile(id), logic.retrievePendingCollaboratorProjects(id), logic.listOwnProjects(id), logic.retrieveProfileImage(id), logic.userUpcomingMeetings(id)])
                 .then(res => {
-                    this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2], image: res[3], upComingMeetings: res[4] })
+                    this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2], image: res[3], upComingMeetings: res[4], error: false })
                 })
+                .catch(err => this.setState({ error: err.message }))
         } catch (err) {
-            console.log(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -44,10 +46,11 @@ class Profile extends Component {
 
             Promise.all([logic.retrieveUserProfile(id), logic.retrievePendingCollaboratorProjects(id), logic.listOwnProjects(id)])
                 .then(res => {
-                    this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2] })
+                    this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2], error: false })
                 })
+                .catch(err => this.setState({ error: err.message }))
         } catch (err) {
-            console.log(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -59,10 +62,11 @@ class Profile extends Component {
             return logic.updateProfile(id, city, github, bio, skills)
                 .then(() => logic.retrieveUserProfile(id))
                 .then(res => {
-                    this.setState({ user: res })
+                    this.setState({ user: res, error: false })
                 })
+                .catch(err => this.setState({ error: err.message }))
         } catch (err) {
-            console.log(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -70,9 +74,10 @@ class Profile extends Component {
         const { id } = this.props
         try {
             return logic.retrievePendingCollaboratorProjects(id)
-                .then(res => this.setState({ collabProjects: res, showProjects: 'collab projects' }))
+                .then(res => this.setState({ collabProjects: res, showProjects: 'collab projects', error: false }))
+                .catch(err => this.setState({ error: err.message }))
         } catch (err) {
-            console.log(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -80,9 +85,10 @@ class Profile extends Component {
         const { id } = this.props
         try {
             return logic.listOwnProjects(id)
-                .then(res => this.setState({ ownProjects: res, showProjects: 'my projects' }))
+                .then(res => this.setState({ ownProjects: res, showProjects: 'my projects', error: false }))
+                .catch(err => this.setState({ error: err.message }))
         } catch (err) {
-            console.log(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -90,9 +96,10 @@ class Profile extends Component {
         try {
 
             return logic.userUpcomingMeetings(id)
-                .then(result => this.setState({ upComingMeetings: result, showProjects: 'meetings' }))
+                .then(result => this.setState({ upComingMeetings: result, showProjects: 'meetings', error: false }))
+                .catch(err => this.setState({ error: err.message }))
         } catch (err) {
-            console.log(err)
+            this.setState({ error: err.message })
         }
     }
 
@@ -123,15 +130,18 @@ class Profile extends Component {
     }
 
     handleUpload = event => {
-        
-        return logic.addProfileImage(event.target.files[0])
-            .then(image => {
-
-                return logic.retrieveUserProfile(this.props.id)
-                    .then(res => {
-                        this.setState({ user: res })
-                    }, () => console.log('finished setstate'))
-            })
+        try {
+            return logic.addProfileImage(event.target.files[0])
+                .then(image => {
+                    return logic.retrieveUserProfile(this.props.id)
+                        .then(res => {
+                            this.setState({ user: res, error: false })
+                        })
+                })
+                .catch(err => this.setState({error: err.message}))
+        } catch(err) {
+            this.setState({error: err.message})
+        }
     }
 
     render() {
@@ -147,7 +157,7 @@ class Profile extends Component {
 
                     <section className="bio col-12">
                         <div className="bio__extra-info col-12">
-                        {user && (user.id === userId) && <Modalpage className="testt" user={user} updateProfile={this.sendProfileUpdate} />}
+                            {user && (user.id === userId) && <Modalpage className="testt" user={user} updateProfile={this.sendProfileUpdate} />}
 
                             <p className="bio-paragraph"><span>Bio</span>:{user && user.bio}</p>
                             <p><span>Github:</span> <a href="https://github.com">{user && user.githubProfile}</a></p>
@@ -157,7 +167,7 @@ class Profile extends Component {
                                     {user && user.skills.map((skill, index) => <SkillsTag searchTag={this.handleSearchTag} skill={skill} key={index} />)}
                                 </div>
                             </div>
-                           
+
                         </div>
                     </section>
 
@@ -171,7 +181,7 @@ class Profile extends Component {
                     <div className="main-area__projects">
                         {ownProjects && (showProjects === 'my projects') && (ownProjects.length ? ownProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">You don't have any projects, start one <Link to='/home'>now</Link></p>)}
 
-                        {collabProjects && (showProjects === 'collab projects') && (collabProjects.length ? collabProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />): <p className="no-projects-text">No pending collaborators</p>)}
+                        {collabProjects && (showProjects === 'collab projects') && (collabProjects.length ? collabProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">No pending collaborators</p>)}
 
                         {upComingMeetings && (showProjects === 'meetings') && (upComingMeetings.length ? upComingMeetings.map((meeting, index) => {
                             return (<div className="profile-meetup-card col-md-8" key={index}>
@@ -187,6 +197,7 @@ class Profile extends Component {
                     </div>
                 </section>
             </div>
+            {this.state.error && <Error message={this.state.error} />}
         </div>
     }
 

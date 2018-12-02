@@ -25,7 +25,7 @@ class Collapsible extends Component {
     return (
       <div>
         <div>
-          <Button color="primary" onClick={this.toggle} style={{ marginBottom: "1rem" }}>Pending COllaboration Requests</Button>
+          <Button color="primary" onClick={this.toggle} style={{ marginBottom: "1rem" }}>Pending Collaboration Requests</Button>
           <Collapse isOpen={this.state.collapse}>
             {pendingCollaborators && (pendingCollaborators.length ? pendingCollaborators.map((collaborator, index) => <PendingCollaborators clickName={this.props.clickName} key={index} pendingCollaborators={collaborator} accept={this.props.accept} reject = {this.props.reject}/>) : <p>No collaborators pending</p>)}
           </Collapse>

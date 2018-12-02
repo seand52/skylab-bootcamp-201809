@@ -11,7 +11,8 @@ class Navbarpage extends React.Component {
             home: false,
             explore: false,
             profile: false
-        }
+        },
+
 
     };
 

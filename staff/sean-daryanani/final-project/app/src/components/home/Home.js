@@ -6,6 +6,7 @@ import logic from '../../logic'
 import ProjectCard from '../project-card/ProjectCard'
 import CreateProject from '../create-project/CreateProject'
 import { withRouter, Link } from 'react-router-dom'
+import Error from '../error/Error'
 
 class Home extends Component {
     state = {
@@ -14,47 +15,69 @@ class Home extends Component {
         ownProjects: null,
         savedProjects: null,
         user: false,
+        error: false
 
     }
 
     componentDidMount() {
+        try {
+            logic.listOwnProjects()
+                .then(res => this.setState({ ownProjects: res, error: false }))
+                .catch(err => this.setState({ error: err.message }))
+        } catch (err) {
+            this.setState({ error: err.message })
+                .catch(err => this.setState({ error: err.message }))
+        }
+        try {
+            logic.retrieveUserProfile(this.props.userId)
+                .then(res => this.setState({ user: res, error: false }))
+        } catch (err) {
+            this.setState({ error: err.message })
 
-        logic.listOwnProjects()
-            .then(res => this.setState({ ownProjects: res }))
-            .then(() => logic.retrieveUserProfile(this.props.userId))
-            .then(res => this.setState({ user: res }))
+        }
     }
 
     sendToMyProjects = () => {
-        return logic.listOwnProjects()
-            .then(res => this.setState({ ownProjects: res, tabIndex: 0 }))
+        try {
+            return logic.listOwnProjects()
+                .then(res => this.setState({ ownProjects: res, tabIndex: 0, error: false }))
+                .catch(err => this.setState({ error: err.message }))
+        } catch (err) {
+            this.setState({ error: err.message })
+        }
 
     }
 
     handleTabChange = tabIndex => {
+        try {
+            switch (tabIndex) {
+                case 0:
+                    logic.listOwnProjects()
+                        .then(res => this.setState({ ownProjects: res, tabIndex, error: false }))
+                        .catch(err => this.setState({ error: err.message }))
+                    window.scrollTo(0, 0)
+                    break
+                case 1:
+                    logic.listCollaboratingProjects()
+                        .then(res => this.setState({ collabProjects: res, tabIndex, error: false }))
+                        .catch(err => this.setState({ error: err.message }))
+                    window.scrollTo(0, 0)
+                    break
+                case 2:
+                    logic.listSavedProjects()
+                        .then(res => this.setState({ savedProjects: res, tabIndex, error: false }))
+                        .catch(err => this.setState({ error: err.message }))
+                    window.scrollTo(0, 0)
+                    break
+                case 3:
+                    this.setState({ tabIndex, error: false })
+                    window.scrollTo(0, 0)
+                    break
+                default:
 
-        switch (tabIndex) {
-            case 0:
-                logic.listOwnProjects()
-                    .then(res => this.setState({ ownProjects: res, tabIndex }))
-                    window.scrollTo(0, 0)
-                break
-            case 1:
-                logic.listCollaboratingProjects()
-                    .then(res => this.setState({ collabProjects: res, tabIndex }))
-                    window.scrollTo(0, 0)
-                break
-            case 2:
-                logic.listSavedProjects()
-                    .then(res => this.setState({ savedProjects: res, tabIndex }))
-                    window.scrollTo(0, 0)
-                break
-            case 3:
-                this.setState({ tabIndex })
-                window.scrollTo(0, 0)
-                break
-            default:
-
+            }
+        } catch (err) {
+            this.setState({ error: err.message })
         }
     }
 
@@ -79,7 +102,7 @@ class Home extends Component {
 
                 <TabPanel>
                     <div className="home-myprojects-display">
-                        {ownProjects && (ownProjects.length ? ownProjects.map((project, index) => <ProjectCard  userId={this.props.userId} searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">You don't have any projects. Start searching <Link to='/explore'>now</Link></p>)}
+                        {ownProjects && (ownProjects.length ? ownProjects.map((project, index) => <ProjectCard userId={this.props.userId} searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">You don't have any projects. Start searching <Link to='/explore'>now</Link></p>)}
                     </div>
                 </TabPanel>
 
@@ -99,6 +122,7 @@ class Home extends Component {
                     <CreateProject backToMyProject={this.sendToMyProjects} />
                 </TabPanel>
             </Tabs>
+            {this.state.error && <Error message={this.state.error} />}
         </div>
     }
 

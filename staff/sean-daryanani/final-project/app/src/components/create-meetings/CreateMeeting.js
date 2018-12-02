@@ -5,13 +5,14 @@ import { Button, Input } from 'mdbreact'
 import logic from '../../logic'
 import { withRouter } from 'react-router-dom'
 import './create-meeting.css'
-
+import Error from '../error/Error'
 class CreateMeeting extends Component {
 
     state = {
         startDate: new Date(),
         description: '',
-        location: ''
+        location: '',
+        error: null,
 
     };
 
@@ -21,8 +22,9 @@ class CreateMeeting extends Component {
         try {
             return logic.addMeeting(this.props.userId, this.props.id, startDate, location, description)
                 .then(() => this.props.history.push(`/project/${this.props.id}`))
+                .catch(err => this.setState({error: err.message}))
         } catch (err) {
-            console.error(err)
+            this.setState({error: err.message})
         }
     }
 
@@ -64,6 +66,7 @@ class CreateMeeting extends Component {
                 /> <br />
                 <Button type="submit">Create Meeting</Button>
             </form>
+            {this.state.error && <Error message={this.state.error} />}
         </div >
     }
 }

@@ -7,7 +7,7 @@ import logic from '../../logic'
 import { withRouter, Link } from 'react-router-dom'
 import ProjectCard from '../project-card/ProjectCard'
 import FiltersCollapsible from '../filters-collapsible/FiltersCollapsible'
-
+import Error from '../error/Error'
 
 const skills = [
     'Java',
@@ -29,7 +29,8 @@ class Explore extends Component {
         searchResults: false,
         searchQuery: '',
         cityQuery: '',
-        recommended: ''
+        recommended: '',
+        error: false,
     }
     componentWillMount = () => {
 
@@ -38,41 +39,50 @@ class Explore extends Component {
     }
 
     componentDidMount() {
-        debugger
-        if (this.props.query !== undefined) {
-            logic.filterProjects(this.props.query)
-                .then(res => this.setState({ searchResults: res }))
-        }
-        else {
-            logic.retrieveUserProfile(this.props.userId)
-            .then(res => {
-                const skill = res.skills
-                if (skill.length) {
-                    debugger
-                    const query = `q=&f=${skill[Math.floor(Math.random() * skill.length)]}&c=`
-                    this.setState({ recommended: query })
+        try {
+            if (this.props.query !== undefined) {
+                logic.filterProjects(this.props.query)
+                    .then(res => this.setState({ searchResults: res, error: false }))
+                    .catch(err => this.setState({ error: err.message }))
+            }
+            else {
+                logic.retrieveUserProfile(this.props.userId)
+                    .then(res => {
+                        const skill = res.skills
+                        if (skill.length) {
+                            const query = `q=&f=${skill[Math.floor(Math.random() * skill.length)]}&c=`
+                            this.setState({ recommended: query, error: false })
+                        }
 
-                }
-
-                else {
-                    const query = `q=&f=&c=`
-                    this.setState({ recommended: query })
-                }
-            })
+                        else {
+                            const query = `q=&f=&c=`
+                            this.setState({ recommended: query, error: false })
+                        }
+                    })
+                    .catch(err => this.setState({ error: err.message }))
+            }
+        } catch (err) {
+            this.setState({ error: err.message })
         }
     }
 
     queryListen = (query) => {
-        this.setState({ searchQuery: query })
+        this.setState({ searchQuery: query, error: false })
     }
 
     componentWillReceiveProps(props) {
-        if (props.query !== undefined) {
-            logic.filterProjects(props.query)
-                .then(res => {
-                    this.setState({ searchResults: res })
+        try {
 
-                })
+            if (props.query !== undefined) {
+                logic.filterProjects(props.query)
+                    .then(res => {
+                        this.setState({ searchResults: res, error: false })
+
+                    })
+                    .catch(err => this.setState({ error: err.message }))
+            }
+        } catch (err) {
+            this.setState({ error: err.message })
         }
     }
 
@@ -101,15 +111,22 @@ class Explore extends Component {
     }
 
     handleAddToFavourites = (id, action) => {
-        if (action === 'add') {
-            return logic.saveProject(id, this.props.userId)
-                .then(() => logic.filterProjects(this.props.query))
-                .then(res => this.setState({ searchResults: res }))
-        }
-        else if (action === 'remove') {
-            return logic.removeSavedProject(id, this.props.userId)
-                .then(() => logic.filterProjects(this.props.query))
-                .then(res => this.setState({ searchResults: res }))
+        try {
+
+            if (action === 'add') {
+                return logic.saveProject(id, this.props.userId)
+                    .then(() => logic.filterProjects(this.props.query))
+                    .then(res => this.setState({ searchResults: res, error: false }))
+                    .catch(err => this.setState({error: err.message}))
+            }
+            else if (action === 'remove') {
+                return logic.removeSavedProject(id, this.props.userId)
+                    .then(() => logic.filterProjects(this.props.query))
+                    .then(res => this.setState({ searchResults: res, error: false }))
+                    .catch(err => this.setState({error: err.message}))
+            }
+        } catch (err) {
+            this.setState({ error: err.message })
         }
     }
 
@@ -137,13 +154,8 @@ class Explore extends Component {
 
             skillsArray.push(checkbox)
         }
-        // const search = searchQuery
 
         let query = `q=${searchQuery}&f=${skillsArray.join('+')}&c=${cityQuery}`
-
-        // if (!skillsArray.length) query = `q=${search}`
-        // else query = `q=${search}&f=${skillsArray.join('+')}`
-
 
 
         this.props.history.push(`/explore/${query}`)
@@ -152,7 +164,6 @@ class Explore extends Component {
 
 
     handleSearchTag = (query) => {
-
         const searchQuery = `q=&f=${query}`
         this.props.history.push(`/explore/${searchQuery}`)
     }
@@ -192,6 +203,7 @@ class Explore extends Component {
                     </div>
                 </div>
             </div>
+            {this.state.error && <Error message={this.state.error} />}
         </div>
 
     }

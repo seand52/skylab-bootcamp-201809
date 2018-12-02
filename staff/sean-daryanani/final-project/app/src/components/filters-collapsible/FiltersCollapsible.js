@@ -13,13 +13,6 @@ class FiltersCollapsible extends Component {
         this.setState({ collapse: !this.state.collapse });
     }
 
-    componentWillReceiveProps(props) {
-        // if (props.pendingCollabs) this.setState({pendingCollaborators: props.pendingCollabs})
-
-    }
-
-
-
     render() {
 
         return (

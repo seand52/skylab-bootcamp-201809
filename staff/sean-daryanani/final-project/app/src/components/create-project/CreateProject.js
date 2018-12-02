@@ -3,7 +3,7 @@ import { Button, Input } from 'mdbreact'
 import Checkbox from '../checkbox/Checkbox'
 import logic from '../../logic'
 import './create-project.css'
-
+import Error from '../error/Error'
 const skills = [
     'Java',
     'Javascript',
@@ -27,7 +27,8 @@ class CreateProject extends Component {
         maxMembers: '',
         error: false,
         toggleSuccess: false,
-        location: ''
+        location: '',
+
     }
 
 
@@ -48,11 +49,10 @@ class CreateProject extends Component {
             return logic.addNewProject(name, description, skillsArray, maxMembers, location)
                 .then(() => this.setState({ error: false, toggleSuccess: !this.state.toggleSuccess }))
                 .then(() => this.props.backToMyProject())
+                .catch(err => this.setState({error: err.message}))
         } catch (err) {
-            this.setState({ error: true })
+            this.setState({ error: err.message })
         }
-
-        //TODO error handling
 
     }
 
@@ -77,24 +77,25 @@ class CreateProject extends Component {
     onProjectNameChange = event => {
         const name = event.target.value
 
-        this.setState({ name })
+        this.setState({ name, error: false })
     }
 
     onProjectDescriptionChange = event => {
         const description = event.target.value
 
-        this.setState({ description })
+        this.setState({ description, error: false })
     }
 
     onMaxMembersChange = event => {
         const maxMembers = event.target.value
 
-        this.setState({ maxMembers })
+        this.setState({ maxMembers, error: false })
     }
 
     onLocationChange = event => {
+
         const location = event.target.value
-        this.setState({ location })
+        this.setState({ location, error: false })
     }
 
     renderDropDown = () => {
@@ -146,18 +147,8 @@ class CreateProject extends Component {
                     {this.state.toggleSuccess ? <p>Project added</p> : null}
 
                 </section>
-
-                {/* <aside className="rules col-4">
-                    <p><b>Remember to keep in mind the following:</b></p>
-                    <ul className="list-group">
-                        <li className="list-group-item">Arrange real, in-person sessions</li>
-                        <li className="list-group-item">Have open and honest intentions</li>
-                        <li className="list-group-item">Always be safe and respectful</li>
-                        <li className="list-group-item">Put your members first</li>
-                        <li className="list-group-item">Vestibulum at eros</li>
-                    </ul>
-                </aside> */}
             </div>
+            {this.state.error && <Error message={this.state.error} />}
         </div>
 
     }
