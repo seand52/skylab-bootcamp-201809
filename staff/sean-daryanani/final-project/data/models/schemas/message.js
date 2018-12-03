@@ -1,28 +1,28 @@
 const { Schema, SchemaTypes: { ObjectId } } = require('mongoose')
 
 const Message = new Schema({
-    sender : {
+    sender: {
         type: ObjectId,
         ref: 'User',
-        required:true
+        required: true
     },
-    receiver: {
-        type: ObjectId,
-        ref: 'User',
-        required:true
-    },
+
     text: {
         type: String,
-
+        required: true
     },
+
     sent: {
         type: Date,
-        default: Date.now()
+        default: Date.now(),
+        required: true
     },
-    conversation: {
-        type: ObjectId,
-        ref: 'Conversation',
-        required:true
+    
+    status: {
+        type: String,
+        default: 'pending',
+        enum: ['read', 'pending'],
+        required: true
     }
 })
 

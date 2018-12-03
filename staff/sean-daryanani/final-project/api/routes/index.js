@@ -440,6 +440,36 @@ router.get('/users/:id/meetings', [bearerTokenParser, jwtVerifier, jsonBodyParse
 
 })
 
+router.get('/users/:id/photo/width/:width/height/:height', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+
+    routeHandler(() => {
+
+        const { params: { id, width, height }, sub } = req
+        return logic.returnUserImage(id, width, height)
+        .then(img => res.json({
+            data: img
+        })
+        )
+    }, res)
+
+})
+
+router.get('/users/:id/projects/:projectid/photos', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+
+    routeHandler(() => {
+
+        const { params: { id, projectid, width, height }, sub } = req
+
+        return logic.returnProjectPageImages(projectid)
+        .then(img => res.json({
+            data: img
+        })
+        )
+    }, res)
+
+})
+
+
 
 
 router.get('/users/:id/projects/filter/:query', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
@@ -524,6 +554,71 @@ router.post('/users/:id/projects/:projectid/photo', [bearerTokenParser, jwtVerif
     }, res)
 })
 
+router.post('/users/:id/message', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+
+        const { sub, params: { id }, body: { receiverId, text } } = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.sendMessage(id, receiverId, text)
+            .then(() => res.json({
+                message: 'message sent'
+            }))
+
+    }, res)
+})
+
+router.get('/users/:id/message/:receiverId', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+
+        const { sub, params: { id, receiverId } } = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.listMessages(id, receiverId)
+            .then(messages => res.json({
+                data: messages
+            }))
+
+    }, res)
+
+    
+})
+
+router.get('/users/:id/chat/:receiverId', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+
+        const { sub, params: { id, receiverId } } = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.findConversation(id, receiverId)
+            .then(conversation => res.json({
+                data: conversation
+            }))
+
+    }, res)
+
+    
+})
+
+router.get('/users/:id/chats', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
+    routeHandler(() => {
+
+        const { sub, params: { id } } = req
+
+        if (id !== sub) throw Error('token sub does not match user id')
+
+        return logic.listConversations(id)
+            .then(conversations => res.json({
+                data: conversations
+            }))
+
+    }, res)
+
+    
+})
 
 
 module.exports = router

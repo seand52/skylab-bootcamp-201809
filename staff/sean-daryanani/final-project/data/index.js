@@ -10,7 +10,6 @@ module.exports = {
         User: mongoose.model('User', User),
         Project: mongoose.model('Project', Project),
         Meeting: mongoose.model('Event', Meeting),
-        Message: mongoose.model('Message', Message ),
         Conversation: mongoose.model('Conversation', Conversation)
     }
 }

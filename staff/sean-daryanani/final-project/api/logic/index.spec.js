@@ -1,4 +1,4 @@
-const { mongoose, models: { User, Project, Meeting, Message, Conversation } } = require('data')
+const { mongoose, models: { User, Project, Meeting, Conversation } } = require('data')
 const logic = require('.')
 const fs = require('fs')
 const { AlreadyExistsError, ValueError, AuthError, NotFoundError } = require('../errors')
@@ -9,7 +9,7 @@ const MONGO_URL = 'mongodb://localhost:27017/socialdev-test'
 describe('logic', () => {
     before(() => mongoose.connect(MONGO_URL, { useNewUrlParser: true, useCreateIndex: true }))
 
-    beforeEach(() => Promise.all([User.deleteMany(), Project.deleteMany(), Meeting.deleteMany()]))
+    beforeEach(() => Promise.all([User.deleteMany(), Project.deleteMany(), Meeting.deleteMany(), Conversation.deleteMany()]))
 
     describe('user', () => {
         describe('register', () => {
@@ -1679,46 +1679,9 @@ describe('logic', () => {
 
         })
 
-        describe('start a new conversation', () => {
-            let user1, user2
-
-            beforeEach(async () => {
-                user1 = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '1232' })
-
-                user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
-
-                await user1.save()
-                await user2.save()
-            })
-
-            it('should start a new conversation if none has been started', async () => {
-                const conversation = await logic.openConversation(user1.id, user2.id)
-                expect(conversation.members.some(item => item.id === user1.id.toString())).to.equal(true)
-                expect(conversation.members.some(item => item.id === user2.id.toString())).to.equal(true)
-                const conversations = await Conversation.find()
-                const [_conversation] = conversations
-                expect(_conversation.members.length).to.equal(2)
-
-            })
-
-            it('should return existing conversation if two members have chatted in the past', async () => {
-                user3 = new User({ name: 'John3', email: 'doe3@gmail.com', username: 'jd3', password: '1332' })
-
-                const conversation = new Conversation({ members: [user1.id, user2.id] })
-
-                await conversation.save()
-
-                const _conversation = await logic.openConversation(user1.id, user2.id)
-
-                expect(_conversation.id).to.equal(conversation.id.toString())
-                expect(_conversation.members.some(item => item.id === user1.id.toString())).to.equal(true)
-                expect(_conversation.members.some(item => item.id === user2.id.toString())).to.equal(true)
 
 
-            })
-        })
-
-        describe('list conversations', () => {
+        describe('send messages', () => {
             let user1, user2, conversation1, conversation2
 
             beforeEach(async () => {
@@ -1726,137 +1689,159 @@ describe('logic', () => {
 
                 user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
 
+                conversation1 = new Conversation({ members: [user1.id, user2.id], created: Date.now() })
+
+                await user1.save()
+                await user2.save()
+                await conversation1.save()
+            })
+
+            it('should send messages', async () => {
+                const text = 'hola mundo'
+
+                await logic.sendMessage(user1.id, user2.id, text)
+
+                const conversations = await Conversation.find()
+
+                const [_conversation] = conversations
+                expect(_conversation.messages[0].text).to.equal('hola mundo')
+                expect(_conversation.id).to.equal(conversation1.id)
+                expect(_conversation.members.length).to.equal(2)
+            })
+
+
+        })
+
+        describe('list messages', () => {
+            let user1, user2, user3, conversation1, message1, message2, message3
+
+            beforeEach(async () => {
+                user1 = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '1232' })
+
+                user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
+
                 user3 = new User({ name: 'John3', email: 'doe3@gmail.com', username: 'jd3', password: '1332' })
 
+                message1 = { sender: user1.id, text: 'hola mundo' }
+                message2 = { sender: user2.id, text: 'hola mundo2' }
 
-                conversation1 = new Conversation({members: [user1.id, user2.id]})
-                conversation2 = new Conversation({members: [user1.id, user3.id]})
+                conversation1 = new Conversation({ members: [user1.id, user2.id], messages: [message1, message2] })
+
+                await user1.save()
+                await user2.save()
+                await user3.save()
+                await conversation1.save()
+            })
+
+            it('should list messages', async () => {
+
+                const conversation = await logic.listMessages(user1.id, user2.id)
+
+                const [_message1, _message2] = conversation.messages
+                expect(_message1.text).to.equal('hola mundo')
+                expect(_message1.status).to.equal('read')
+                expect(_message2.text).to.equal('hola mundo2')
+                expect(_message2.status).to.equal('read')
+
+
+            })
+
+
+
+
+        })
+
+        describe('list existing conversations', () => {
+            let user1, user2, user3, conversation1, conversation2, message1, message2
+
+            beforeEach(async () => {
+                user1 = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '1232' })
+
+                user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
+
+                user3 = new User({ name: 'John3', email: 'doe3@gmail.com', username: 'jd3', password: '1332' })
+
+                message1 = { sender: user1.id, text: 'hola mundo' }
+                message2 = { sender: user2.id, text: 'hola mundo2' }
+
+                conversation1 = new Conversation({ members: [user1.id, user2.id], messages: [message1, message2] })
+                conversation2 = new Conversation({ members: [user1.id, user3.id], messages: [message1, message1] })
 
                 await user1.save()
                 await user2.save()
                 await user3.save()
                 await conversation1.save()
                 await conversation2.save()
+
             })
 
-            it('should retrieve all conversations for user1', async() => {
-              
-                const conversations = await logic.listExistingChatrooms(user1.id) 
+            it('should list conversations', async () => {
 
+                const conversations = await logic.listConversations(user1.id)
                 expect(conversations.length).to.equal(2)
-
                 const [_conversation1, _conversation2] = conversations
-
                 expect(_conversation1.id).to.equal(conversation1.id.toString())
                 expect(_conversation2.id).to.equal(conversation2.id.toString())
+                expect(_conversation1.messages.length).to.equal(2)
+                expect(_conversation2.messages.length).to.equal(2)
+
+
             })
 
-            
+
         })
 
-        describe('send messages', () => {
-            let user1, user2, conversation1, conversation2
+        describe('Find conversations', () => {
+            let user1, user2, user3, conversation1, conversation2, message1, message2
 
             beforeEach(async () => {
                 user1 = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '1232' })
 
                 user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
 
-                conversation1 = new Conversation({members: [user1.id, user2.id]})
+                user3 = new User({ name: 'John3', email: 'doe3@gmail.com', username: 'jd3', password: '1332' })
+
+                message1 = { sender: user1.id, text: 'hola mundo' }
+                message2 = { sender: user2.id, text: 'hola mundo2' }
+
+                conversation1 = new Conversation({ members: [user1.id, user2.id], messages: [message1, message2] })
+                conversation2 = new Conversation({ members: [user1.id, user3.id], messages: [message1, message1] })
 
                 await user1.save()
                 await user2.save()
+                await user3.save()
                 await conversation1.save()
+                await conversation2.save()
+
             })
 
-            it('should send messages', async() => {
-                const text = 'hola mundo'
+            it('should should find an existing conversation', async () => {
 
-                await logic.sendMessage(user1.id, user2.id, conversation1.id, text)
+                const conversation = await logic.findConversation(user1.id, user2.id)
 
-                const messages = await Message.find()
+                expect(conversation).to.equal(conversation1.id.toString())
 
-                const [_message] = messages
 
-                expect(_message.text).to.equal('hola mundo')
-
-                expect(_message.conversation.toString()).to.equal(conversation1.id.toString())
-                expect(_message.sender.toString()).to.equal(user1.id.toString())
-                expect(_message.receiver.toString()).to.equal(user2.id.toString())
-            })            
-        })
-
-        describe('send messages', () => {
-            let user1, user2, conversation1, conversation2
-
-            beforeEach(async () => {
-                user1 = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '1232' })
-
-                user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
-
-                conversation1 = new Conversation({members: [user1.id, user2.id]})
-
-                await user1.save()
-                await user2.save()
-                await conversation1.save()
             })
 
-            it('should send messages', async() => {
-                const text = 'hola mundo'
 
-                await logic.sendMessage(user1.id, user2.id, conversation1.id, text)
+            it('should should return false if no conversation is found', async () => {
 
-                const messages = await Message.find()
+                const conversation = await logic.findConversation(user3.id, user2.id)
 
-                const [_message] = messages
+                expect(conversation).to.equal(false)
 
-                expect(_message.text).to.equal('hola mundo')
 
-                expect(_message.conversation.toString()).to.equal(conversation1.id.toString())
-                expect(_message.sender.toString()).to.equal(user1.id.toString())
-                expect(_message.receiver.toString()).to.equal(user2.id.toString())
-            })            
-        })
-
-        describe('list messages', () => {
-            let user1, user2, conversation1, message1, message2, message3
-
-            beforeEach(async () => {
-                user1 = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '1232' })
-
-                user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
-
-                conversation1 = new Conversation({members: [user1.id, user2.id]})
-
-                message1 = new Message({sender: user1.id, receiver: user2.id, text: 'message number 1', conversation: conversation1.id})
-                message2 = new Message({sender: user1.id, receiver: user2.id, text: 'message number 2', conversation: conversation1.id})
-                message3 = new Message({sender: user1.id, receiver: user2.id, text: 'message number 3', conversation: conversation1.id})
-                await user1.save()
-                await user2.save()
-                await conversation1.save()
-                await message1.save()
-                await message2.save()
-                await message3.save()
             })
 
-            it('list the messages for a conversation', async() => {
-                const messages = await logic.listMessages(conversation1.id)
-                debugger
-                expect(messages.length).to.equal(3)
-                const [_message1, _message2, _message3] = messages
-                debugger
-                expect(_message1.text).to.equal('message number 1')
-                expect(_message2.text).to.equal('message number 2')
-                expect(_message3.text).to.equal('message number 3')
-                expect(_message1.id).to.equal(message1.id.toString())
-                expect(_message2.id).to.equal(message2.id.toString())
-                expect(_message3.id).to.equal(message3.id.toString())
-                
-            })            
+
         })
+
+
+
     })
 
-    afterEach(() => Promise.all([User.deleteMany(), Project.deleteMany(), Meeting.deleteMany(), Message.deleteMany(), Conversation.deleteMany()]))
+    afterEach(() => Promise.all([User.deleteMany(), Project.deleteMany(), Meeting.deleteMany(), Conversation.deleteMany()]))
 
     after(() => mongoose.disconnect())
 })
