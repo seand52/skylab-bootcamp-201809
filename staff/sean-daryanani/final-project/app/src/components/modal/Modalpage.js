@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Container, Button, Modal, ModalBody, ModalHeader, ModalFooter } from 'mdbreact'
 import './modalpage.css'
 import UpdateProfileForm from '../update-profile-form/UpdateProfileForm'
-import MeetingAttendees from '../meetingAttendees/MeetingAttendees'
+
 
 
 class Modalpage extends Component {

@@ -1,6 +1,5 @@
 import React from 'react'
 import './collabcard.css'
-import { Button } from 'mdbreact'
 const CollaboratorCard = props => {
     const { collaborator, clickName, userId, ownerId, removeCollaborator } = props
 

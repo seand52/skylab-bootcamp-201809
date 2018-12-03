@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Button, Collapse } from 'mdbreact';
-import PendingCollaborators from '../pending-collaborators/PendingCollaborators'
 import Checkbox from '../checkbox/Checkbox'
 class FiltersCollapsible extends Component {
 

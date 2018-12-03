@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Input } from 'mdbreact'
+import { Button } from 'mdbreact'
 import Checkbox from '../checkbox/Checkbox'
 import logic from '../../logic'
 import './create-project.css'

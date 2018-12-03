@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
-import Searchbar from '../searchbar/Searchbar'
 import Checkbox from '../checkbox/Checkbox'
-import { Button } from 'mdbreact'
 import './explore.css'
 import logic from '../../logic'
 import { withRouter, Link } from 'react-router-dom'

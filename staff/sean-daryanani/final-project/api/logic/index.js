@@ -1,4 +1,4 @@
-const { models: { User, Project, Meeting } } = require('data')
+const { models: { User, Project, Meeting, Conversation, Message } } = require('data')
 const { AlreadyExistsError, AuthError, NotAllowedError, NotFoundError, ValueError } = require('../errors')
 const validate = require('../utils/validate')
 const cloudinary = require('cloudinary')
@@ -666,7 +666,7 @@ const logic = {
 
             if (!project) throw new NotFoundError(`project with id ${projectId} not found`)
 
-            if (project.owner.toString()!==id) throw new Error(`not the owner of the project`)
+            if (project.owner.toString() !== id) throw new Error(`not the owner of the project`)
 
             const meeting = new Meeting({ project: project.id, date, location, attending: [user._id], description: description })
 
@@ -690,12 +690,12 @@ const logic = {
         return (async () => {
 
             const meeting = await Meeting.findById(meetingId)
-            debugger
+
             if (!meeting) throw new NotFoundError(`meeting with id ${meetingId} not found`)
 
             const project = await Project.findById(meeting.project)
 
-            if (project.owner.toString()!==userId) throw new Error('not the owner of the project')
+            if (project.owner.toString() !== userId) throw new Error('not the owner of the project')
 
             await meeting.remove()
 
@@ -959,29 +959,143 @@ const logic = {
         })()
     },
 
-    returnUserImage(id, width, height) {
-        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+    openConversation(user1Id, user2Id) {
+        if (typeof user1Id !== 'string') throw TypeError(`${user1Id} is not a string`)
+        if (typeof user2Id !== 'string') throw TypeError(`${user2Id} is not a string`)
+        if (!user1Id.trim()) throw new ValueError('user1Id is empty or blank')
+        if (!user2Id.trim()) throw new ValueError('user2Id is empty or blank')
+
         return (async () => {
-            const user = await User.findById(id)
 
-            const picture = cloudinary.url(user.profileImage, { width: width, height: height, gravity: "face", radius: "max", crop: "fill", fetch_format: "auto", type: "fetch" })
+            const user1 = await User.findById(user1Id)
+
+            const user2 = await User.findById(user2Id)
+
+            const conversation = await Conversation.find({ members: { $all: [user1.id, user2.id] } }).populate({ path: 'members', select: 'username profileImage' })
+                .lean()
+
+            if (conversation.length === 0) {
+                const newConversation = new Conversation({ members: [user1.id, user2.id] })
+
+                await newConversation.save()
+                const _conversation = await Conversation.findById(newConversation.id)
+                    .populate({ path: 'members', select: 'username profileImage' })
+                    .lean()
+
+                _conversation.id = _conversation._id.toString()
+
+                delete _conversation._id
+                delete _conversation.__v
+                _conversation.members.forEach(member => {
+                    member.id = member._id.toString()
+                    member._id && delete member._id
+                    delete member.__v
+                })
+                return _conversation
+            }
+
+            else {
+
+                conversation[0].id = conversation[0]._id.toString()
+
+                delete conversation[0]._id
+                delete conversation[0].__v
+                conversation[0].members.forEach(member => {
+                    member.id = member._id.toString()
+                    member._id && delete member._id
+                    delete member.__v
+                })
+
+                return conversation[0]
+            }
+
+        })()
+
+    },
+
+    listExistingChatrooms(userId) {
+        if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
+        if (!userId.trim()) throw new ValueError('userId is empty or blank')
+
+        return (async () => {
+            const user = await User.findById(userId)
+            const conversations = await Conversation.find({ members: { $in: [user.id] } })
+                .lean()
+                .populate({ path: 'members', select: 'username' })
+                .exec()
+
+            conversations.forEach(conversation => {
+                conversation.id = conversation._id.toString()
+                delete conversation._id
+                delete conversation.__v
+                conversation.members.forEach(member => {
+
+                    member.id = member._id && member._id.toString()
+                    delete member._id
+                    delete member.__v
+
+                })
+                return conversation
+            })
+
+            return conversations
 
 
-            return picture
         })()
     },
 
-    returnProjectPageImages(projectId) {
-        if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
+    sendMessage(senderId, receiverId, conversationId, text) {
+        if (typeof senderId !== 'string') throw TypeError(`${senderId} is not a string`)
+        if (typeof receiverId !== 'string') throw TypeError(`${receiverId} is not a string`)
+        if (typeof conversationId !== 'string') throw TypeError(`${conversationId} is not a string`)
+        if (typeof text !== 'string') throw TypeError(`${text} is not a string`)
+        if (!senderId.trim()) throw new ValueError('senderId is empty or blank')
+        if (!receiverId.trim()) throw new ValueError('receiverId is empty or blank')
+        if (!conversationId.trim()) throw new ValueError('conversationId is empty or blank')
+        if (!text.trim()) throw new ValueError('text is empty or blank')
 
         return (async () => {
-            const project = await Project.findById(projectId)
+            const sender = await User.findById(senderId)
+            const receiver = await User.findById(receiverId)
+            const conversation = await Conversation.findById(conversationId)
+            if (!sender || !receiver) throw new NotFoundError('could not find either of the users')
+            if (!conversation) throw new NotFoundError('could not find conversation')
+            const message = new Message({ sender: sender.id, receiver: receiver.id, text: text, conversation: conversationId })
 
-            const picture = cloudinary.url(project.projectImage, { width: 300, height: 300, crop: "scale", fetch_format: "auto", type: "fetch" })
+            await message.save()
 
-            return picture
+
+        })()
+    },
+
+    listMessages(conversationId) {
+        if (typeof conversationId !== 'string') throw TypeError(`${conversationId} is not a string`)
+        if (!conversationId.trim()) throw new ValueError('conversationId is empty or blank')
+
+        return (async () => {
+            const conversation = await Conversation.findById(conversationId)
+            if (!conversation) throw new NotFoundError('conversation not found')
+
+            const messages = await Message.find({ conversation: conversation.id })
+                .populate({ path: 'sender', select: 'username' })
+                .populate({ path: 'receiver', select: 'username' })
+                .sort({ date: -1 })
+                .lean()
+
+            messages.forEach(message => {
+                message._id && ( message.id =  message._id.toString())
+                message.sender._id && ( message.sender.id =  message.sender._id.toString())
+                message.receiver._id && ( message.receiver.id =  message.receiver._id.toString())
+
+                message._id && delete message._id 
+                delete message.__v
+                message.sender._id && delete message.sender._id
+                message.receiver._id && delete message.receiver._id 
+            })
+            return messages
         })()
     }
+
 
 
 }

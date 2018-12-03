@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import './profile.css'
 import logic from '../../logic'
-import { Badge } from 'mdbreact'
 import ProfileCard from '../profile-card/ProfileCard'
 import ProjectCard from '../project-card/ProjectCard'
 import Modalpage from '../modal/Modalpage'
@@ -9,9 +8,8 @@ import SkillsTag from '../skills-tag/SkillsTag'
 import { withRouter, Link } from 'react-router-dom'
 import Moment from 'react-moment'
 import Error from '../error/Error'
+import MDSpinner from "react-md-spinner"
 
-
-import Meetings from '../meetings/Meetings'
 
 class Profile extends Component {
 
@@ -22,7 +20,8 @@ class Profile extends Component {
         upComingMeetings: false,
         showProjects: 'my projects',
         image: false,
-        error: false
+        error: false,
+        loading: false
     }
 
     componentDidMount() {
@@ -131,8 +130,10 @@ class Profile extends Component {
 
     handleUpload = event => {
         try {
+            this.setState({loading: true})
             return logic.addProfileImage(event.target.files[0])
-                .then(image => {
+                .then(() => this.setState({loading: false}))
+                .then(() => {
                     return logic.retrieveUserProfile(this.props.id)
                         .then(res => {
                             this.setState({ user: res, error: false })
@@ -152,9 +153,11 @@ class Profile extends Component {
 
         return <div className="profile-page-container">
             <div className="row">
+            
                 <section className="profile-top-area col-xs-12  col-md-4">
+                <div className="spinner">{this.state.loading ? <MDSpinner /> : ''}</div>
                     <ProfileCard uploadImage={this.handleUpload} showCollabProjects={this.handleShowCollabProjects} user={user} myProjects={ownProjects} projectsStarted={this.handleshowOwnProjects} collabProjects={collabProjects} userId={userId} profileImage={image} meetings={this.handleUpComingMeetings} numberOfMeetings={upComingMeetings.length} />
-
+                   
                     <section className="bio col-12">
                         <div className="bio__extra-info col-12">
                             {user && (user.id === userId) && <Modalpage className="testt" user={user} updateProfile={this.sendProfileUpdate} />}

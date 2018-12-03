@@ -1,4 +1,4 @@
-const { mongoose, models: { User, Project, Meeting } } = require('data')
+const { mongoose, models: { User, Project, Meeting, Message, Conversation } } = require('data')
 const logic = require('.')
 const fs = require('fs')
 const { AlreadyExistsError, ValueError, AuthError, NotFoundError } = require('../errors')
@@ -1217,7 +1217,7 @@ describe('logic', () => {
         })
 
         it('should fail on empty user id', () => {
-            expect(() => logic.retrievePendingCollaboratorProjects   ('       \n').to.throw(ValueError, 'userId is empty or blank'))
+            expect(() => logic.retrievePendingCollaboratorProjects('       \n').to.throw(ValueError, 'userId is empty or blank'))
         })
 
         describe('should remove a collaborator from a project', () => {
@@ -1252,38 +1252,38 @@ describe('logic', () => {
             })
 
 
-        it('should fail on undefined user id', () => {
-            expect(() => logic.removeCollaboratorFromProject(undefined, user2.id, project.id).to.throw(TypeError, 'undefined is not a string'))
-        })
+            it('should fail on undefined user id', () => {
+                expect(() => logic.removeCollaboratorFromProject(undefined, user2.id, project.id).to.throw(TypeError, 'undefined is not a string'))
+            })
 
-        it('should fail on undefined user2 id', () => {
-            expect(() => logic.removeCollaboratorFromProject(user.id, undefined, project.id).to.throw(TypeError, 'undefined is not a string'))
-        })
-        it('should fail on undefined project id', () => {
-            expect(() => logic.removeCollaboratorFromProject(user.id, user2.id, undefined).to.throw(TypeError, 'undefined is not a string'))
-        })
+            it('should fail on undefined user2 id', () => {
+                expect(() => logic.removeCollaboratorFromProject(user.id, undefined, project.id).to.throw(TypeError, 'undefined is not a string'))
+            })
+            it('should fail on undefined project id', () => {
+                expect(() => logic.removeCollaboratorFromProject(user.id, user2.id, undefined).to.throw(TypeError, 'undefined is not a string'))
+            })
 
-        it('should fail on blank user id', () => {
-            expect(() => logic.removeCollaboratorFromProject('', user2.id, project.id).to.throw(ValueError, 'id is empty or blank'))
-        })
+            it('should fail on blank user id', () => {
+                expect(() => logic.removeCollaboratorFromProject('', user2.id, project.id).to.throw(ValueError, 'id is empty or blank'))
+            })
 
-        it('should fail on blank user2 id', () => {
-            expect(() => logic.removeCollaboratorFromProject(user.id, '', project.id).to.throw(ValueError, 'collabId is empty or blank'))
-        })
-        it('should fail on blank project id', () => {
-            expect(() => logic.removeCollaboratorFromProject(user.id, user2.id, '').to.throw(ValueError, 'projectId is empty or blank'))
-        })
+            it('should fail on blank user2 id', () => {
+                expect(() => logic.removeCollaboratorFromProject(user.id, '', project.id).to.throw(ValueError, 'collabId is empty or blank'))
+            })
+            it('should fail on blank project id', () => {
+                expect(() => logic.removeCollaboratorFromProject(user.id, user2.id, '').to.throw(ValueError, 'projectId is empty or blank'))
+            })
 
-        it('should fail on empty user id', () => {
-            expect(() => logic.removeCollaboratorFromProject('      \n', user2.id, project.id).to.throw(ValueError, 'id is empty or blank'))
-        })
+            it('should fail on empty user id', () => {
+                expect(() => logic.removeCollaboratorFromProject('      \n', user2.id, project.id).to.throw(ValueError, 'id is empty or blank'))
+            })
 
-        it('should fail on empty user2 id', () => {
-            expect(() => logic.removeCollaboratorFromProject(user.id, '    \n', project.id).to.throw(ValueError, 'collabId is empty or blank'))
-        })
-        it('should fail on empty project id', () => {
-            expect(() => logic.removeCollaboratorFromProject(user.id, user2.id, '    \n').to.throw(ValueError, 'projectId is empty or blank'))
-        })
+            it('should fail on empty user2 id', () => {
+                expect(() => logic.removeCollaboratorFromProject(user.id, '    \n', project.id).to.throw(ValueError, 'collabId is empty or blank'))
+            })
+            it('should fail on empty project id', () => {
+                expect(() => logic.removeCollaboratorFromProject(user.id, user2.id, '    \n').to.throw(ValueError, 'projectId is empty or blank'))
+            })
         })
 
     })
@@ -1329,7 +1329,7 @@ describe('logic', () => {
             it('should fail on undefined project id', () => {
                 expect(() => logic.addMeeting(user.id, undefined, date, 'barcelona', 'test description').to.throw(TypeError, 'undefined is not a string'))
             })
-    
+
             it('should fail on undefined city', () => {
                 expect(() => logic.addMeeting(user.id, project.id, date, undefined, 'test description').to.throw(TypeError, 'undefined is not a string'))
             })
@@ -1343,7 +1343,7 @@ describe('logic', () => {
             it('should fail on blank project id', () => {
                 expect(() => logic.addMeeting(user.id, '', date, 'barcelona', 'test description').to.throw(ValueError, 'projectId is empty or blank'))
             })
-        
+
             it('should fail on blank city', () => {
                 expect(() => logic.addMeeting(user.id, project.id, date, '', 'test description').to.throw(ValueError, 'city is empty or blank'))
             })
@@ -1356,14 +1356,14 @@ describe('logic', () => {
             it('should fail on empty project id', () => {
                 expect(() => logic.addMeeting(user.id, '     \n', date, 'barcelona', 'test description').to.throw(ValueError, 'projectId is empty or blank'))
             })
-        
+
             it('should fail on empty city', () => {
                 expect(() => logic.addMeeting(user.id, project.id, date, '     \n', 'test description').to.throw(ValueError, 'city is empty or blank'))
             })
             it('should fail on empty description', () => {
                 expect(() => logic.addMeeting(user.id, project.id, date, 'barcelona', '     \n').to.throw(ValueError, 'description is empty or blank'))
             })
-            
+
 
 
             it('should succeed on deleting event', async () => {
@@ -1381,7 +1381,7 @@ describe('logic', () => {
 
 
                 expect(_meeting.location).to.equal('barcelona')
-                debugger
+
                 await logic.deleteMeeting(_meeting.id, user.id)
 
                 const _meetings = await Meeting.find()
@@ -1389,7 +1389,7 @@ describe('logic', () => {
                 expect(_meetings.length).to.equal(0)
             })
 
-   
+
 
             describe('list meetings ', () => {
                 let project2, meeting1, meeting2, meeting3
@@ -1444,7 +1444,7 @@ describe('logic', () => {
                 it('should fail on blank project id', () => {
                     expect(() => logic.listProjectMeetings('        \n').to.throw(ValueError, 'projectId is empty or blank'))
                 })
-           
+
 
                 it('should retrieve information on a specific meeting', async () => {
 
@@ -1509,7 +1509,7 @@ describe('logic', () => {
                 it('should fail on undefined user id', () => {
                     expect(() => logic.attendMeeting(user2.id, undefined).to.throw(TypeError, 'undefined is not a string'))
                 })
-      
+
                 it('should fail on blank user id', () => {
                     expect(() => logic.attendMeeting('', meeting1.id).to.throw(TypeError, 'id is empty or blank'))
                 })
@@ -1558,7 +1558,7 @@ describe('logic', () => {
                 it('should fail on undefined user id', () => {
                     expect(() => logic.unAttendMeeting(user2.id, undefined).to.throw(TypeError, 'undefined is not a string'))
                 })
-      
+
                 it('should fail on blank user id', () => {
                     expect(() => logic.unAttendMeeting('', meeting1.id).to.throw(TypeError, 'id is empty or blank'))
                 })
@@ -1672,7 +1672,191 @@ describe('logic', () => {
         })
     })
 
-    afterEach(() => Promise.all([User.deleteMany(), Project.deleteMany(), Meeting.deleteMany()]))
+    describe('chat', () => {
+
+        beforeEach(async () => {
+
+
+        })
+
+        describe('start a new conversation', () => {
+            let user1, user2
+
+            beforeEach(async () => {
+                user1 = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '1232' })
+
+                user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
+
+                await user1.save()
+                await user2.save()
+            })
+
+            it('should start a new conversation if none has been started', async () => {
+                const conversation = await logic.openConversation(user1.id, user2.id)
+                expect(conversation.members.some(item => item.id === user1.id.toString())).to.equal(true)
+                expect(conversation.members.some(item => item.id === user2.id.toString())).to.equal(true)
+                const conversations = await Conversation.find()
+                const [_conversation] = conversations
+                expect(_conversation.members.length).to.equal(2)
+
+            })
+
+            it('should return existing conversation if two members have chatted in the past', async () => {
+                user3 = new User({ name: 'John3', email: 'doe3@gmail.com', username: 'jd3', password: '1332' })
+
+                const conversation = new Conversation({ members: [user1.id, user2.id] })
+
+                await conversation.save()
+
+                const _conversation = await logic.openConversation(user1.id, user2.id)
+
+                expect(_conversation.id).to.equal(conversation.id.toString())
+                expect(_conversation.members.some(item => item.id === user1.id.toString())).to.equal(true)
+                expect(_conversation.members.some(item => item.id === user2.id.toString())).to.equal(true)
+
+
+            })
+        })
+
+        describe('list conversations', () => {
+            let user1, user2, conversation1, conversation2
+
+            beforeEach(async () => {
+                user1 = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '1232' })
+
+                user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
+
+                user3 = new User({ name: 'John3', email: 'doe3@gmail.com', username: 'jd3', password: '1332' })
+
+
+                conversation1 = new Conversation({members: [user1.id, user2.id]})
+                conversation2 = new Conversation({members: [user1.id, user3.id]})
+
+                await user1.save()
+                await user2.save()
+                await user3.save()
+                await conversation1.save()
+                await conversation2.save()
+            })
+
+            it('should retrieve all conversations for user1', async() => {
+              
+                const conversations = await logic.listExistingChatrooms(user1.id) 
+
+                expect(conversations.length).to.equal(2)
+
+                const [_conversation1, _conversation2] = conversations
+
+                expect(_conversation1.id).to.equal(conversation1.id.toString())
+                expect(_conversation2.id).to.equal(conversation2.id.toString())
+            })
+
+            
+        })
+
+        describe('send messages', () => {
+            let user1, user2, conversation1, conversation2
+
+            beforeEach(async () => {
+                user1 = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '1232' })
+
+                user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
+
+                conversation1 = new Conversation({members: [user1.id, user2.id]})
+
+                await user1.save()
+                await user2.save()
+                await conversation1.save()
+            })
+
+            it('should send messages', async() => {
+                const text = 'hola mundo'
+
+                await logic.sendMessage(user1.id, user2.id, conversation1.id, text)
+
+                const messages = await Message.find()
+
+                const [_message] = messages
+
+                expect(_message.text).to.equal('hola mundo')
+
+                expect(_message.conversation.toString()).to.equal(conversation1.id.toString())
+                expect(_message.sender.toString()).to.equal(user1.id.toString())
+                expect(_message.receiver.toString()).to.equal(user2.id.toString())
+            })            
+        })
+
+        describe('send messages', () => {
+            let user1, user2, conversation1, conversation2
+
+            beforeEach(async () => {
+                user1 = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '1232' })
+
+                user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
+
+                conversation1 = new Conversation({members: [user1.id, user2.id]})
+
+                await user1.save()
+                await user2.save()
+                await conversation1.save()
+            })
+
+            it('should send messages', async() => {
+                const text = 'hola mundo'
+
+                await logic.sendMessage(user1.id, user2.id, conversation1.id, text)
+
+                const messages = await Message.find()
+
+                const [_message] = messages
+
+                expect(_message.text).to.equal('hola mundo')
+
+                expect(_message.conversation.toString()).to.equal(conversation1.id.toString())
+                expect(_message.sender.toString()).to.equal(user1.id.toString())
+                expect(_message.receiver.toString()).to.equal(user2.id.toString())
+            })            
+        })
+
+        describe('list messages', () => {
+            let user1, user2, conversation1, message1, message2, message3
+
+            beforeEach(async () => {
+                user1 = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '1232' })
+
+                user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
+
+                conversation1 = new Conversation({members: [user1.id, user2.id]})
+
+                message1 = new Message({sender: user1.id, receiver: user2.id, text: 'message number 1', conversation: conversation1.id})
+                message2 = new Message({sender: user1.id, receiver: user2.id, text: 'message number 2', conversation: conversation1.id})
+                message3 = new Message({sender: user1.id, receiver: user2.id, text: 'message number 3', conversation: conversation1.id})
+                await user1.save()
+                await user2.save()
+                await conversation1.save()
+                await message1.save()
+                await message2.save()
+                await message3.save()
+            })
+
+            it('list the messages for a conversation', async() => {
+                const messages = await logic.listMessages(conversation1.id)
+                debugger
+                expect(messages.length).to.equal(3)
+                const [_message1, _message2, _message3] = messages
+                debugger
+                expect(_message1.text).to.equal('message number 1')
+                expect(_message2.text).to.equal('message number 2')
+                expect(_message3.text).to.equal('message number 3')
+                expect(_message1.id).to.equal(message1.id.toString())
+                expect(_message2.id).to.equal(message2.id.toString())
+                expect(_message3.id).to.equal(message3.id.toString())
+                
+            })            
+        })
+    })
+
+    afterEach(() => Promise.all([User.deleteMany(), Project.deleteMany(), Meeting.deleteMany(), Message.deleteMany(), Conversation.deleteMany()]))
 
     after(() => mongoose.disconnect())
 })

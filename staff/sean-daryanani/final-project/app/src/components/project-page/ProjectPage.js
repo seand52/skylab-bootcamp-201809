@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import logic from '../../logic'
 import './projectpage.css'
-import { Badge, Button } from 'mdbreact'
-import Modalpage from '../modal/Modalpage'
+import { Button } from 'mdbreact'
 import Collapsible from '../collapse/Collapse'
 import Meetings from '../meetings/Meetings'
 import CollaboratorCard from '../collaborator-card/CollaboratorCard'
@@ -10,6 +9,8 @@ import { withRouter } from 'react-router-dom'
 import SkillsTag from '../skills-tag/SkillsTag'
 import MeetingAttendeesModal from '../meet-attendees-modal/MeetingAttendeesModal'
 import Error from '../error/Error'
+import MDSpinner from "react-md-spinner"
+
 class ProjectPage extends Component {
     state = {
         project: null,
@@ -17,7 +18,8 @@ class ProjectPage extends Component {
         user: null,
         projectImage: null,
         commonInterestToggle: false,
-        error: false
+        error: false,
+        loading: false
     }
     componentDidMount() {
         try {
@@ -242,8 +244,9 @@ class ProjectPage extends Component {
 
     uploadImage = event => {
         try {
-
+            this.setState({loading: true})
             return logic.addProjectImage(event.target.files[0], this.props.id)
+                .then(() => this.setState({loading: false}))
                 .then(() => {
                     return logic.retrieveProjectInfo(this.props.id)
                         .then(res => this.setState({ project: res, error: false }))
@@ -289,6 +292,7 @@ class ProjectPage extends Component {
             <header className="project-top-section row">
                 <div className="project-image-container col-md-3">
                     <h1 className="project-name-mobile">{project && project.name}</h1>
+                    <div className="spinner">{this.state.loading ? <MDSpinner /> : ''}</div>
                     <img src={project ? project.projectImage : null} />
                     {project && ((this.props.userId === project.owner.id)) && <form encType="multipart/form-data" onSubmit={this.uploadImage}>
                         <label className="profileImage-upload">

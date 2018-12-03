@@ -524,34 +524,6 @@ router.post('/users/:id/projects/:projectid/photo', [bearerTokenParser, jwtVerif
     }, res)
 })
 
-router.get('/users/:id/photo/width/:width/height/:height', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
-
-    routeHandler(() => {
-
-        const { params: { id, width, height }, sub } = req
-        return logic.returnUserImage(id, width, height)
-        .then(img => res.json({
-            data: img
-        })
-        )
-    }, res)
-
-})
-
-router.get('/users/:id/projects/:projectid/photos', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
-
-    routeHandler(() => {
-
-        const { params: { id, projectid, width, height }, sub } = req
-
-        return logic.returnProjectPageImages(projectid)
-        .then(img => res.json({
-            data: img
-        })
-        )
-    }, res)
-
-})
 
 
 module.exports = router
