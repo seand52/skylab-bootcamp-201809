@@ -9,6 +9,8 @@ import { withRouter, Link } from 'react-router-dom'
 import Moment from 'react-moment'
 import Error from '../error/Error'
 import MDSpinner from "react-md-spinner"
+import { Button } from 'mdbreact'
+import ChatRooms from '../chatrooms-popup/ChatRooms'
 
 
 class Profile extends Component {
@@ -21,7 +23,9 @@ class Profile extends Component {
         showProjects: 'my projects',
         image: false,
         error: false,
-        loading: false
+        loading: false,
+        chatPopup: false,
+        chatMessage: ''
     }
 
     componentDidMount() {
@@ -128,20 +132,44 @@ class Profile extends Component {
         this.props.history.push(`/explore/${searchQuery}`)
     }
 
+    handleChatStart = () => {
+        logic.findConversation(this.props.id)
+            .then(res => {
+
+                if (!res) this.setState({ chatPopup: true })
+                else this.props.history.push(`/messages/${res.id}/${this.props.id}`)
+            })
+    }
+
+    onChatMessageChange = (event) => {
+        const message = event.target.value
+        this.setState({ chatMessage: message })
+    }
+
+    handleChatSubmit = (event) => {
+        event.preventDefault()
+
+        const { state: { chatMessage }, props: { userId, id } } = this
+
+        return logic.sendMessage(userId, id, chatMessage)
+            .then(() => logic.findConversation(this.props.id))
+            .then(res => this.props.history.push(`/messages/${res.id}/${this.props.id}`))
+    }
+
     handleUpload = event => {
         try {
-            this.setState({loading: true})
+            this.setState({ loading: true })
             return logic.addProfileImage(event.target.files[0])
-                .then(() => this.setState({loading: false}))
+                .then(() => this.setState({ loading: false }))
                 .then(() => {
                     return logic.retrieveUserProfile(this.props.id)
                         .then(res => {
                             this.setState({ user: res, error: false })
                         })
                 })
-                .catch(err => this.setState({error: err.message}))
-        } catch(err) {
-            this.setState({error: err.message})
+                .catch(err => this.setState({ error: err.message }))
+        } catch (err) {
+            this.setState({ error: err.message })
         }
     }
 
@@ -153,11 +181,11 @@ class Profile extends Component {
 
         return <div className="profile-page-container">
             <div className="row">
-            
+
                 <section className="profile-top-area col-xs-12  col-md-4">
-                <div className="spinner">{this.state.loading ? <MDSpinner /> : ''}</div>
+                    <div className="spinner">{this.state.loading ? <MDSpinner /> : ''}</div>
                     <ProfileCard uploadImage={this.handleUpload} showCollabProjects={this.handleShowCollabProjects} user={user} myProjects={ownProjects} projectsStarted={this.handleshowOwnProjects} collabProjects={collabProjects} userId={userId} profileImage={image} meetings={this.handleUpComingMeetings} numberOfMeetings={upComingMeetings.length} />
-                   
+
                     <section className="bio col-12">
                         <div className="bio__extra-info col-12">
                             {user && (user.id === userId) && <Modalpage className="testt" user={user} updateProfile={this.sendProfileUpdate} />}
@@ -173,7 +201,15 @@ class Profile extends Component {
 
                         </div>
                     </section>
+                    {(id !== userId) ? <Button onClick={this.handleChatStart}> Chat with {user && user.name}</Button> : null}
+                    {this.state.chatPopup && <div>
+                        <form onSubmit={this.handleChatSubmit}>
+                            <input onChange={this.onChatMessageChange} type="textarea"></input>
+                            <button type="submit">Send</button>
+                        </form>
 
+                    </div>}
+                    {(id === userId) ? <ChatRooms /> : null}
                 </section>
 
                 <section className="main-area col-xs-12 col-md-7">

@@ -13,6 +13,7 @@ import ProjectPage from './components/project-page/ProjectPage'
 import CreateMeeting from './components/create-meetings/CreateMeeting'
 import Navbarpage from './components/navbar/Navbar'
 import Footer from './components/footer/Footer'
+import ChatPage from './components/chatpage/ChatPage'
 
 
 logic.url = 'http://localhost:5000/api'
@@ -106,6 +107,10 @@ class App extends Component {
           <Route path="/profile/:id" render={props => logic.loggedIn ? <Profile userId={userId} {...props} id={props.match.params.id} /> : <Redirect to="/" />} />
 
           <Route path="/create-event/:id" render={props => logic.loggedIn ? <CreateMeeting userId={userId} id={props.match.params.id} /> : <Redirect to="/" />} />
+
+          <Route path="/messages/:id/:receiverid" render={props => logic.loggedIn ? <ChatPage userId={userId} receiverId={props.match.params.receiverid} id={props.match.params.id} /> : <Redirect to="/" />} />
+
+
         </Switch>
         <Route path="/" render={() => <Footer />} />
 

@@ -996,6 +996,7 @@ const logic = {
                 text: text,
                 sender: senderId
             }]
+
             const sender = await User.findById(senderId)
             const receiver = await User.findById(receiverId)
             if (!sender || !receiver) throw new NotFoundError('could not find either of the users')
@@ -1008,6 +1009,7 @@ const logic = {
 
 
             } else {
+
                 const res = new Conversation({ members: [sender.id, receiver.id], messages })
 
                 res.save()
@@ -1026,6 +1028,8 @@ const logic = {
             const conversation = await Conversation.findOne({ members: { $all: [user1.id, user2.id] } })
                 .populate({ path: 'messages.sender', select: 'username' }).lean()
 
+            const test = conversation._id
+
             if (!conversation) throw new NotFoundError('could not find conversation')
 
             conversation.id = conversation._id.toString()
@@ -1042,8 +1046,17 @@ const logic = {
                 message.sender.__v && delete message.sender.__v
             })
 
-            await Conversation.updateOne({ _id: conversation.id }, { $set: { messages: { status: 'read' } } })
-    
+
+            await Conversation.updateOne(
+                {
+                    members: { $all: [user1.id, user2.id] },
+                    messages: { $elemMatch: { status: 'pending' } }
+                },
+                { $set: { "messages.$.status": 'read' } }
+            )
+
+            // const testconvo = await Conversation.findOne({ members: { $all: [user1.id, user2.id] } })
+            // debugger
             return conversation.messages
 
         })()
@@ -1059,7 +1072,7 @@ const logic = {
         return (async () => {
             const user1 = await User.findById(user1Id)
             const user2 = await User.findById(user2Id)
-            const conversation = await Conversation.findOne({ members: { $all: [user1.id, user2.id] } }).populate({ path: 'members', select: 'username' }).lean()
+            const conversation = await Conversation.findOne({ members: { $all: [user1.id, user2.id] } }).populate({ path: 'members', select: 'username profileImage' }).lean()
             if (conversation) {
                 conversation.id = conversation._id.toString()
                 delete conversation._id
@@ -1088,12 +1101,17 @@ const logic = {
 
             if (!user) throw new NotFoundError(`could not find user with id ${userId}`)
 
-            const conversations = await Conversation.find({ members: user.id }).lean()
+            const conversations = await Conversation.find({ members: user.id }).populate({ path: 'members', select: 'username profileImage' }).lean()
 
             conversations.forEach(conversation => {
                 conversation._id && (conversation.id = conversation._id.toString())
                 conversation._id && delete conversation._id
                 delete conversation.__v
+                conversation.members.forEach(member => {
+                    member._id && (member.id = member._id.toString())
+                    member._id && delete member._id
+                    member.__v && delete member.__v
+                })
 
                 conversation.messages.forEach(message => {
                     message._id && (message.id = message._id.toString())

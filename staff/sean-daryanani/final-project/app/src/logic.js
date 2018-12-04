@@ -286,9 +286,9 @@ const logic = {
         })
             .then(res => res.json())
             .then(res => {
-debugger
+                debugger
                 if (res.error) throw Error(res.error)
-                
+
             })
     },
 
@@ -451,7 +451,7 @@ debugger
      * Removes a collaborator from a project
      * @param {*} collaboratorId 
      * @param {*} projectId 
-     */    
+     */
     removeCollaborator(collaboratorId, projectId) {
         if (typeof collaboratorId !== 'string') throw TypeError(`${collaboratorId} is not a string`)
         if (!collaboratorId.trim()) throw Error('collaboratid is empty or blank')
@@ -695,7 +695,7 @@ debugger
         if (!location.trim()) throw Error('location is empty or blank')
         if (!description.trim()) throw Error('description is empty or blank')
 
-        if(new Date() > startDate ) throw Error ('cannot create a meeting in the past')
+        if (new Date() > startDate) throw Error('cannot create a meeting in the past')
 
 
         return fetch(`${this.url}/users/${this._userId}/projects/${projectId}/meetings`, {
@@ -722,7 +722,7 @@ debugger
      */
     addProfileImage(file) {
         let avatar = new FormData()
-        
+
         avatar.append('avatar', file)
         debugger
         return fetch(`${this.url}/users/${this._userId}/photo`, {
@@ -735,7 +735,7 @@ debugger
             .then(res => res.json())
             .then(res => {
                 debugger
-               })
+            })
     },
 
     /**
@@ -759,7 +759,8 @@ debugger
             .then(res => {
                 console.log('got image')
 
-                return res.data})
+                return res.data
+            })
     },
 
     retrieveProfileImage(id, width, height) {
@@ -797,9 +798,88 @@ debugger
 
                 return res.data
             })
+    },
+
+    findConversation(receiverId) {
+        if (typeof receiverId !== 'string') throw TypeError(`${receiverId} is not a string`)
+        if (!receiverId.trim()) throw Error('receiverId is empty or blank')
+        return fetch(`${this.url}/users/${this._userId}/chat/${receiverId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+
+                return res.data
+            })
+
+    },
+
+    sendMessage(senderId, receiverId, text) {
+        if (typeof senderId !== 'string') throw TypeError(`${senderId} is not a string`)
+        if (!senderId.trim()) throw Error('senderId is empty or blank')
+        if (typeof receiverId !== 'string') throw TypeError(`${receiverId} is not a string`)
+        if (!receiverId.trim()) throw Error('receiverId is empty or blank')
+        if (typeof text !== 'string') throw TypeError(`${text} is not a string`)
+        if (!text.trim()) throw Error('text is empty or blank')
+
+        return fetch(`${this.url}/users/${this._userId}/message`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Bearer ${this._token}`
+
+            },
+            body: JSON.stringify({ receiverId, text })
+        })
+            .then(res => res.json())
+            .then(res => {
+
+                if (res.error) throw Error(res.error)
+            })
+    },
+
+    listMessages(user2Id) {
+        if (typeof user2Id !== 'string') throw TypeError(`${user2Id} is not a string`)
+        if (!user2Id.trim()) throw Error('user2Id is empty or blank')
+
+        return fetch(`${this.url}/users/${this._userId}/message/${user2Id}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+
+                return res.data
+            })
+    },
+
+    listConversations() {
+
+        return fetch(`${this.url}/users/${this._userId}/chats`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this._token}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) throw Error(res.error)
+                const output = res.data.map(item => {
+                    const arr = item.members.filter(item => item.id !== this._userId)
+                    arr.push({ conversationId: item.id })
+                    return arr
+                })
+                debugger
+                return output
+            })
     }
-
-
 }
 
 // export default logic

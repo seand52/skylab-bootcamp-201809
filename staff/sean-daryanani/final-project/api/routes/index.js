@@ -560,7 +560,7 @@ router.post('/users/:id/message', [bearerTokenParser, jwtVerifier, jsonBodyParse
         const { sub, params: { id }, body: { receiverId, text } } = req
 
         if (id !== sub) throw Error('token sub does not match user id')
-
+        debugger
         return logic.sendMessage(id, receiverId, text)
             .then(() => res.json({
                 message: 'message sent'
