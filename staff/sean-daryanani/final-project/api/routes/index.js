@@ -571,7 +571,7 @@ router.post('/users/:id/message', [bearerTokenParser, jwtVerifier, jsonBodyParse
 
 router.get('/users/:id/message/:receiverId', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
-
+        debugger
         const { sub, params: { id, receiverId } } = req
 
         if (id !== sub) throw Error('token sub does not match user id')

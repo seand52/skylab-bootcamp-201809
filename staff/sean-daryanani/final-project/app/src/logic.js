@@ -286,7 +286,7 @@ const logic = {
         })
             .then(res => res.json())
             .then(res => {
-                debugger
+
                 if (res.error) throw Error(res.error)
 
             })
@@ -724,7 +724,7 @@ const logic = {
         let avatar = new FormData()
 
         avatar.append('avatar', file)
-        debugger
+
         return fetch(`${this.url}/users/${this._userId}/photo`, {
             method: 'POST',
             headers: {
@@ -734,7 +734,7 @@ const logic = {
         })
             .then(res => res.json())
             .then(res => {
-                debugger
+
             })
     },
 
@@ -873,10 +873,11 @@ const logic = {
                 if (res.error) throw Error(res.error)
                 const output = res.data.map(item => {
                     const arr = item.members.filter(item => item.id !== this._userId)
-                    arr.push({ conversationId: item.id })
+                    arr.push({ conversationId: item.id, pendingMessages: item.pendingMessages })
+
                     return arr
                 })
-                debugger
+
                 return output
             })
     }

@@ -1019,45 +1019,50 @@ const logic = {
 
     listMessages(user1Id, user2Id) {
 
-
+        //userId sender
+        //user2id receiver  
         return (async () => {
             const user1 = await User.findById(user1Id)
 
-            const user2 = await User.findById(user2Id)
-
+            const user2 = await User.findById(user2Id).select({ "username": 1, "profileImage": 1 }).lean();
+            user2._id && (user2.id = user2._id.toString())
+            user2._id && delete user2._id
+            delete user2.__v
             const conversation = await Conversation.findOne({ members: { $all: [user1.id, user2.id] } })
-                .populate({ path: 'messages.sender', select: 'username' }).lean()
-
-            const test = conversation._id
 
             if (!conversation) throw new NotFoundError('could not find conversation')
 
-            conversation.id = conversation._id.toString()
-            delete conversation._id
-            delete conversation.__v
+            const message = conversation.messages[conversation.messages.length - 1]
 
-            conversation.messages.forEach(message => {
+            if (message.sender.toString() !== user1Id) {
+                for (let i = conversation.messages.length - 1; i >= 0; i--) {
+
+                    const message = conversation.messages[i]
+
+                    if (message.sender.toString() !== user1Id && message.status === 'pending')
+                        message.status = 'read'
+                    else break
+                }
+
+                await conversation.save()
+            }
+
+            const newConversation = await Conversation.findOne({ members: { $all: [user1.id, user2.id] } }).lean()
+
+            newConversation.messages.forEach(message => {
                 message._id && (message.id = message._id.toString())
                 message._id && delete message._id
                 message.__v && delete message.__v
-                message.status = 'read'
-                message.sender._id && (message.sender.id = message.sender._id.toString())
-                message.sender._id && delete message.sender._id
-                message.sender.__v && delete message.sender.__v
+
+
             })
 
+            // TODO user2
 
-            await Conversation.updateOne(
-                {
-                    members: { $all: [user1.id, user2.id] },
-                    messages: { $elemMatch: { status: 'pending' } }
-                },
-                { $set: { "messages.$.status": 'read' } }
-            )
 
-            // const testconvo = await Conversation.findOne({ members: { $all: [user1.id, user2.id] } })
-            // debugger
-            return conversation.messages
+            const output = { messages: newConversation.messages, receiver: user2 }
+
+            return output
 
         })()
     },
@@ -1102,7 +1107,7 @@ const logic = {
             if (!user) throw new NotFoundError(`could not find user with id ${userId}`)
 
             const conversations = await Conversation.find({ members: user.id }).populate({ path: 'members', select: 'username profileImage' }).lean()
-
+            debugger
             conversations.forEach(conversation => {
                 conversation._id && (conversation.id = conversation._id.toString())
                 conversation._id && delete conversation._id
@@ -1118,9 +1123,25 @@ const logic = {
                     message._id && delete message._id
                     message.__v && delete message.__v
                 })
+
                 return conversation
+
             })
 
+            for (var i = 0; i < conversations.length; i++) {
+                conversations[i].pendingMessages = 0
+
+                for (var j = 0; j < conversations[i].messages.length; j++) {
+
+                    if (conversations[i].messages[j].status === 'pending' && conversations[i].messages[j].sender.toString()!==userId ) {
+
+
+                        conversations[i].pendingMessages++
+                    }
+                }
+            }
+
+            debugger
             return conversations
         })()
     }

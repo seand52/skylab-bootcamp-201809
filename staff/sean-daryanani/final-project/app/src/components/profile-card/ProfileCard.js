@@ -4,7 +4,7 @@ import { Badge } from 'mdbreact'
 import Moment from 'react-moment'
 
 const ProfileCard = props => {
-    const { user, myProjects, collabProjects, showCollabProjects, projectsStarted, uploadImage, userId, profileImage, meetings, numberOfMeetings } = props
+    const { user, myProjects, collabProjects, showCollabProjects, projectsStarted, uploadImage, userId, profileImage, meetings, numberOfMeetings, chats, totalPending } = props
 
     if (user) {
         const { name, joinDate, city, githubProfile, skills } = user
@@ -39,9 +39,12 @@ const ProfileCard = props => {
                     {(userId === user.id) && <button onClick={showCollabProjects} type="button" className="profile-card-button" >
                         Projects with pending Collaborators <br /> <Badge color="light-blue" pill >{collabProjects ? collabProjects.length : 0}</Badge>
                     </button>}
-                    <button onClick={() => meetings(user.id)} type="button" className="profile-card-button" id="last-button" >
+                    <button onClick={() => meetings(user.id)} type="button" className="profile-card-button"  >
                         Upcoming Meetings <br /> <Badge color="light-blue" pill >{numberOfMeetings ? numberOfMeetings : 0}</Badge>
                     </button>
+                    {(userId === user.id) && <button onClick={chats} type="button" className="profile-card-button" id="last-button" >
+                        Chats <br /> <Badge color="light-blue" pill >{totalPending ? totalPending : 0}</Badge>
+                    </button>}
 
                 </div>
             </div>

@@ -24,6 +24,7 @@ const Message = new Schema({
         enum: ['read', 'pending'],
         required: true
     }
+
 })
 
 module.exports = Message

@@ -6,7 +6,8 @@ import './chatroom.css'
 class ChatRooms extends Component {
     state = {
         modal: false,
-        conversations: false
+        conversations: false,
+        totalPending: 0,
     }
 
     toggle = () => {
@@ -18,29 +19,32 @@ class ChatRooms extends Component {
     }
 
     componentDidMount() {
-        debugger
+
         return logic.listConversations()
             .then(res => {
                 debugger
-                this.setState({ conversations: res })
+                let total = 0
+                res.forEach(item => total = item[1].pendingMessages + total )
+                this.setState({ conversations: res, totalPending: total  })
             })
     }
 
 
     render() {
 
-        const { state: { modal, conversations }, props: { meetingId }, toggle } = this
+        const { state: { modal, conversations, totalPending }, props: { meetingId }, toggle } = this
 
         return (
             <Container>
-                <Button color="blue" onClick={toggle}>View Active Chats</Button>
+                <Button color="blue" onClick={toggle}>View Chats ({totalPending}) </Button>
                 <Modal isOpen={modal} toggle={toggle}>
                     <ModalHeader toggle={toggle}>Active chats</ModalHeader>
                     <ModalBody>
-                        {conversations && conversations.map(conversation => {
-                            return <div className="conversation-card">
+                        {conversations && conversations.map((conversation, index) => {
+                            return <div key={index} className="conversation-card">
                                 <img src={conversation[0].profileImage} />
-                                <Link to={`/messages/${conversation[1].conversationId}/${conversation[0].id}`}><p>{conversation[0].username}</p></Link>
+                                <Link to={`/messages/${conversation[1].conversationId}/${conversation[0].id}`}>{conversation[0].username}</Link>
+                                <span className="badge badge-primary">{conversation[1].pendingMessages}</span>
                             </div>
                         })}
                     </ModalBody>

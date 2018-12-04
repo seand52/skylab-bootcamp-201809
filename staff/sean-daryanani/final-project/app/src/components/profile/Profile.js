@@ -25,16 +25,20 @@ class Profile extends Component {
         error: false,
         loading: false,
         chatPopup: false,
-        chatMessage: ''
+        chatMessage: '',
+        conversations: false,
+        totalPending: 0
     }
 
     componentDidMount() {
         const { id } = this.props
         try {
 
-            Promise.all([logic.retrieveUserProfile(id), logic.retrievePendingCollaboratorProjects(id), logic.listOwnProjects(id), logic.retrieveProfileImage(id), logic.userUpcomingMeetings(id)])
+            Promise.all([logic.retrieveUserProfile(id), logic.retrievePendingCollaboratorProjects(id), logic.listOwnProjects(id), logic.retrieveProfileImage(id), logic.userUpcomingMeetings(id), logic.listConversations()])
                 .then(res => {
-                    this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2], image: res[3], upComingMeetings: res[4], error: false })
+                    let total = 0
+                    res[5].forEach(item => total = item[1].pendingMessages + total)
+                    this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2], image: res[3], upComingMeetings: res[4], conversations: res[5], totalPending: total, error: false })
                 })
                 .catch(err => this.setState({ error: err.message }))
         } catch (err) {
@@ -47,9 +51,11 @@ class Profile extends Component {
         const { id } = props
         try {
 
-            Promise.all([logic.retrieveUserProfile(id), logic.retrievePendingCollaboratorProjects(id), logic.listOwnProjects(id)])
+            Promise.all([logic.retrieveUserProfile(id), logic.retrievePendingCollaboratorProjects(id), logic.listOwnProjects(id), logic.retrieveProfileImage(id), logic.userUpcomingMeetings(id), logic.listConversations()])
                 .then(res => {
-                    this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2], error: false })
+                    let total = 0
+                    res[5].forEach(item => total = item[1].pendingMessages + total)
+                    this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2], image: res[3], upComingMeetings: res[4], conversations: res[5], totalPending: total, error: false })
                 })
                 .catch(err => this.setState({ error: err.message }))
         } catch (err) {
@@ -106,6 +112,11 @@ class Profile extends Component {
         }
     }
 
+    handleShowChats = () => {
+        console.log('hi')
+        this.setState({ showProjects: 'chats' })
+    }
+
     renderTitle = () => {
 
         const { user, showProjects } = this.state
@@ -116,8 +127,11 @@ class Profile extends Component {
             }
             else if (showProjects === 'collab projects') {
                 return <h1>Projects with pending collaborators</h1>
-            } else {
+            }
+            else if (showProjects === 'meetings') {
                 return <h1>Upcoming Meetings</h1>
+            } else {
+                return <h1>Chats</h1>
             }
         }
     }
@@ -176,7 +190,7 @@ class Profile extends Component {
     render() {
 
 
-        const { state: { user, ownProjects, collabProjects, showProjects, image, upComingMeetings }, props: { id, userId } } = this
+        const { state: { user, ownProjects, collabProjects, showProjects, image, upComingMeetings, conversations, totalPending }, props: { id, userId } } = this
 
 
         return <div className="profile-page-container">
@@ -184,7 +198,7 @@ class Profile extends Component {
 
                 <section className="profile-top-area col-xs-12  col-md-4">
                     <div className="spinner">{this.state.loading ? <MDSpinner /> : ''}</div>
-                    <ProfileCard uploadImage={this.handleUpload} showCollabProjects={this.handleShowCollabProjects} user={user} myProjects={ownProjects} projectsStarted={this.handleshowOwnProjects} collabProjects={collabProjects} userId={userId} profileImage={image} meetings={this.handleUpComingMeetings} numberOfMeetings={upComingMeetings.length} />
+                    <ProfileCard uploadImage={this.handleUpload} showCollabProjects={this.handleShowCollabProjects} user={user} myProjects={ownProjects} projectsStarted={this.handleshowOwnProjects} collabProjects={collabProjects} userId={userId} profileImage={image} meetings={this.handleUpComingMeetings} numberOfMeetings={upComingMeetings.length} chats={this.handleShowChats} totalPending={totalPending} />
 
                     <section className="bio col-12">
                         <div className="bio__extra-info col-12">
@@ -201,15 +215,15 @@ class Profile extends Component {
 
                         </div>
                     </section>
-                    {(id !== userId) ? <Button onClick={this.handleChatStart}> Chat with {user && user.name}</Button> : null}
+                    {(id !== userId) ? <Button color="primary" onClick={this.handleChatStart}> Chat with {user && user.name}</Button> : null}
                     {this.state.chatPopup && <div>
+                        <p>This is your first message with {user && user.name}, make it count!</p>
                         <form onSubmit={this.handleChatSubmit}>
-                            <input onChange={this.onChatMessageChange} type="textarea"></input>
-                            <button type="submit">Send</button>
+                            <textarea onChange={this.onChatMessageChange} className="form-control" rows="5" id="comment"></textarea>
+                            <button className="chat-send-button-profile" type="submit">Send</button>
                         </form>
 
                     </div>}
-                    {(id === userId) ? <ChatRooms /> : null}
                 </section>
 
                 <section className="main-area col-xs-12 col-md-7">
@@ -232,6 +246,18 @@ class Profile extends Component {
 
                             </div>)
                         }) : <p className="no-projects-text">No upcoming meetings</p>)}
+
+                        {conversations && (showProjects === 'chats') && (conversations.length ? conversations.map((conversation, index) => {
+                            return <div key={index} className="conversation-card">
+                                <div className="conversation-card-image ">
+                                    <img src={conversation[0].profileImage} />
+                                </div>
+                                <div className="conversation-card-username ">
+                                    <Link to={`/messages/${conversation[1].conversationId}/${conversation[0].id}`}>{conversation[0].username}</Link>
+                                    <span className="badge badge-primary">{conversation[1].pendingMessages}</span>
+                                </div>
+                            </div>
+                        }) : <p className="no-projects-text">You don't have any active chats</p>)}
 
                     </div>
                 </section>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Navbar, NavbarBrand, NavbarNav, NavItem, NavbarToggler, Collapse } from "mdbreact";
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import logic from '../../logic'
 import './navbar.css'
 
@@ -10,7 +10,8 @@ class Navbarpage extends React.Component {
         selected: {
             home: false,
             explore: false,
-            profile: false
+            profile: false,
+
         },
 
 
@@ -20,18 +21,18 @@ class Navbarpage extends React.Component {
     onLogoClick = () => this.props.history.push('/home')
 
     onHomeClick = () => {
-        if (this.state.isOpen) this.setState({ isOpen: !this.state.isOpen}, () => this.props.history.push('/home'))
+        if (this.state.isOpen) this.setState({ isOpen: !this.state.isOpen }, () => this.props.history.push('/home'))
         else this.props.history.push('/home')
     }
 
     onExploreClick = () => {
-        if (this.state.isOpen) this.setState({ isOpen: !this.state.isOpen}, () => this.props.history.push('/explore'))
+        if (this.state.isOpen) this.setState({ isOpen: !this.state.isOpen }, () => this.props.history.push('/explore'))
         else this.props.history.push('/explore')
     }
 
 
     onProfileClick = () => {
-        if (this.state.isOpen) this.setState({ isOpen: !this.state.isOpen}, () => this.props.history.push(`/profile/${this.props.userId}`))
+        if (this.state.isOpen) this.setState({ isOpen: !this.state.isOpen }, () => this.props.history.push(`/profile/${this.props.userId}`))
         else this.props.history.push(`/profile/${this.props.userId}`)
 
     }
@@ -42,15 +43,16 @@ class Navbarpage extends React.Component {
         this.props.history.push('/')
     }
 
-    // componentDidMount() {
-    //     const newSelected = {
-    //         home: true,
-    //         explore: false,
-    //         profile: false
-    //     }
-    //     this.setState({selected: newSelected})
+    componentDidMount() {
+        return logic.listConversations()
+            .then(res => {
+                debugger
+                let total = 0
+                res.forEach(item => total = item[1].pendingMessages + total)
+                this.setState({ sendToConversation: res, pendingMessages: total })
+            })
 
-    // }
+    }
 
     componentWillReceiveProps(props) {
 
@@ -86,12 +88,17 @@ class Navbarpage extends React.Component {
             }
             this.setState({ selected: newSelected })
         }
+
+
     }
+
+
 
     toggleCollapse = () => this.setState({ isOpen: !this.state.isOpen })
 
     render() {
-        const { selected, isOpen } = this.state
+        const { selected, isOpen, pendingMessages, sendToConversation } = this.state
+
         return (
 
             <Navbar color="indigo" dark expand="md">
@@ -116,9 +123,10 @@ class Navbarpage extends React.Component {
                         <NavItem >
                             <button onClick={this.onProfileClick} className={selected.profile ? 'navbar__button-selected' : 'navbar__button'} type="button">Profile</button>
                         </NavItem>
-                        {/* <NavItem >
-                            <p>{this.state.pendingCollaborators && this.state.pendingCollaborators}</p>
-                        </NavItem> */}
+                        <NavItem >
+                            {/* {sendToConversation ? <Link to={`/messages/${sendToConversation[1].conversationId}/${sendToConversation[0].id}`}><button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i><span class="badge badge-danger">{pendingMessages}</span></div></button></Link> : <button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i><span class="badge badge-danger">{pendingMessages}</span></div></button> } */}
+                            <button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i><span class="badge badge-danger">{pendingMessages}</span></div></button>
+                        </NavItem>
                         <NavItem >
                             <button onClick={this.handleLogout} className="navbar__button" type="button">Logout</button>
                         </NavItem>

@@ -21,7 +21,8 @@ logic.url = 'http://localhost:5000/api'
 class App extends Component {
   state = {
     error: null,
-    userId: null
+    userId: null, 
+    pendingNotifications: 0,
   }
 
   componentDidMount = () => {
@@ -83,11 +84,15 @@ class App extends Component {
     }
   }
 
+  handlePendingNotifications = (total) => {
+    this.setState({pendingNotifications: total})
+  }
+
   render() {
-    const { error, userId } = this.state
+    const { error, userId, pendingNotifications } = this.state
     return (
       <div className="App">
-      {logic.loggedIn && <Navbarpage userId={userId} />}
+      {logic.loggedIn && <Navbarpage  userId={userId} />}
 
         <Switch>
           <Route exact path="/" render={() => !logic.loggedIn ? <Landing onRegisterClick={this.handleRegisterClick} onLoginClick={this.handleLoginClick} /> : <Redirect to="/home" />} />
@@ -108,7 +113,7 @@ class App extends Component {
 
           <Route path="/create-event/:id" render={props => logic.loggedIn ? <CreateMeeting userId={userId} id={props.match.params.id} /> : <Redirect to="/" />} />
 
-          <Route path="/messages/:id/:receiverid" render={props => logic.loggedIn ? <ChatPage userId={userId} receiverId={props.match.params.receiverid} id={props.match.params.id} /> : <Redirect to="/" />} />
+          <Route path="/messages/:id/:receiverid" render={props => logic.loggedIn ? <ChatPage  userId={userId} receiverId={props.match.params.receiverid} id={props.match.params.id} /> : <Redirect to="/" />} />
 
 
         </Switch>

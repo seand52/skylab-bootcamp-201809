@@ -1713,7 +1713,7 @@ describe('logic', () => {
         })
 
         describe('list messages', () => {
-            let user1, user2, user3, conversation1, message1, message2, message3
+            let user1, user2, user3, conversation1, message1, message2
 
             beforeEach(async () => {
                 user1 = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '1232' })
@@ -1722,26 +1722,41 @@ describe('logic', () => {
 
                 user3 = new User({ name: 'John3', email: 'doe3@gmail.com', username: 'jd3', password: '1332' })
 
-                message1 = { sender: user1.id, text: 'hola mundo' }
-                message2 = { sender: user2.id, text: 'hola mundo2' }
-
-                conversation1 = new Conversation({ members: [user1.id, user2.id], messages: [message1, message2] })
-
                 await user1.save()
                 await user2.save()
                 await user3.save()
-                await conversation1.save()
+
             })
 
             it('should list messages', async () => {
+                await logic.sendMessage(user1.id, user2.id, 'hola mundo soy user1')
+                await logic.sendMessage(user1.id, user2.id, 'hola mundo soy user1 message2')
+                await logic.sendMessage(user1.id, user2.id, 'hola mundo soy user1 message3')
 
-                const conversation = await logic.listMessages(user1.id, user2.id)
+                const messages1 = await logic.listMessages(user1.id, user2.id)
 
-                const [_message1, _message2] = conversation.messages
-                expect(_message1.text).to.equal('hola mundo')
-                expect(_message1.status).to.equal('read')
-                expect(_message2.text).to.equal('hola mundo2')
-                expect(_message2.status).to.equal('read')
+                expect(messages1.messages[0].status).to.equal('pending')
+                expect(messages1.messages[1].status).to.equal('pending')
+                expect(messages1.messages[2].status).to.equal('pending')
+
+                const messages2= await logic.listMessages(user2.id, user2.id)
+                expect(messages2.messages[0].status).to.equal('read')
+                expect(messages2.messages[1].status).to.equal('read')
+                expect(messages2.messages[2].status).to.equal('read')
+
+                await logic.sendMessage(user2.id, user1.id, 'hola mundo soy user2')
+                await logic.sendMessage(user2.id, user1.id, 'hola mundo soy user2 message 2')
+
+                const messages3 = await logic.listMessages(user2.id, user1.id)
+                expect(messages3.messages[3].status).to.equal('pending')
+                expect(messages3.messages[4].status).to.equal('pending')
+
+
+                const messages4 = await logic.listMessages(user1.id, user2.id)
+                
+                expect(messages4.messages[3].status).to.equal('read')
+                expect(messages4.messages[4].status).to.equal('read')
+
 
 
             })
@@ -1819,7 +1834,7 @@ describe('logic', () => {
 
                 const conversation = await logic.findConversation(user1.id, user2.id)
 
-                expect(conversation).to.equal(conversation1.id.toString())
+                expect(conversation.id).to.equal(conversation1.id.toString())
 
 
             })
