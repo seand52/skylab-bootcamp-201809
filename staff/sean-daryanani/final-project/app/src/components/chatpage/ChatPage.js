@@ -3,6 +3,8 @@ import * as ReactDOM from 'react-dom';
 import './chatpage.css'
 import logic from '../../logic'
 import { withRouter, Link } from 'react-router-dom'
+import Moment from 'react-moment'
+import Error from '../error/Error'
 class ChatPage extends Component {
 
     state = {
@@ -11,34 +13,43 @@ class ChatPage extends Component {
         messages: false,
         conversations: false,
         totalPendingMessages: 0,
-        receiverImage: ''
+        receiverImage: '',
+        error: null
 
     }
 
     componentDidMount() {
+        try {
+            if (this.props.id && this.props.receiverId) {
+                logic.findConversation(this.props.receiverId)
+                    .then(res => {
+                        const receiver = res.members.find(item => item.id !== this.props.userId)
+                        this.setState({ receiverName: receiver.username, receiverImage: receiver.profileImage, error: null })
+                    })
+                    .then(() => logic.listMessages(this.props.receiverId))
+                    .then(res => {
+                        this.setState({ messages: [...res.messages], error: null }, () => this.scrollToBottom())
+                    })
+                    .catch(err => this.setState({ error: err.message }))
+            }
+        } catch (err) {
+            this.setState({ error: err.message })
+        }
 
-        if (this.props.id && this.props.receiverId) {
-            logic.findConversation(this.props.receiverId)
-                .then(res => {
-
-                    const receiver = res.members.find(item => item.id !== this.props.userId)
-                    this.setState({ receiverName: receiver.username, receiverImage: receiver.profileImage })
-                })
-                .then(() => logic.listMessages(this.props.receiverId))
-                .then(res => {
-
-                    this.setState({ messages: [...res.messages] }, () => this.scrollToBottom())
-                })
+        try {
 
             logic.listConversations()
                 .then(res => {
                     let total = 0
                     res.forEach(item => total = item[1].pendingMessages + total)
-                    debugger
+                    this.props.pendingNotifications(total)
 
-                    this.setState({ conversations: res })
+
+                    this.setState({ conversations: res, error: null })
                 })
 
+        } catch (err) {
+            this.setState({ error: err.message })
         }
 
         // this.interval = setInterval(() => this.refresh(), 2000)
@@ -46,43 +57,71 @@ class ChatPage extends Component {
 
     refresh() {
         // clearInterval(this.interval)
+        try {
 
-        if (this.props.id && this.props.receiverId) {
-
-            logic.listMessages(this.props.receiverId)
-                .then(res => {
-
-                    if (this.state.messages.length !== res.messages.length) this.setState({ messages: [...res.messages] }, () => this.scrollToBottom())
-                })
+            if (this.props.id && this.props.receiverId) {
+                logic.listMessages(this.props.receiverId)
+                    .then(res => {
+                        if (this.state.messages.length !== res.messages.length) this.setState({ messages: [...res.messages], erorr: null }, () => this.scrollToBottom())
+                    })
+                    .catch(err => { this.setState({ error: err.mesa }) })
+            }
+            // this.interval = setInterval(() => this.refresh(), 2000)
+        } catch (err) {
+            this.setState({ error: err.message })
         }
-        // this.interval = setInterval(() => this.refresh(), 2000)
 
     }
 
 
-    componentWillReceiveProps(props) {
-        debugger
-        console.log('will receive props')
-        if (props.id && props.receiverId) {
-            logic.findConversation(props.receiverId)
-                .then(res => {
-                    const receiver = res.members.find(item => item.id !== props.userId)
-                    this.setState({ receiverName: receiver.username, receiverImage: receiver.profileImage })
-                })
-                .then(() => logic.listMessages(props.receiverId))
-                .then(res => {
-                    this.setState({ messages: [...res.messages] }, () => this.scrollToBottom())
-                })
+    componentWillReceiveProps(nextProps) {
+        // console.log(nextProps)
+        // try {
+        //     if (nextProps.receiverId !== this.props.receiverId) {
+        //         if (nextProps.id && nextProps.receiverId) {
+        //             console.log('doing stuff')
+        //             logic.findConversation(nextProps.receiverId)
+        //                 .then(res => {
+        //                     const receiver = res.members.find(item => item.id !== nextProps.userId)
+        //                     this.setState({ receiverName: receiver.username, receiverImage: receiver.profileImage, error: null })
+        //                 })
+        //                 .then(() => logic.listMessages(nextProps.receiverId))
+        //                 .then(res => {
+        //                     this.setState({ messages: [...res.messages], error: null }, () => this.scrollToBottom())
+        //                 })
+        //                 .catch(err => this.setState({ error: err.message }))
 
-            logic.listConversations()
-                .then(res => {
-                    let total = 0
+                    logic.listConversations()
+                        .then(res => {
+                            debugger
+                            let total = 0
+                            res.forEach(item => total = item[1].pendingMessages + total)
+                            this.props.pendingNotifications(total)
+                            this.setState({ conversations: res, totalPendingMessages: total, error: null })
+                        })
+                        .catch(err => this.setState({ error: err.message }))
 
-                    res.forEach(item => total = item[1].pendingMessages + total)
+        // } catch (err) {
+        //     this.setState({ error: err.message })
+        // }
+        // try {
+        //     if (nextProps.history.length !== this.props.history.length) {
+        //         console.log('list convos')
+        //         logic.listConversations()
+        //             .then(res => {
+        //                 let total = 0
+        //                 res.forEach(item => total = item[1].pendingMessages + total)
+        //                 this.props.pendingNotifications(total)
+        //                 this.setState({ conversations: res, totalPendingMessages: total, error: null })
+        //             })
+        //             .catch(err => this.setState({ error: err.message }))
+        //     }
+        // } catch (err) {
+        //     this.setState({ error: err.message })
+        // }
 
-                    this.setState({ conversations: res })
-                })
-        }
+
+
     }
 
     componentDidUpdate() {
@@ -91,10 +130,22 @@ class ChatPage extends Component {
 
     handleSendMessage = (event) => {
         event.preventDefault()
-
-        return logic.sendMessage(this.props.userId, this.props.receiverId, this.state.message)
-            .then(() => logic.listMessages(this.props.receiverId))
-            .then(res => this.setState({ messages: res.messages, message: '' }))
+        this.props.pendingNotifications(this.state.totalPendingMessages)
+        try {
+            return logic.sendMessage(this.props.userId, this.props.receiverId, this.state.message)
+                .then(() => logic.listMessages(this.props.receiverId))
+                .then(res => this.setState({ messages: res.messages, message: '', error: null }))
+                .then(() => logic.listConversations())
+                .then(res => {
+                    let total = 0
+                    res.forEach(item => total = item[1].pendingMessages + total)
+                    this.props.pendingNotifications(total)
+                    this.setState({ conversations: res, totalPendingMessages: total, error: null })
+                })
+                .catch(err => this.setState({ error: err.message }))
+        } catch (err) {
+            this.setState({ error: err.message })
+        }
     }
 
 
@@ -112,16 +163,22 @@ class ChatPage extends Component {
         this.setState({ message })
     }
 
+    renderMessageTicks = (message) => {
+        if (message.status === 'read') return <div><i className="fa fa-check" aria-hidden="true"></i><i className="fa fa-check" aria-hidden="true"></i></div>
+        else return <i className="fa fa-check" aria-hidden="true"></i>
+    }
+
     render() {
 
-        const { messages, conversations, receiverImage } = this.state
+        const { messages, conversations, receiverImage, error } = this.state
         return <section className="chat">
+            {error && <Error message={error} />}
             <div className="conversation-page-container row">
 
                 <div className="conversations-list col-4">
                     <h2>Chats</h2>
-                    {conversations && conversations.sort((a,b) => b[1].pendingMessages - a[1].pendingMessages).map((conversation, index) => {
-                        return <div key={index} className={(this.state.receiverName===conversation[0].username) ? "conversation-card-chatroom-test" : "conversation-card-chatroom"}>
+                    {conversations && conversations.sort((a, b) => b[1].lastMessage - a[1].lastMessage).map((conversation, index) => {
+                        return <div key={index} className={(this.state.receiverName === conversation[0].username) ? "conversation-card-chatroom-test" : "conversation-card-chatroom"}>
                             <img src={conversation[0].profileImage} />
                             <Link to={`/messages/${conversation[1].conversationId}/${conversation[0].id}`}>{conversation[0].username}</Link>
                             <span className="badge badge-primary">{conversation[1].pendingMessages}</span>
@@ -138,11 +195,17 @@ class ChatPage extends Component {
 
                                 if (message.sender != this.props.userId) {
                                     return <div key={index} className="msg-left">
-                                        {message.text}
+                                        <div className="message-body "> {message.text}</div>
+                                        <div className="message-date">  <Moment format="DD/MM/YYYY HH:mm">{message.sent}</Moment>
+
+                                        </div>
+
                                     </div>
                                 } else {
                                     return <div key={index} className="msg-right">
-                                        {message.text}
+                                        <div className="message-body"> {message.text}</div>
+                                        <div className="message-date-right">  <Moment format="DD/MM/YYYY HH:mm">{message.sent}</Moment></div>
+                                        {this.renderMessageTicks(message)}
                                     </div>
                                 }
                             }
@@ -152,7 +215,7 @@ class ChatPage extends Component {
                     </div>
                     <div className="chatbox col-12">
                         <form className="chat-input-form" onSubmit={this.handleSendMessage}>
-                            <div className="row">
+                            <div className="chat-bottom-area row">
                                 <div className="col-9">
                                     <input className="chat-input" onChange={this.onMessageChange} value={this.state.message} placeholder="Type your message and hit enter!" id="chat-input" />
                                 </div>

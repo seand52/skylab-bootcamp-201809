@@ -822,9 +822,9 @@ const logic = {
         if (typeof senderId !== 'string') throw TypeError(`${senderId} is not a string`)
         if (!senderId.trim()) throw Error('senderId is empty or blank')
         if (typeof receiverId !== 'string') throw TypeError(`${receiverId} is not a string`)
-        if (!receiverId.trim()) throw Error('receiverId is empty or blank')
+        if (!receiverId.trim()) throw Error('Why are you sending a blank message?')
         if (typeof text !== 'string') throw TypeError(`${text} is not a string`)
-        if (!text.trim()) throw Error('text is empty or blank')
+        if (!text.trim()) throw Error('Why are you sending a blank message?')
 
         return fetch(`${this.url}/users/${this._userId}/message`, {
             method: 'POST',
@@ -871,9 +871,10 @@ const logic = {
             .then(res => res.json())
             .then(res => {
                 if (res.error) throw Error(res.error)
+                debugger
                 const output = res.data.map(item => {
                     const arr = item.members.filter(item => item.id !== this._userId)
-                    arr.push({ conversationId: item.id, pendingMessages: item.pendingMessages })
+                    arr.push({ conversationId: item.id, pendingMessages: item.pendingMessages, lastMessage: new Date(item.messages[item.messages.length-1].sent) })
 
                     return arr
                 })

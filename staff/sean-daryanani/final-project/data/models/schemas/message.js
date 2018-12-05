@@ -14,7 +14,7 @@ const Message = new Schema({
 
     sent: {
         type: Date,
-        default: Date.now(),
+        default: Date.now,
         required: true
     },
     

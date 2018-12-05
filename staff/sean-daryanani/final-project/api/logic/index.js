@@ -839,7 +839,7 @@ const logic = {
         if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
         if (!query.trim()) throw new ValueError('query is empty or blank')
         if (!userId.trim()) throw new ValueError('userId is empty or blank')
-
+        debugger
         const queryObject = {
             name: { $regex: '' },
             skills: { $all: [] },

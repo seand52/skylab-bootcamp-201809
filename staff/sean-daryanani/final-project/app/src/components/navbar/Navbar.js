@@ -13,8 +13,7 @@ class Navbarpage extends React.Component {
             profile: false,
 
         },
-
-
+        pendingNotifications: 0,
     };
 
 
@@ -88,6 +87,9 @@ class Navbarpage extends React.Component {
             }
             this.setState({ selected: newSelected })
         }
+        if(props.pendingNotifications !== this.state.pendingNotifications  ) {
+            console.log('props updating')
+            this.setState({pendingNotifications : props.pendingNotifications})}
 
 
     }
@@ -125,7 +127,7 @@ class Navbarpage extends React.Component {
                         </NavItem>
                         <NavItem >
                             {/* {sendToConversation ? <Link to={`/messages/${sendToConversation[1].conversationId}/${sendToConversation[0].id}`}><button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i><span class="badge badge-danger">{pendingMessages}</span></div></button></Link> : <button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i><span class="badge badge-danger">{pendingMessages}</span></div></button> } */}
-                            <button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i><span class="badge badge-danger">{pendingMessages}</span></div></button>
+                            <button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i><span className="badge badge-danger">{pendingMessages}</span></div></button>
                         </NavItem>
                         <NavItem >
                             <button onClick={this.handleLogout} className="navbar__button" type="button">Logout</button>
