@@ -14,6 +14,7 @@ class Navbarpage extends React.Component {
 
         },
         pendingNotifications: 0,
+        sendToConversation: false
     };
 
 
@@ -45,10 +46,9 @@ class Navbarpage extends React.Component {
     componentDidMount() {
         return logic.listConversations()
             .then(res => {
-                debugger
                 let total = 0
                 res.forEach(item => total = item[1].pendingMessages + total)
-                this.setState({ sendToConversation: res, pendingMessages: total })
+                this.setState({ sendToConversation: res, pendingNotifications: total })
             })
 
     }
@@ -79,19 +79,22 @@ class Navbarpage extends React.Component {
             }
             this.setState({ selected: newSelected })
         }
-        else {
-            let newSelected = {
-                home: false,
-                explore: false,
-                profile: false
+        else if (props.location.pathname.indexOf('messages') >= 0) {
+            if (props.pendingNotifications !== this.state.pendingNotifications) {
+                debugger
+                console.log('props updating')
+                this.setState({ pendingNotifications: props.pendingNotifications })
+
             }
-            this.setState({ selected: newSelected })
+            else {
+                let newSelected = {
+                    home: false,
+                    explore: false,
+                    profile: false
+                }
+                this.setState({ selected: newSelected })
+            }
         }
-        if(props.pendingNotifications !== this.state.pendingNotifications  ) {
-            console.log('props updating')
-            this.setState({pendingNotifications : props.pendingNotifications})}
-
-
     }
 
 
@@ -99,7 +102,7 @@ class Navbarpage extends React.Component {
     toggleCollapse = () => this.setState({ isOpen: !this.state.isOpen })
 
     render() {
-        const { selected, isOpen, pendingMessages, sendToConversation } = this.state
+        const { selected, isOpen, pendingNotifications, sendToConversation } = this.state
 
         return (
 
@@ -126,8 +129,8 @@ class Navbarpage extends React.Component {
                             <button onClick={this.onProfileClick} className={selected.profile ? 'navbar__button-selected' : 'navbar__button'} type="button">Profile</button>
                         </NavItem>
                         <NavItem >
-                            {/* {sendToConversation ? <Link to={`/messages/${sendToConversation[1].conversationId}/${sendToConversation[0].id}`}><button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i><span class="badge badge-danger">{pendingMessages}</span></div></button></Link> : <button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i><span class="badge badge-danger">{pendingMessages}</span></div></button> } */}
-                            <button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i><span className="badge badge-danger">{pendingMessages}</span></div></button>
+                            {sendToConversation ? <Link to={`/messages/${sendToConversation[0][1].conversationId}/${sendToConversation[0][0].id}`}><button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i><span class="badge badge-danger">{pendingNotifications}</span></div></button></Link> : <button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i><span class="badge badge-danger">{pendingNotifications}</span></div></button> }
+            
                         </NavItem>
                         <NavItem >
                             <button onClick={this.handleLogout} className="navbar__button" type="button">Logout</button>

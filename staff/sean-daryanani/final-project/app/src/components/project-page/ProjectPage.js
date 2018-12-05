@@ -244,9 +244,9 @@ class ProjectPage extends Component {
 
     uploadImage = event => {
         try {
-            this.setState({loading: true})
+            this.setState({ loading: true })
             return logic.addProjectImage(event.target.files[0], this.props.id)
-                .then(() => this.setState({loading: false}))
+                .then(() => this.setState({ loading: false }))
                 .then(() => {
                     return logic.retrieveProjectInfo(this.props.id)
                         .then(res => this.setState({ project: res, error: false }))
@@ -293,7 +293,11 @@ class ProjectPage extends Component {
                 <div className="project-image-container col-md-3">
                     <h1 className="project-name-mobile">{project && project.name}</h1>
                     <div className="spinner">{this.state.loading ? <MDSpinner /> : ''}</div>
-                    <img src={project ? project.projectImage : null} />
+                    <div className="container__image--project">
+                        <div className="project__image-box">
+                            <img className="project__image" src={project ? project.projectImage : null} />
+                        </div>
+                    </div>
                     {project && ((this.props.userId === project.owner.id)) && <form encType="multipart/form-data" onSubmit={this.uploadImage}>
                         <label className="profileImage-upload">
                             <input className="uploadImage-input" type="file" name="avatar" onChange={this.uploadImage} />
@@ -306,8 +310,10 @@ class ProjectPage extends Component {
                 <div className="project-page-header-additional-info col-md-4" align="center">
                     <h1 className="project-name">{project && project.name}</h1>
                     <div className="owner-photo-and-extra-info row">
-                        <div className="extrainfo-image-container col-md-3 col-xs-12">
-                            <img className="extrainfo__image-profile" src={project && project.owner.profileImage} alt="profile" />
+                        <div className="container__image--host-profile">
+                            <div className="host-profile__image-box">
+                                <img className="host-profile__image" src={project && project.owner.profileImage} alt="profile" />
+                            </div>
                         </div>
                         <div className="owner-name-and-email col-md-9">
                             <span>Hosted by</span><p className="project-page-header-additional-info__user-link" onClick={this.clickProfileName}>{project && project.owner.name}</p>
@@ -347,7 +353,7 @@ class ProjectPage extends Component {
                     </section>
                     <section className="project-page-meetings col-md-6">
                         <h2>Upcoming Meetings</h2>
-                        {meetings && meetings.sort((a, b) => a.realDate - b.realDate).map((meeting, index) => {
+                        {meetings && meetings.length ? meetings.sort((a, b) => a.realDate - b.realDate).map((meeting, index) => {
                             return (
                                 <div className="individual-meeting-container col-md-10" key={index}>
                                     <Meetings unAttendMeeting={this.handleUnAttendMeeting} attendMeeting={this.handleAttendMeeting} userId={this.props.userId} key={index} meeting={meeting} project={project} />
@@ -357,7 +363,7 @@ class ProjectPage extends Component {
 
 
                                 </div>)
-                        })}
+                        }) : <p>This event doesn't have any upcoming meetings</p>}
                     </section>
                 </div>
 

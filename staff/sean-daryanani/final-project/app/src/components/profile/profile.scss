@@ -11,6 +11,7 @@
 }
 
 
+
 .edit-profile-button {
     background: none;
     border: none;
@@ -47,7 +48,7 @@
     // justify-content: center;
     // background: aliceblue;
     margin: 20px;
-
+    
     padding-top: 20px;
     // border: 3px solid rgb(67, 64, 245);
     // border-radius: 10px;
@@ -122,7 +123,7 @@ box-shadow: 3px 4px 5px 0px rgba(0,0,0,0.75);
     border: 2px solid #ccc;
     margin-left: 30px;
     border-radius: 20px;
-    background-color: white;
+    background-color: aliceblue;
     box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 
     @media only screen and (max-width: 576px) {
@@ -193,9 +194,11 @@ box-shadow: 3px 4px 5px 0px rgba(0,0,0,0.75);
     box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
     margin: 60px 20px;
     padding-top: 20px;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
     border: 2px solid #ccc;
     border-radius: 20px;
-    background-color: white; 
+    background-color: aliceblue; 
     @media only screen and (max-width: 576px) {
 
     }
@@ -230,4 +233,39 @@ box-shadow: 3px 4px 5px 0px rgba(0,0,0,0.75);
     border: 1px solid #ccc;
     border-radius: 20px;
 
+}
+
+.conversation-img-container {
+    height: 75px;
+    width: 75px;
+
+
+    // border-radius: 50%;
+    // & img {
+    //     display: block;
+    //     width: 100%;
+    //     height: auto;
+    //     border-radius: 50%;
+    //     overflow: hidden;
+    // }
+}
+
+.conversation-img-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.conversation-img {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.conversation-card {
+    border: none;
 }

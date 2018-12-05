@@ -85,6 +85,7 @@ class App extends Component {
   }
 
   handlePendingNotifications = (total) => {
+
     this.setState({pendingNotifications: total})
   }
 

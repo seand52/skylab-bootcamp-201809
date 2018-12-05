@@ -55,7 +55,7 @@ class Profile extends Component {
                 .then(res => {
                     let total = 0
                     res[5].forEach(item => total = item[1].pendingMessages + total)
-                    this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2], image: res[3], upComingMeetings: res[4], conversations: res[5], totalPending: total, error: false })
+                    this.setState({ user: res[0], collabProjects: res[1], ownProjects: res[2], image: res[3], upComingMeetings: res[4], conversations: res[5], totalPending: total, error: false, chatPopup: false })
                 })
                 .catch(err => this.setState({ error: err.message }))
         } catch (err) {
@@ -196,7 +196,7 @@ class Profile extends Component {
         return <div className="profile-page-container">
             <div className="row">
 
-                <section className="profile-top-area col-xs-12  col-md-4">
+                <section className="profile-top-area col-md-12  col-lg-4">
                     <div className="spinner">{this.state.loading ? <MDSpinner /> : ''}</div>
                     <ProfileCard uploadImage={this.handleUpload} showCollabProjects={this.handleShowCollabProjects} user={user} myProjects={ownProjects} projectsStarted={this.handleshowOwnProjects} collabProjects={collabProjects} userId={userId} profileImage={image} meetings={this.handleUpComingMeetings} numberOfMeetings={upComingMeetings.length} chats={this.handleShowChats} totalPending={totalPending} />
 
@@ -226,13 +226,15 @@ class Profile extends Component {
                     </div>}
                 </section>
 
-                <section className="main-area col-xs-12 col-md-7">
+                <section className="main-area col-md-12 col-lg-7">
                     <div className="main-area__title">
                         {this.renderTitle()}
 
                     </div>
                     <div className="main-area__projects">
-                        {ownProjects && (showProjects === 'my projects') && (ownProjects.length ? ownProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">You don't have any projects, start one <Link to='/home'>now</Link></p>)}
+                        {user && (user.id === userId) && ownProjects && (showProjects === 'my projects') && (ownProjects.length ? ownProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">You don't have any projects, start one <Link to='/home'>now</Link></p>)}
+
+                        {user && (user.id !== userId) && ownProjects && (showProjects === 'my projects') && (ownProjects.length ? ownProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">This user has not started any projects</p>)}
 
                         {collabProjects && (showProjects === 'collab projects') && (collabProjects.length ? collabProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">No pending collaborators</p>)}
 
@@ -249,13 +251,15 @@ class Profile extends Component {
 
                         {conversations && (showProjects === 'chats') && (conversations.length ? conversations.map((conversation, index) => {
                             return <div key={index} className="conversation-card">
-                                <div className="conversation-card-image ">
-                                    <img src={conversation[0].profileImage} />
+                                <div className="conversation-img-container">
+                                    <div className="conversation-img-box">
+                                        <img className="conversation-img" src={conversation[0].profileImage} />
+                                    </div>
                                 </div>
-                                <div className="conversation-card-username ">
-                                    <Link to={`/messages/${conversation[1].conversationId}/${conversation[0].id}`}>{conversation[0].username}</Link>
-                                    <span className="badge badge-primary">{conversation[1].pendingMessages}</span>
-                                </div>
+
+                                <Link to={`/messages/${conversation[1].conversationId}/${conversation[0].id}`}>{conversation[0].username}</Link>
+                                <div><span class="badge light-blue badge-light-blue badge-pill">{conversation[1].pendingMessages}</span></div>
+
                             </div>
                         }) : <p className="no-projects-text">You don't have any active chats</p>)}
 

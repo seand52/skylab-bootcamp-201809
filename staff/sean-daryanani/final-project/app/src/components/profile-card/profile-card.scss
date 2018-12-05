@@ -17,25 +17,47 @@
     border: 2px solid #ccc;
     margin-top: 20px;
     border-radius: 20px;
-    background-color: white;
-margin-bottom: 20px;
+    background-color: aliceblue;
+    margin-bottom: 20px;
+@media only screen and (max-width: 970px) {
+    // margin-right: 100px;
+}
 }
 
 .profile-img-container {
+    height: 100px;
     width: 100px;
     position: absolute;
     top: -30px;
     right: 0;
-    border: 1px solid #ccc;
-    border-radius: 50%;
-    & img {
-        display: block;
-        width: 100%;
-        height: auto;
-        border-radius: 50%;
-        overflow: hidden;
-    }
+
+    // border-radius: 50%;
+    // & img {
+    //     display: block;
+    //     width: 100%;
+    //     height: auto;
+    //     border-radius: 50%;
+    //     overflow: hidden;
+    // }
 }
+
+.profile-img-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.profile-img {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+
 
 @supports(object-fit: cover){
     .profile-img-container img{
@@ -60,7 +82,7 @@ display: none;
 
 .bottom-area {
     box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
-    background-color: white;
+    background-color: aliceblue;
     display: flex;
     flex-direction: column;
     border: 2px solid #ccc;
@@ -87,12 +109,12 @@ display: none;
 
 .profile-card-button:focus {
     outline:0 !important;
-    background: rgb(170, 190, 207);
+    background: rgb(166, 235, 197);
 
 }
 
 .profile-card-button:active{
-    background:rgb(170, 190, 207);
+    background:rgb(166, 235, 197);
 }
 
 .badge {
@@ -102,13 +124,9 @@ display: none;
 
 
 .conversation-card {
-    border: 1px solid #ccc;
-    border-top-left-radius: 0;
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
+
     padding: 20px;
-    margin: 50px;
+
 }
 
 .conversation-card-image  {

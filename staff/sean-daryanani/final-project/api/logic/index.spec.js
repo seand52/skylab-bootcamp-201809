@@ -1,3 +1,4 @@
+'use strict';
 const { mongoose, models: { User, Project, Meeting, Conversation } } = require('data')
 const logic = require('.')
 const fs = require('fs')
@@ -434,14 +435,15 @@ describe('logic', () => {
             })
 
             it('should fail if id is not found', async () => {
-
+                debugger
                 try {
-                    await logic.updateProfile('12345', user.bio, user.githubProfile, user.city, user.skills)
+                    await logic.updateProfile('5c07dae85729ae63c68447ba', user.bio, user.githubProfile, user.city, user.skills)
 
                     expect(true).to.be.false
                 } catch (err) {
+                    
                     expect(err).to.be.instanceof(NotFoundError)
-                    expect(err.message).to.equal(`user with id 12345 not found`)
+                    expect(err.message).to.equal(`user with id 5c07dae85729ae63c68447ba not found`)
                 }
 
             })
@@ -641,8 +643,8 @@ describe('logic', () => {
 
 
                 it('should succeed on listing saved projects', async () => {
-                    project2 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id })
-                    project3 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id })
+                    const project2 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id })
+                    const project3 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user2.id })
 
                     await project2.save()
                     await project3.save()
@@ -846,6 +848,20 @@ describe('logic', () => {
 
                 })
 
+                it('should fail to retrieve objects if user not found', async () => {
+                    debugger
+                    try {
+                        await logic.listOwnProjects('5c07dae85729ae63c68447ba')
+    
+                        expect(true).to.be.false
+                    } catch (err) {
+                        
+                        expect(err).to.be.instanceof(NotFoundError)
+                        expect(err.message).to.equal(`user with id 5c07dae85729ae63c68447ba not found`)
+                    }
+    
+                })
+
                 it('should succeed on listing all projects where user a collaborator', async () => {
                     const user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '123' })
 
@@ -977,7 +993,7 @@ describe('logic', () => {
 
 
             describe('retrieve project info', () => {
-                let user, project
+                let user, project, user2
 
                 beforeEach(async () => {
 
@@ -1129,6 +1145,23 @@ describe('logic', () => {
 
                 })
 
+                it('should fail if the project is full', async () => {
+                    const project2 = new Project({ name: 'test1', description: 'testdescription1', skills: ['react1', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '1', owner: user.id })
+                    const user3 = new User({ name: 'John3', email: 'doe3@gmail.com', username: 'jd3', password: '123' })
+                    await user3.save()
+                    await project.save()
+                    try {
+                        await logic.requestCollaboration(user3.id, project2.id)
+    
+                        expect(true).to.be.false
+                    } catch (err) {
+                        
+                        expect(err).to.be.instanceof(NotFoundError)
+
+                    }
+    
+                })
+
                 it('should fail on undefined user id', () => {
                     expect(() => logic.requestCollaboration(undefined, project.id).to.throw(ValueError, 'undefined is not a string'))
                 })
@@ -1164,7 +1197,7 @@ describe('logic', () => {
     })
 
     describe('retrieve collaborations pending', () => {
-        let user, user5, project, project2, project3, user2
+        let user, user5, project, project2, project3, project4, user2
 
         beforeEach(async () => {
             user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123' })
@@ -1474,7 +1507,7 @@ describe('logic', () => {
             })
 
             describe('attend meeting ', () => {
-                let user2, meeting1, meeting2, meeting3
+                let user2, project2, meeting1, meeting2, meeting3
 
                 beforeEach(async () => {
 
@@ -1526,7 +1559,7 @@ describe('logic', () => {
             })
 
             describe('unattend meeting ', () => {
-                let user2, meeting1, meeting2
+                let user2, meeting1, meeting2, project2
 
                 beforeEach(async () => {
 
@@ -1577,7 +1610,7 @@ describe('logic', () => {
         })
 
         describe('list upcoming meetings for a user ', () => {
-            let user, user2, project, project2, meeting1, meeting2, meeting3
+            let user, user2, project, project2, meeting1, meeting2, meeting3, meeting4, meeting5
 
             beforeEach(async () => {
 

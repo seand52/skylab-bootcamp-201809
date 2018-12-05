@@ -19,5 +19,11 @@
   color: white;
   cursor: pointer;
 }
+@media only screen and (max-width: 750px) {
+  .remove-collab-button {
+    width: 90%;
+    font-size: 12px;
+  }
+}
 
 /*# sourceMappingURL=collabcard.css.map */

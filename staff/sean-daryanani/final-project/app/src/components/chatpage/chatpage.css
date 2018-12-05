@@ -13,6 +13,11 @@
   margin-top: 20px;
   margin-left: 100px;
 }
+@media only screen and (max-width: 576px) {
+  .container-chat-and-input {
+    margin-left: 0px;
+  }
+}
 
 .conversations-list {
   margin-left: 50px;
@@ -21,6 +26,12 @@
   margin-top: 20px;
   padding: 0 !important;
   background: aliceblue;
+  overflow: auto;
+}
+@media only screen and (max-width: 576px) {
+  .conversations-list {
+    margin: 20px;
+  }
 }
 
 .profile-image-chat {
@@ -81,6 +92,9 @@
   border-color: #3BA1EE transparent transparent transparent;
 }
 
+.chatbox {
+  padding-top: 20px;
+}
 .chatbox form input {
   width: 100%;
 }

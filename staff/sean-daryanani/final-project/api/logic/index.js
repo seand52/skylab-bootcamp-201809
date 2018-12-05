@@ -1,3 +1,4 @@
+'use strict';
 const { models: { User, Project, Meeting, Conversation, Message } } = require('data')
 const { AlreadyExistsError, AuthError, NotAllowedError, NotFoundError, ValueError } = require('../errors')
 const validate = require('../utils/validate')
@@ -504,12 +505,10 @@ const logic = {
         if (!projectId.trim()) throw new ValueError('projectId is empty or blank')
 
         return (async () => {
-
+            
             const user = await User.findById(id)
 
             const project = await Project.findById(projectId)
-
-            if (parseInt(project.maxMembers) === project.currentMembers) throw Error('project capacity is full')
 
             await Project.updateOne({ _id: projectId }, { $pull: { pendingCollaborators: user._id } })
 
@@ -951,7 +950,7 @@ const logic = {
 
                 file.pipe(stream)
             })
-
+            
             await Project.updateOne({ _id: projectId }, { projectImage: result.url })
 
 

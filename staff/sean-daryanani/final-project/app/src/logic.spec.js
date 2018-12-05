@@ -1,8 +1,7 @@
 const logic = require('./logic.js')
-
 const { expect } = require('chai')
 require('isomorphic-fetch')
-const { mongoose, models: { User, Project, Meeting } } = require('data')
+const { mongoose, models: { User, Project, Meeting, Conversation } } = require('data')
 global.sessionStorage = require('sessionstorage')
 logic.url = 'http://localhost:5000/api'
 const MONGO_URL = 'mongodb://localhost:27017/socialdev'
@@ -10,7 +9,7 @@ const MONGO_URL = 'mongodb://localhost:27017/socialdev'
 describe('logic', () => {
     before(() => mongoose.connect(MONGO_URL, { useNewUrlParser: true, useCreateIndex: true }))
 
-    beforeEach(() => Promise.all([User.deleteMany(), Project.deleteMany(), Meeting.deleteMany()]))
+    beforeEach(() => Promise.all([User.deleteMany(), Project.deleteMany(), Meeting.deleteMany(), Conversation.deleteMany()]))
 
     describe('users', () => {
         describe('register', () => {
@@ -96,15 +95,15 @@ describe('logic', () => {
                 it('should fail on undefined username', () => {
                     expect(() => logic.authenticate(undefined, password)).to.throw(TypeError, 'undefined is not a string')
                 })
-    
+
                 it('should fail on undefined passowrd', () => {
                     expect(() => logic.authenticate(username, undefined)).to.throw(TypeError, 'undefined is not a string')
                 })
-    
+
                 it('should fail on blank username', () => {
                     expect(() => logic.authenticate('', password)).to.throw(Error, 'username is empty or blank')
                 })
-    
+
                 it('should fail on blank passowrd', () => {
                     expect(() => logic.authenticate(username, '')).to.throw(Error, 'password is empty or blank')
                 })
@@ -173,7 +172,7 @@ describe('logic', () => {
                 await user.save()
                 await logic.authenticate(user.username, user.password)
 
-        })
+            })
 
             it('should update on correct data and password', async () => {
                 const { id, bio, githubProfile, city } = user
@@ -201,6 +200,7 @@ describe('logic', () => {
             })
 
             it('should fail undefined id', () => {
+
                 expect(() => logic.updateProfile(undefined, 'barcelona', 'github', 'newbio', 'newskills')).to.throw(TypeError, 'undefined is not a string')
             })
             it('should  failundefined bio', () => {
@@ -214,9 +214,7 @@ describe('logic', () => {
             it('should fail undefined city', () => {
                 expect(() => logic.updateProfile(user.id, 'barcelona', 'github', undefined, 'newskills')).to.throw(TypeError, 'undefined is not a string')
             })
-            it('should fail undefined city', () => {
-                expect(() => logic.updateProfile(user.id, 'barcelona', 'github', 'newbio', undefined)).to.throw(TypeError, 'undefined is not a string')
-            })
+
 
 
             it('should update on correct bio (and other fields null)', async () => {
@@ -263,7 +261,7 @@ describe('logic', () => {
 
             it('should update on correct city (and other fields null)', async () => {
                 const { id, bio, githubProfile, city, skills } = user
-                debugger
+
                 const newCity = `${city}-${Math.random()}`
 
                 const res = await logic.updateProfile(id, newCity, githubProfile, bio, null)
@@ -273,7 +271,7 @@ describe('logic', () => {
                 const _users = await User.find()
 
                 const [_user] = _users
-                debugger
+
                 expect(_user.city).to.equal(newCity)
 
                 expect(_user.bio).to.equal(bio)
@@ -282,7 +280,7 @@ describe('logic', () => {
 
             })
         })
-})
+    })
 
 })
 
@@ -295,7 +293,7 @@ describe('projects', () => {
             await user.save()
 
             await logic.authenticate(user.username, user.password)
-            name ='test'
+            name = 'test'
             description = 'test'
             skills = ['skill1', 'skill2', 'skill3']
             location = 'barcelona'
@@ -641,12 +639,12 @@ describe('projects', () => {
             expect(() => logic.filterProjects(undefined, user.id).to.throw(ValueError, 'undefined is not a string'))
         })
 
-    
+
         it('should fail on empty query', () => {
             expect(() => logic.filterProjects('', user.id).to.throw(ValueError, ' is empty or blank'))
         })
 
-      
+
 
         it('should fail on blank query', () => {
             expect(() => logic.filterProjects('    \n', user.id).to.throw(ValueError, ' is empty or blank'))
@@ -689,12 +687,12 @@ describe('projects', () => {
             expect(() => logic.retrieveProjectInfo(undefined).to.throw(ValueError, 'undefined is not a string'))
         })
 
-    
+
         it('should fail on empty query', () => {
             expect(() => logic.retrieveProjectInfo('', user.id).to.throw(ValueError, ' is empty or blank'))
         })
 
-      
+
 
         it('should fail on blank query', () => {
             expect(() => logic.retrieveProjectInfo('    \n', user.id).to.throw(ValueError, ' is empty or blank'))
@@ -759,26 +757,6 @@ describe('projects', () => {
 
             })
 
-            it('should remove collaborators from pending collaborators when rejected', async () => {
-
-                const decision = 'reject'
-
-                expect(project.owner.toString()).to.equal(user.id.toString())
-                debugger
-                await logic.requestCollaboration(user2.id, project38.id)
-
-                await logic.handleCollaboration(project.id, decision, user2.id)
-
-                const _projects = await Project.find()
-
-                const [_project] = _projects
-
-                expect(_project.pendingCollaborators.length).to.equal(0)
-
-                expect(_project.collaborators.length).to.equal(0)
-
-
-            })
 
             it('should fail on undefined user id', () => {
                 expect(() => logic.requestCollaboration(undefined, project38.id).to.throw(ValueError, 'undefined is not a string'))
@@ -907,10 +885,10 @@ describe('projects', () => {
     describe('meetings', () => {
 
         describe('attend meeting ', () => {
-            let user2, meeting1, meeting2
+            let user, user2, meeting1, meeting2
 
             beforeEach(async () => {
-                user2 = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123sdf2' })
+                user = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '123sdf2' })
                 user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
 
                 project2 = new Project({ name: 'test12', description: 'testdescription12', skills: ['react12', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id, collaborators: [user2.id] })
@@ -920,11 +898,12 @@ describe('projects', () => {
                 meeting2 = new Meeting({ project: project.id, date: Date.now(), location: 'madrid' })
 
                 await user2.save()
+                await user.save()
                 await project2.save()
                 await meeting1.save()
                 await meeting2.save()
 
-                await logic.authenticate(user2.username, user2.password)
+                await logic.authenticate(user.username, user.password)
             })
 
             it('should succeed on correct data', async () => {
@@ -935,7 +914,7 @@ describe('projects', () => {
 
                 expect(meeting.attending.length).to.equal(1)
 
-                expect(meeting.attending[0].toString()).to.equal(user2.id)
+                expect(meeting.attending[0].toString()).to.equal(user.id)
             })
 
             it('should fail on undefined meeting id', () => {
@@ -944,43 +923,20 @@ describe('projects', () => {
             it('should fail on blank meeting id', () => {
                 expect(() => logic.attendMeeting('').to.throw(Error, ' is not empty or blank'))
             })
-  
+
             it('should fail on empty user id', () => {
                 expect(() => logic.attendMeeting('     \n').to.throw(Error, 'id is empty or blank'))
             })
 
 
-            it('should succeed on deleting event', async () => {
-                const date = new Date()
-                date.setDate(date.getDate() + 10)
 
-                await logic.addMeeting(user.id, project2.id, date, 'barcelona', 'test description')
-
-                const meetings = await Meeting.find()
-
-                expect(meetings.length).to.equal(3)
-
-                const [_meeting] = meetings
-
-                expect(_meeting.project.toString()).to.equal(project.id)
-
-
-                expect(_meeting.location).to.equal('barcelona')
-
-                await logic.deleteMeeting(_meeting.id)
-
-                const _meetings = await Meeting.find()
-
-                expect(_meetings.length).to.equal(2)
-
-            })
             it('should fail on undefined meeting id', () => {
                 expect(() => logic.deleteMeeting(undefined).to.throw(TypeError, 'undefined is not a string'))
             })
             it('should fail on blank meeting id', () => {
                 expect(() => logic.deleteMeeting('').to.throw(Error, ' is not empty or blank'))
             })
-  
+
             it('should fail on empty user id', () => {
                 expect(() => logic.deleteMeeting('     \n').to.throw(Error, 'id is empty or blank'))
             })
@@ -1038,7 +994,7 @@ describe('projects', () => {
             it('should fail on blank user id', () => {
                 expect(() => logic.userUpcomingMeetings('').to.throw(Error, ' is not empty or blank'))
             })
-  
+
             it('should fail on empty user id', () => {
                 expect(() => logic.userUpcomingMeetings('     \n').to.throw(Error, 'id is empty or blank'))
             })
@@ -1097,7 +1053,7 @@ describe('projects', () => {
             it('should fail on blank project id', () => {
                 expect(() => logic.listProjectMeetings('').to.throw(Error, ' is not empty or blank'))
             })
-  
+
             it('should fail on empty project id', () => {
                 expect(() => logic.listProjectMeetings('     \n').to.throw(Error, 'id is empty or blank'))
             })
@@ -1155,7 +1111,7 @@ describe('projects', () => {
             it('should fail on blank meeting id', () => {
                 expect(() => logic.unAttendMeeting('').to.throw(Error, ' is not empty or blank'))
             })
-  
+
             it('should fail on empty meeting id', () => {
                 expect(() => logic.unAttendMeeting('     \n').to.throw(Error, 'id is empty or blank'))
             })
@@ -1165,10 +1121,150 @@ describe('projects', () => {
 
 
 
+    describe('chat', () => {
+        describe('send messages', () => {
+            let user1, user2, conversation1, conversation2
+
+            beforeEach(async () => {
+                user1 = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '1232' })
+
+                user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
+
+                conversation1 = new Conversation({
+                    members: [user1.id, user2.id], created: Date.now()
+                })
+
+                await user1.save()
+                await user2.save()
+                await conversation1.save()
+                await logic.authenticate(user1.username, user1.password)
+            })
+
+            it('should send messages', async () => {
+                const text = 'hola mundo'
+                debugger
+                await logic.sendMessage(user1.id, user2.id, text)
+
+                const conversations = await Conversation.find()
+
+                const [_conversation] = conversations
+                expect(_conversation.messages[0].text).to.equal('hola mundo')
+                expect(_conversation.id).to.equal(conversation1.id)
+                expect(_conversation.members.length).to.equal(2)
+            })
+
+
+        })
+
+        describe('list messages', () => {
+            let user1, user2, user3, conversation1, message1, message2
+
+            beforeEach(async () => {
+                user1 = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '1232' })
+
+                user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
+
+                user3 = new User({ name: 'John3', email: 'doe3@gmail.com', username: 'jd3', password: '1332' })
+
+                await user1.save()
+                await user2.save()
+                await user3.save()
+                await logic.authenticate(user1.username, user2.password)
+
+            })
+
+            it('should list messages', async () => {
+                await logic.sendMessage(user1.id, user2.id, 'hola mundo soy user1')
+                await logic.sendMessage(user1.id, user2.id, 'hola mundo soy user1 message2')
+                await logic.sendMessage(user1.id, user2.id, 'hola mundo soy user1 message3')
+
+                const messages1 = await logic.listMessages(user1.id, user2.id)
+
+                expect(messages1.messages[0].status).to.equal('pending')
+                expect(messages1.messages[1].status).to.equal('pending')
+                expect(messages1.messages[2].status).to.equal('pending')
+                await logic.authenticate(user2.username, user1.password)
+
+                const messages2 = await logic.listMessages(user2.id, user2.id)
+                expect(messages2.messages[0].status).to.equal('read')
+                expect(messages2.messages[1].status).to.equal('read')
+                expect(messages2.messages[2].status).to.equal('read')
+
+                await logic.sendMessage(user2.id, user1.id, 'hola mundo soy user2')
+                await logic.sendMessage(user2.id, user1.id, 'hola mundo soy user2 message 2')
+
+                const messages3 = await logic.listMessages(user2.id, user1.id)
+                expect(messages3.messages[3].status).to.equal('pending')
+                expect(messages3.messages[4].status).to.equal('pending')
+
+                await logic.authenticate(user1.username, user2.password)
+                const messages4 = await logic.listMessages(user1.id, user2.id)
+
+                expect(messages4.messages[3].status).to.equal('read')
+                expect(messages4.messages[4].status).to.equal('read')
 
 
 
-    afterEach(() => Promise.all([User.deleteMany(), Project.deleteMany(), Meeting.deleteMany()]))
+            })
+        })
+
+        describe('list existing conversations', () => {
+            let user1, user2, user3, conversation1, conversation2, message1, message2
+
+            beforeEach(async () => {
+                user1 = new User({ name: 'John', email: 'doe@gmail.com', username: 'jd', password: '1232' })
+
+                user2 = new User({ name: 'John2', email: 'doe2@gmail.com', username: 'jd2', password: '1232' })
+
+                user3 = new User({ name: 'John3', email: 'doe3@gmail.com', username: 'jd3', password: '1332' })
+
+                message1 = { sender: user1.id, text: 'hola mundo' }
+                message2 = { sender: user2.id, text: 'hola mundo2' }
+
+                conversation1 = new Conversation({ members: [user1.id, user2.id], messages: [message1, message2] })
+                conversation2 = new Conversation({ members: [user1.id, user3.id], messages: [message1, message1] })
+
+                await user1.save()
+                await user2.save()
+                await user3.save()
+                await conversation1.save()
+                await conversation2.save()
+                await logic.authenticate(user1.username, user1.password)
+
+            })
+
+            it('should list conversations', async () => {
+
+                const conversations = await logic.listConversations()
+                expect(conversations.length).to.equal(2)
+                const [_conversation1, _conversation2] = conversations
+                debugger
+                expect(_conversation1[0].username).to.equal('jd2')
+                expect(_conversation1[0].id).to.equal(user2.id.toString())
+                expect(_conversation2[0].username).to.equal('jd3')
+                expect(_conversation2[0].id).to.equal(user3.id.toString())
+
+
+
+            })
+
+
+        
+
+        
+
+        })
+    })
+
+
+
+
+
+
+
+
+
+    afterEach(() => Promise.all([User.deleteMany(), Project.deleteMany(), Meeting.deleteMany(), Conversation.deleteMany()]))
 
     after(() => mongoose.disconnect())
 })

@@ -47,7 +47,7 @@ class UpdateProfileForm extends Component {
 
     }
 
-    handleSubmit = event => {
+    handleSubmit = async event => {
 
         event.preventDefault()
 
@@ -59,7 +59,10 @@ class UpdateProfileForm extends Component {
         }
         const { city, githubProfile, bio } = this.state
 
-        this.props.updateProfile(this.state.city, this.state.githubProfile, this.state.bio, skillsArray)
+        await this.props.updateProfile(this.state.city, this.state.githubProfile, this.state.bio, skillsArray)
+        
+        this.props.toggleModal()
+
 
 
 

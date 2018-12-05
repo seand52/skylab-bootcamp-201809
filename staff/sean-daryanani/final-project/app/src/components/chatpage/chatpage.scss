@@ -6,6 +6,7 @@
 	// box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 	border-radius: 20px;
   position: relative;
+
 }
 
 .container-chat-and-input {
@@ -14,6 +15,9 @@
   padding: 0 !important;
   margin-top: 20px;
   margin-left: 100px;
+  @media only screen and (max-width: 576px) {
+    margin-left: 0px;
+    }
 }
 
 .conversations-list {
@@ -23,6 +27,10 @@
   margin-top: 20px;
   padding: 0 !important;
   background: aliceblue;
+  overflow: auto;
+  @media only screen and (max-width: 576px) {
+margin: 20px;
+}
 }
 
 .profile-image-chat {
@@ -83,7 +91,7 @@
 }
 
 .chatbox {
- 
+  padding-top: 20px;
   & form {
     & input {
       width: 100%;

@@ -26,28 +26,30 @@ const ProfileCard = props => {
                         </label>
                             </form>}
                         </div>
-                        <div className='profile-img-container'>
-                            <img src={user.profileImage} />
-                        </div>
+                        <div className="profile-img-container">
+                            <div className="profile-img-box">
+                            <img className="profile-img" src={user.profileImage} />
+                            </div>
                     </div>
-
                 </div>
-                <div className='bottom-area'>
-                    <button onClick={projectsStarted} type="button" className="profile-card-button" id="first-button" >
-                        Projects started <br /> <Badge color="light-blue" pill >{myProjects ? myProjects.length : 0}</Badge>
-                    </button>
-                    {(userId === user.id) && <button onClick={showCollabProjects} type="button" className="profile-card-button" >
-                        Projects with pending Collaborators <br /> <Badge color="light-blue" pill >{collabProjects ? collabProjects.length : 0}</Badge>
-                    </button>}
-                    <button onClick={() => meetings(user.id)} type="button" className="profile-card-button"  >
-                        Upcoming Meetings <br /> <Badge color="light-blue" pill >{numberOfMeetings ? numberOfMeetings : 0}</Badge>
-                    </button>
-                    {(userId === user.id) && <button onClick={chats} type="button" className="profile-card-button" id="last-button" >
-                        Chats <br /> <Badge color="light-blue" pill >{totalPending ? totalPending : 0}</Badge>
-                    </button>}
 
-                </div>
             </div>
+            <div className='bottom-area'>
+                <button onClick={projectsStarted} type="button" className="profile-card-button" id="first-button" >
+                    Projects started <br /> <Badge color="light-blue" pill >{myProjects ? myProjects.length : 0}</Badge>
+                </button>
+                {(userId === user.id) && <button onClick={showCollabProjects} type="button" className="profile-card-button" >
+                    Projects with pending Collaborators <br /> <Badge color="light-blue" pill >{collabProjects ? collabProjects.length : 0}</Badge>
+                </button>}
+                <button onClick={() => meetings(user.id)} type="button" className="profile-card-button"  >
+                    Upcoming Meetings <br /> <Badge color="light-blue" pill >{numberOfMeetings ? numberOfMeetings : 0}</Badge>
+                </button>
+                {(userId === user.id) && <button onClick={chats} type="button" className="profile-card-button" id="last-button" >
+                    Chats <br /> <Badge color="light-blue" pill >{totalPending ? totalPending : 0}</Badge>
+                </button>}
+
+            </div>
+            </div >
         )
     } else return null
 

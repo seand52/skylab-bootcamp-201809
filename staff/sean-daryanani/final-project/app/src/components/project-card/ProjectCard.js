@@ -13,7 +13,7 @@ const ProjectCard = props => {
                 <CardImage
                     className="img-fluid"
                     src={project.projectImage}
-                    style={{ height: "150px", width: "100%" }}
+                    style={{ height: "180px", width: "100%" }}
                     waves
                 />
                 <CardBody>

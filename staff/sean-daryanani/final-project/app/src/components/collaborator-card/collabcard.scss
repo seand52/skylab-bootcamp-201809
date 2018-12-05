@@ -19,4 +19,8 @@
     background: rgb(240, 122, 122);
     color: white;
     cursor: pointer;
+    @media only screen and (max-width: 750px) {
+        width: 90%;
+        font-size: 12px;
+    }
 }

@@ -61,6 +61,10 @@ const Project = new Schema({
     location: {
         type: String,
         default: ''
+    },
+
+    projectUrl: {
+        type: String,
     }
 })
 
