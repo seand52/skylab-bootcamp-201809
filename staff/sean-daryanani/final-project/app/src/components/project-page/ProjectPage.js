@@ -289,22 +289,22 @@ class ProjectPage extends Component {
         const { project, meetings, commonInterestToggle } = this.state
 
         return <div className="project-page-container">
-            <header className="project-top-section row">
-                <div className="project-image-container col-md-3">
-                    <h1 className="project-name-mobile">{project && project.name}</h1>
-                    <div className="spinner">{this.state.loading ? <MDSpinner /> : ''}</div>
-                    <div className="container__image--project">
-                        <div className="project__image-box">
-                            <img className="project__image" src={project ? project.projectImage : null} />
-                        </div>
+        <header className="project-top-section row">
+            <div className="project-image-container col-md-3">
+                <h1 className="project-name-mobile">{project && project.name}</h1>
+                <div className="spinner">{this.state.loading ? <MDSpinner /> : ''}</div>
+                <div className="container__image--project">
+                    <div className="project__image-box">
+                        <img className="project__image" src={project ? project.projectImage : null} />
                     </div>
-                    {project && ((this.props.userId === project.owner.id)) && <form encType="multipart/form-data" onSubmit={this.uploadImage}>
-                        <label className="profileImage-upload">
-                            <input className="uploadImage-input" type="file" name="avatar" onChange={this.uploadImage} />
-                            Edit image
-                                </label>
-                    </form>}
                 </div>
+                {project && ((this.props.userId === project.owner.id)) && <form encType="multipart/form-data" onSubmit={this.uploadImage}>
+                    <label className="profileImage-upload">
+                        <input className="uploadImage-input" type="file" name="avatar" onChange={this.uploadImage} />
+                        Edit image
+                            </label>
+                </form>}
+            </div>
 
 
                 <div className="project-page-header-additional-info col-md-4" align="center">
@@ -347,6 +347,9 @@ class ProjectPage extends Component {
                         <p>{project && project.location}</p>
                         <h3>Description</h3>
                         <p>{project && project.description}</p>
+                        <h3>Capacity</h3>
+                        <p className="members"> <span>Current Members</span>: {project && project.currentMembers}</p>
+                        <p className="members"><span>Maximum Capacity</span>: {project && project.maxMembers} </p>
                         <h3>Tech stack used</h3>
                         {project && project.skills.map((skill, index) => <SkillsTag searchTag={this.handleSearchTag} key={index} skill={skill} viewerSkills={project.viewerSkills} />)}
                         <button onClick={this.toggleCommonInterests} className="common-interests-display"><i className="fa fa-question-circle" aria-hidden="true"></i></button><p>{commonInterestToggle && this.calculateCommonInterests()}</p>

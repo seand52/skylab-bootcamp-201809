@@ -22,7 +22,6 @@ class ChatRooms extends Component {
 
         return logic.listConversations()
             .then(res => {
-                debugger
                 let total = 0
                 res.forEach(item => total = item[1].pendingMessages + total )
                 this.setState({ conversations: res, totalPending: total  })

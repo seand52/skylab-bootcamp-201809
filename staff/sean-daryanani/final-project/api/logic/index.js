@@ -3,14 +3,19 @@ const { models: { User, Project, Meeting, Conversation, Message } } = require('d
 const { AlreadyExistsError, AuthError, NotAllowedError, NotFoundError, ValueError } = require('../errors')
 const validate = require('../utils/validate')
 const cloudinary = require('cloudinary')
-
+const { env: { CLOUD__NAME, API__KEY, API__SECRET } } = process
 cloudinary.config({
-    cloud_name: 'dql7wn1ej',
-    api_key: '853219916242289',
-    api_secret: 'xHAmRRBTudticrVV4h0K1sXPVpg'
+    cloud_name: CLOUD__NAME,
+    api_key: API__KEY,
+    api_secret: API__SECRET
 })
 
 const logic = {
+
+    _isAlreadyRegisteredEmail(email) {
+
+        return User.findOne({ email }).lean()
+    },
     /**
      * Register User
      * @param {string} name 
@@ -30,10 +35,15 @@ const logic = {
         if (!username.trim()) throw new ValueError('username is empty or blank')
         if (!password.trim()) throw new ValueError('password is empty or blank')
 
+
         return (async () => {
             let user = await User.findOne({ username })
+            let emailIsRegistered = await logic._isAlreadyRegisteredEmail(email)
 
-            if (user) throw new AlreadyExistsError(`username ${username} already registered`)
+            if (emailIsRegistered) throw new AlreadyExistsError(`email ${email} is already registered`)
+
+            // if (user) throw new AlreadyExistsError(`username ${username} already registered`)
+
 
             user = new User({ name, email, username, password })
 
@@ -505,7 +515,7 @@ const logic = {
         if (!projectId.trim()) throw new ValueError('projectId is empty or blank')
 
         return (async () => {
-            
+
             const user = await User.findById(id)
 
             const project = await Project.findById(projectId)
@@ -621,6 +631,7 @@ const logic = {
                 { _id: projectId },
                 {
                     $pull: { collaborators: user.id },
+                    $inc: { currentMembers: -1 }
                 }
             )
 
@@ -950,7 +961,7 @@ const logic = {
 
                 file.pipe(stream)
             })
-            
+
             await Project.updateOne({ _id: projectId }, { projectImage: result.url })
 
 
@@ -1132,7 +1143,7 @@ const logic = {
 
                 for (var j = 0; j < conversations[i].messages.length; j++) {
 
-                    if (conversations[i].messages[j].status === 'pending' && conversations[i].messages[j].sender.toString()!==userId ) {
+                    if (conversations[i].messages[j].status === 'pending' && conversations[i].messages[j].sender.toString() !== userId) {
 
 
                         conversations[i].pendingMessages++

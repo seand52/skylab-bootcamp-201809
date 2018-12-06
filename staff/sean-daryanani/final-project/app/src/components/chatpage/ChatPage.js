@@ -34,7 +34,7 @@ class ChatPage extends Component {
                     .then(res => {
                         let total = 0
                         res.forEach(item => total = item[1].pendingMessages + total)
-                        debugger
+
                         this.props.pendingNotifications(total)
 
 
@@ -47,11 +47,11 @@ class ChatPage extends Component {
         }
 
 
-        // this.interval = setInterval(() => this.refresh(), 2000)
+        this.interval = setInterval(() => this.refresh(), 2000)
     }
 
     refresh() {
-        // clearInterval(this.interval)
+        clearInterval(this.interval)
         try {
 
             if (this.props.id && this.props.receiverId) {
@@ -61,7 +61,7 @@ class ChatPage extends Component {
                     })
                     .catch(err => { this.setState({ error: err.mesa }) })
             }
-            // this.interval = setInterval(() => this.refresh(), 2000)
+            this.interval = setInterval(() => this.refresh(), 2000)
         } catch (err) {
             this.setState({ error: err.message })
         }
@@ -147,7 +147,6 @@ class ChatPage extends Component {
     }
 
     render() {
-        console.log('render')
         const { messages, conversations, receiverImage, error } = this.state
         return <section className="chat">
             {error && <Error message={error} />}
@@ -156,10 +155,10 @@ class ChatPage extends Component {
                 <div className="conversations-list col-lg-4 col-xs-12">
                     <h2>Chats</h2>
                     {conversations && conversations.sort((a, b) => b[1].lastMessage - a[1].lastMessage).map((conversation, index) => {
-                        return <div key={index} className={(this.state.receiverName === conversation[0].username) ? "conversation-card-chatroom-test" : "conversation-card-chatroom"}>
+                        return <div key={index} className={(this.state.receiverName === conversation[0].username) ? "conversation-card-chatroom-selected" : "conversation-card-chatroom"}>
                             <img src={conversation[0].profileImage} />
                             <Link to={`/messages/${conversation[1].conversationId}/${conversation[0].id}`}>{conversation[0].username}</Link>
-                            <span className="badge badge-primary">{conversation[1].pendingMessages}</span>
+                            <span className="badge light-blue badge-light-blue badge-pill">{conversation[1].pendingMessages}</span>
                         </div>
                     })}
                 </div>

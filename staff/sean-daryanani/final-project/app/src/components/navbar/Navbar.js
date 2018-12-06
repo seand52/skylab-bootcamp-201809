@@ -3,7 +3,7 @@ import { Navbar, NavbarBrand, NavbarNav, NavItem, NavbarToggler, Collapse } from
 import { withRouter, Link } from 'react-router-dom'
 import logic from '../../logic'
 import './navbar.css'
-
+import Error from '../error/Error'
 class Navbarpage extends React.Component {
     state = {
         isOpen: false,
@@ -14,7 +14,8 @@ class Navbarpage extends React.Component {
 
         },
         pendingNotifications: 0,
-        sendToConversation: false
+        sendToConversation: false,
+        
     };
 
 
@@ -41,6 +42,24 @@ class Navbarpage extends React.Component {
         logic.logout()
 
         this.props.history.push('/')
+    }
+
+
+    
+
+
+    renderMessageIcon = () => {
+        const { sendToConversation, pendingNotifications } = this.state
+        if (sendToConversation) {
+            if (sendToConversation.length && pendingNotifications !== 0) {
+                return <Link to={`/messages/${sendToConversation[0][1].conversationId}/${sendToConversation[0][0].id}`}><button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i><span class="badge badge-danger">{pendingNotifications}</span></div></button></Link>
+            }
+
+            else if (sendToConversation.length && pendingNotifications === 0) {
+                return <Link to={`/messages/${sendToConversation[0][1].conversationId}/${sendToConversation[0][0].id}`}><button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i></div></button></Link>
+            }
+        }
+
     }
 
     componentDidMount() {
@@ -81,8 +100,8 @@ class Navbarpage extends React.Component {
         }
         else if (props.location.pathname.indexOf('messages') >= 0) {
             if (props.pendingNotifications !== this.state.pendingNotifications) {
-                debugger
-                console.log('props updating')
+
+
                 this.setState({ pendingNotifications: props.pendingNotifications })
 
             }
@@ -102,7 +121,7 @@ class Navbarpage extends React.Component {
     toggleCollapse = () => this.setState({ isOpen: !this.state.isOpen })
 
     render() {
-        const { selected, isOpen, pendingNotifications, sendToConversation } = this.state
+        const { selected, isOpen } = this.state
 
         return (
 
@@ -129,8 +148,8 @@ class Navbarpage extends React.Component {
                             <button onClick={this.onProfileClick} className={selected.profile ? 'navbar__button-selected' : 'navbar__button'} type="button">Profile</button>
                         </NavItem>
                         <NavItem >
-                            {sendToConversation ? <Link to={`/messages/${sendToConversation[0][1].conversationId}/${sendToConversation[0][0].id}`}><button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i><span class="badge badge-danger">{pendingNotifications}</span></div></button></Link> : <button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i><span class="badge badge-danger">{pendingNotifications}</span></div></button> }
-            
+                            {this.renderMessageIcon()}
+
                         </NavItem>
                         <NavItem >
                             <button onClick={this.handleLogout} className="navbar__button" type="button">Logout</button>
@@ -138,6 +157,7 @@ class Navbarpage extends React.Component {
                     </NavbarNav>
 
                 </Collapse>
+              
             </Navbar>
         );
     }

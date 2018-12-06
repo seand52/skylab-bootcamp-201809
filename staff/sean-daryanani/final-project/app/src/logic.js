@@ -871,7 +871,7 @@ const logic = {
             .then(res => res.json())
             .then(res => {
                 if (res.error) throw Error(res.error)
-                debugger
+
                 const output = res.data.map(item => {
                     const arr = item.members.filter(item => item.id !== this._userId)
                     arr.push({ conversationId: item.id, pendingMessages: item.pendingMessages, lastMessage: new Date(item.messages[item.messages.length-1].sent) })

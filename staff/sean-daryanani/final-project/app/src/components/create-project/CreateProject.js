@@ -24,10 +24,11 @@ class CreateProject extends Component {
     state = {
         name: '',
         description: '',
-        maxMembers: '',
+        maxMembers: '1',
         error: false,
         toggleSuccess: false,
         location: '',
+   
 
     }
 
@@ -117,7 +118,7 @@ class CreateProject extends Component {
 
                         <label className="create-project__description-label" >Describe who should join, and what you aim to achieve</label>
 
-                        <input type="textarea" onChange={this.onProjectDescriptionChange} className="form-control rounded-0" id="exampleFormControlTextarea2" rows="3" />
+                        <textarea onChange={this.onProjectDescriptionChange} className="form-control" rows="5" id="comment"></textarea>
 
                         <label className="create-project__select-label">In what city will your meetings be hosted?</label><br />
 
@@ -126,13 +127,10 @@ class CreateProject extends Component {
 
                         <label className="create-project__select-label">What is the maximum amount of members you would like to allow?</label><br />
 
-                        <select className="create-project__select form-control" onChange={this.onMaxMembersChange} name="agent" id="agent">
+                        <select className="create-project__select form-control" onChange={this.onMaxMembersChange} value={this.state.maxMembers} name="agent" id="agent">
                             {this.renderDropDown()}
+      
                         </select> <br />
-
-                        {/* <label>Check the box if your project is beginner friendly</label>
-
-                    <input type="checkbox" value={'beginner-friendly'} onChange={this.onBeginnerFriendlySelect}/> <br/> */}
 
                         <label className="create-project__technologies-label">What technologies will your project include?</label>
                         <div className="create-project__skills-checkboxes">

@@ -59,8 +59,8 @@ class App extends Component {
         .catch(err => this.setState({ error: err.message }))
 
     } catch (err) {
-
-      this.setState({ error: err.message })
+      
+      this.setState({error: err.message})
 
     }
   }
@@ -83,6 +83,8 @@ class App extends Component {
 
     }
   }
+
+
 
   handlePendingNotifications = (total) => {
 

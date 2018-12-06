@@ -45,7 +45,7 @@ const ProfileCard = props => {
                     Upcoming Meetings <br /> <Badge color="light-blue" pill >{numberOfMeetings ? numberOfMeetings : 0}</Badge>
                 </button>
                 {(userId === user.id) && <button onClick={chats} type="button" className="profile-card-button" id="last-button" >
-                    Chats <br /> <Badge color="light-blue" pill >{totalPending ? totalPending : 0}</Badge>
+                    Chats <br /> New messages: <Badge color="light-blue" pill >{totalPending ? totalPending : 0}</Badge>
                 </button>}
 
             </div>
