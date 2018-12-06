@@ -48,6 +48,7 @@ class CreateMeeting extends Component {
 
     render() {
         return <div className="create-meeting-container col-sm-11 col-md-7">
+              {this.state.error && <Error message={this.state.error} />}
             <form onSubmit={this.handleSubmit}>
                 <label>What is the main goal of this meeting?</label>
 
@@ -66,7 +67,7 @@ class CreateMeeting extends Component {
                 /> <br />
                 <Button type="submit">Create Meeting</Button>
             </form>
-            {this.state.error && <Error message={this.state.error} />}
+      
         </div >
     }
 }

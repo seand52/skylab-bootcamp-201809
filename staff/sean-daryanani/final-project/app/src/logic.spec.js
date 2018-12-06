@@ -1142,7 +1142,7 @@ describe('projects', () => {
 
             it('should send messages', async () => {
                 const text = 'hola mundo'
-                debugger
+
                 await logic.sendMessage(user1.id, user2.id, text)
 
                 const conversations = await Conversation.find()
@@ -1238,7 +1238,7 @@ describe('projects', () => {
                 const conversations = await logic.listConversations()
                 expect(conversations.length).to.equal(2)
                 const [_conversation1, _conversation2] = conversations
-                debugger
+
                 expect(_conversation1[0].username).to.equal('jd2')
                 expect(_conversation1[0].id).to.equal(user2.id.toString())
                 expect(_conversation2[0].username).to.equal('jd3')

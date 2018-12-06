@@ -31,7 +31,7 @@ class ChatRooms extends Component {
 
     render() {
 
-        const { state: { modal, conversations, totalPending }, props: { meetingId }, toggle } = this
+        const { state: { modal, conversations, totalPending }, props: {toggle} } = this
 
         return (
             <Container>

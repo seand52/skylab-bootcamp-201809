@@ -4,10 +4,10 @@ import { Badge } from 'mdbreact'
 import Moment from 'react-moment'
 
 const ProfileCard = props => {
-    const { user, myProjects, collabProjects, showCollabProjects, projectsStarted, uploadImage, userId, profileImage, meetings, numberOfMeetings, chats, totalPending } = props
+    const { user, myProjects, collabProjects, showCollabProjects, projectsStarted, uploadImage, userId, meetings, numberOfMeetings, chats, totalPending } = props
 
     if (user) {
-        const { name, joinDate, city, githubProfile, skills } = user
+        const { name, joinDate, city} = user
 
         return (
             <div className="col-12 profile-card-container">

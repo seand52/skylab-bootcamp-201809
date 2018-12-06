@@ -6,19 +6,7 @@ const logic = {
 
     url: 'NO-URL',
 
-    _changeDate(isoDate, type) {
 
-        let cleanDate = new Date(isoDate)
-        if (type === 'meeting') {
-
-            return `${cleanDate.getDate()}-${cleanDate.getMonth()}-${cleanDate.getFullYear()} at ${cleanDate.getHours()}:${cleanDate.getMinutes()}:${cleanDate.getSeconds()}`
-
-        } else {
-
-            return `${cleanDate.getDate()}-${cleanDate.getMonth()}-${cleanDate.getFullYear()}`
-        }
-
-    },
     /**
      * Registers a user
      * @param {string} name 
@@ -117,8 +105,6 @@ const logic = {
             .then(res => res.json())
             .then(res => {
                 if (res.error) throw Error(res.error)
-
-                // res.data.joinDate = logic._changeDate(res.data.joinDate, 'profile')
 
                 return res.data
             })
@@ -292,22 +278,7 @@ const logic = {
             })
     },
 
-    // searchProjects(query) {
-    //     if (typeof query !== 'string') throw TypeError(`${query} is not a string`)
-    //     if (!query.trim()) throw Error('query is empty or blank')
-    //     return fetch(`${this.url}/users/${this._userId}/projects/search/${query}`, {
-    //         method: 'GET',
-    //         headers: {
-    //             'Authorization': `Bearer ${this._token}`
-    //         }
-    //     })
-    //         .then(res => res.json())
-    //         .then(res => {
-    //             if (res.error) throw Error(res.error)
 
-    //             return res.data
-    //         })
-    // },
 
     /**
      * Filters a project based on a user query
@@ -757,7 +728,7 @@ const logic = {
         })
             .then(res => res.json())
             .then(res => {
-                console.log('got image')
+
 
                 return res.data
             })

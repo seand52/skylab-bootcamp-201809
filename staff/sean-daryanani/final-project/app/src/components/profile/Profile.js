@@ -10,7 +10,7 @@ import Moment from 'react-moment'
 import Error from '../error/Error'
 import MDSpinner from "react-md-spinner"
 import { Button } from 'mdbreact'
-import ChatRooms from '../chatrooms-popup/ChatRooms'
+
 
 
 class Profile extends Component {
@@ -194,6 +194,7 @@ class Profile extends Component {
 
 
         return <div className="profile-page-container">
+           {this.state.error && <Error message={this.state.error} />}
             <div className="row">
 
                 <section className="profile-top-area col-md-12  col-lg-4">
@@ -232,11 +233,11 @@ class Profile extends Component {
 
                     </div>
                     <div className="main-area__projects">
-                        {user && (user.id === userId) && ownProjects && (showProjects === 'my projects') && (ownProjects.length ? ownProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">You don't have any projects, start one <Link to='/home'>now</Link></p>)}
+                        {user && (user.id === userId) && ownProjects && (showProjects === 'my projects') && (ownProjects.length ? ownProjects.map((project, index) => <ProjectCard from={'profile'} searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">You don't have any projects, start one <Link to='/home'>now</Link></p>)}
 
-                        {user && (user.id !== userId) && ownProjects && (showProjects === 'my projects') && (ownProjects.length ? ownProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">This user has not started any projects</p>)}
+                        {user && (user.id !== userId) && ownProjects && (showProjects === 'my projects') && (ownProjects.length ? ownProjects.map((project, index) => <ProjectCard from={'profile'} searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">This user has not started any projects</p>)}
 
-                        {collabProjects && (showProjects === 'collab projects') && (collabProjects.length ? collabProjects.map((project, index) => <ProjectCard searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">No pending collaborators</p>)}
+                        {collabProjects && (showProjects === 'collab projects') && (collabProjects.length ? collabProjects.map((project, index) => <ProjectCard from={'profile'} searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">No pending collaborators</p>)}
 
                         {upComingMeetings && (showProjects === 'meetings') && (upComingMeetings.length ? upComingMeetings.map((meeting, index) => {
                             return (<div className="profile-meetup-card col-md-8" key={index}>
@@ -253,7 +254,7 @@ class Profile extends Component {
                             return <div key={index} className="conversation-card">
                                 <div className="conversation-img-container">
                                     <div className="conversation-img-box">
-                                        <img className="conversation-img" src={conversation[0].profileImage} />
+                                        <img className="conversation-img" alt="profile" src={conversation[0].profileImage} />
                                     </div>
                                 </div>
 
@@ -266,7 +267,7 @@ class Profile extends Component {
                     </div>
                 </section>
             </div>
-            {this.state.error && <Error message={this.state.error} />}
+         
         </div>
     }
 

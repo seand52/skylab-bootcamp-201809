@@ -30,7 +30,9 @@ class Home extends Component {
         }
         try {
             logic.retrieveUserProfile(this.props.userId)
-                .then(res => this.setState({ user: res, error: false }))
+                .then(res =>{
+                    this.props.userName(res.name)
+                    this.setState({ user: res, error: false })})
         } catch (err) {
             this.setState({ error: err.message })
 
@@ -91,8 +93,9 @@ class Home extends Component {
     render() {
         const { collabProjects, ownProjects, savedProjects, user } = this.state
         return <div className="home-page-container">
+        {this.state.error && <Error message={this.state.error} />}
             <Tabs selectedIndex={this.state.tabIndex} onSelect={this.handleTabChange}>
-
+        
                 <TabList>
                     <Tab>My Projects</Tab>
                     <Tab>My Collaborations </Tab>
@@ -122,7 +125,7 @@ class Home extends Component {
                     <CreateProject backToMyProject={this.sendToMyProjects} />
                 </TabPanel>
             </Tabs>
-            {this.state.error && <Error message={this.state.error} />}
+            
         </div>
     }
 

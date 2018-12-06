@@ -1,15 +1,15 @@
 import React from 'react'
-import { Button, Card, CardBody, CardImage, CardTitle, CardText, Col, Badge } from 'mdbreact';
+import { Button, Card, CardBody, CardImage, CardTitle, CardText } from 'mdbreact';
 import { withRouter, Link } from 'react-router-dom'
 import SkillsTag from '../skills-tag/SkillsTag'
 import './projectcard.css'
 
 const ProjectCard = props => {
-    const { project, searchTag, addToFavourites, userId } = props
+    const { project, searchTag, addToFavourites, userId, from } = props
 
     if (project) {
         return (
-            <Card style={{ width: "16rem", margin: "20px" }}>
+            <Card style={{ width: (from === 'profile') ? "19rem" : "16rem", margin: "20px" }}>
                 <CardImage
                     className="img-fluid"
                     src={project.projectImage}

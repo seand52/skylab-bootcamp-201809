@@ -109,6 +109,7 @@ class CreateProject extends Component {
 
     render() {
         return <div className="newproject-container">
+          {this.state.error && <Error message={this.state.error} />}
             <div className="row">
                 <section className="create-project-form-section col-8 form-group">
                     <form className="create-project-form" onSubmit={this.handleSubmit}>
@@ -146,7 +147,7 @@ class CreateProject extends Component {
 
                 </section>
             </div>
-            {this.state.error && <Error message={this.state.error} />}
+          
         </div>
 
     }

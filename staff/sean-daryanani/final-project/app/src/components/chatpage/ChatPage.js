@@ -156,7 +156,7 @@ class ChatPage extends Component {
                     <h2>Chats</h2>
                     {conversations && conversations.sort((a, b) => b[1].lastMessage - a[1].lastMessage).map((conversation, index) => {
                         return <div key={index} className={(this.state.receiverName === conversation[0].username) ? "conversation-card-chatroom-selected" : "conversation-card-chatroom"}>
-                            <img src={conversation[0].profileImage} />
+                            <img src={conversation[0].profileImage} alt="profile" />
                             <Link to={`/messages/${conversation[1].conversationId}/${conversation[0].id}`}>{conversation[0].username}</Link>
                             <span className="badge light-blue badge-light-blue badge-pill">{conversation[1].pendingMessages}</span>
                         </div>
@@ -165,7 +165,7 @@ class ChatPage extends Component {
                 <div className="container-chat-and-input col-lg-6 col-xs-12">
                     <div className="container-chat">
                         <div className="title">
-                            <h2><img className="profile-image-chat" src={receiverImage} /> <Link to={`/profile/${this.props.receiverId}`}>{this.state.receiverName}</Link></h2>
+                            <h2><img className="profile-image-chat" alt="profile" src={receiverImage} /> <Link to={`/profile/${this.props.receiverId}`}>{this.state.receiverName}</Link></h2>
                         </div>
                         <div id="messages" ref="messageList">
                             {messages && messages.map((message, index) => {

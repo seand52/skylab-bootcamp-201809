@@ -289,22 +289,23 @@ class ProjectPage extends Component {
         const { project, meetings, commonInterestToggle } = this.state
 
         return <div className="project-page-container">
-        <header className="project-top-section row">
-            <div className="project-image-container col-md-3">
-                <h1 className="project-name-mobile">{project && project.name}</h1>
-                <div className="spinner">{this.state.loading ? <MDSpinner /> : ''}</div>
-                <div className="container__image--project">
-                    <div className="project__image-box">
-                        <img className="project__image" src={project ? project.projectImage : null} />
+            {this.state.error && <Error message={this.state.error} />}
+            <header className="project-top-section row">
+                <div className="project-image-container col-md-3">
+                    <h1 className="project-name-mobile">{project && project.name}</h1>
+                    <div className="spinner">{this.state.loading ? <MDSpinner /> : ''}</div>
+                    <div className="container__image--project">
+                        <div className="project__image-box">
+                            <img className="project__image" alt="project" src={project ? project.projectImage : null} />
+                        </div>
                     </div>
-                </div>
-                {project && ((this.props.userId === project.owner.id)) && <form encType="multipart/form-data" onSubmit={this.uploadImage}>
-                    <label className="profileImage-upload">
-                        <input className="uploadImage-input" type="file" name="avatar" onChange={this.uploadImage} />
-                        Edit image
+                    {project && ((this.props.userId === project.owner.id)) && <form encType="multipart/form-data" onSubmit={this.uploadImage}>
+                        <label className="profileImage-upload">
+                            <input className="uploadImage-input" type="file" name="avatar" onChange={this.uploadImage} />
+                            Edit image
                             </label>
-                </form>}
-            </div>
+                    </form>}
+                </div>
 
 
                 <div className="project-page-header-additional-info col-md-4" align="center">
@@ -375,22 +376,21 @@ class ProjectPage extends Component {
                     <section className="project-page-collaborators col-md-5">
                         <h1>Current Collaborators</h1>
                         <div className="project-page-collaborators-display row">
-
-                            {project && project.collaborators.map((collaborator, index) => <CollaboratorCard clickName={this.clickProfileName} collaborator={collaborator} key={index} userId={this.props.userId} ownerId={project.owner.id} removeCollaborator={this.handleRemoveCollaborator} />)}
+                            {project && project.collaborators.length ? project.collaborators.map((collaborator, index) => <CollaboratorCard clickName={this.clickProfileName} collaborator={collaborator} key={index} userId={this.props.userId} ownerId={project.owner.id} removeCollaborator={this.handleRemoveCollaborator} />) : <p>This project currently doesn't have any collaborators</p>}
                         </div>
                         {project && (this.props.userId === project.owner.id) ? <section className="project-page-pending-collaborators">
                             <Collapsible clickName={this.clickProfileName} accept={this.acceptCollabHandle} reject={this.rejectCollabHandle} pendingCollabs={project.pendingCollaborators} />
                         </section> : null}
                     </section>
-                    <section className="project-page-collaborators col-md-6">
+                    {/* <section className="project-page-collaborators col-md-6">
                         <h1>Comments</h1>
                         Comments in development :)
-                    </section>
+                    </section> */}
                 </div>
 
 
             </section>
-            {this.state.error && <Error message={this.state.error} />}
+
         </div>
     }
 }

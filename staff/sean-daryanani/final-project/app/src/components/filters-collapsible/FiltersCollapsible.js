@@ -21,7 +21,7 @@ class FiltersCollapsible extends Component {
                     <Collapse isOpen={this.state.collapse}>
                         {this.props.skills.map((skill, index) => <Checkbox label={skill} handleCheckboxChange={this.props.handleCheckboxChange} key={index} selected={this.props.selected} />)}
                         <h1>Filter by city</h1>
-                        <input className="input-group-text search-city-input" placeholder="Add a city" onChange={this.onCityFilterChange} type="text" onChange={this.props.onChange} />
+                        <input className="input-group-text search-city-input" placeholder="Add a city"  type="text" onChange={this.props.onChange} />
                     </Collapse>
                 </div>
             </div>

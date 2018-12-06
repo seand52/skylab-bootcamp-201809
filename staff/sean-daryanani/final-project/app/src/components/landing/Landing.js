@@ -19,7 +19,7 @@ const Landing = props => {
             <div className="app-info">
                 <div className="app-info__detail explore">
                     <i className="fa fa-search" aria-hidden="true"></i>
-                    <h2>Find a project that you are interested in collaborating in</h2>
+                    <h2>Find a project that you would like to collaborate in</h2>
                 </div>
                 <div className="app-info__detail meet">
                     <i className="fa fa-group" aria-hidden="true"></i>

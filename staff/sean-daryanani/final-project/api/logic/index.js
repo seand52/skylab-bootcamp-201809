@@ -849,7 +849,7 @@ const logic = {
         if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
         if (!query.trim()) throw new ValueError('query is empty or blank')
         if (!userId.trim()) throw new ValueError('userId is empty or blank')
-        debugger
+
         const queryObject = {
             name: { $regex: '' },
             skills: { $all: [] },
@@ -1117,7 +1117,7 @@ const logic = {
             if (!user) throw new NotFoundError(`could not find user with id ${userId}`)
 
             const conversations = await Conversation.find({ members: user.id }).populate({ path: 'members', select: 'username profileImage' }).lean()
-            debugger
+
             conversations.forEach(conversation => {
                 conversation._id && (conversation.id = conversation._id.toString())
                 conversation._id && delete conversation._id
@@ -1151,7 +1151,7 @@ const logic = {
                 }
             }
 
-            debugger
+
             return conversations
         })()
     }

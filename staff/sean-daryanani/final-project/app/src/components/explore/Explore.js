@@ -167,6 +167,7 @@ class Explore extends Component {
     }
     render() {
         return <div className="explore-container">
+           {this.state.error && <Error message={this.state.error} />}
             <header className="explore-header col-12">
                 <div className="searchbar-container col-md-6 col-xs-12">
                     <div className="explore-search-form">
@@ -201,7 +202,7 @@ class Explore extends Component {
                     </div>
                 </div>
             </div>
-            {this.state.error && <Error message={this.state.error} />}
+         
         </div>
 
     }

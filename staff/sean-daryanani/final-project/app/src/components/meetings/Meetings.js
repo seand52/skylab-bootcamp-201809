@@ -5,7 +5,7 @@ const Meetings = props => {
 
 
 
-    const { meeting, project, userId, deleteMeeting, attendMeeting, unAttendMeeting } = props
+    const { meeting, project, userId, attendMeeting, unAttendMeeting } = props
     if (meeting && project) {
         return (
             <div className="meeting-actions row">

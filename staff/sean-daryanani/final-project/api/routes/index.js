@@ -127,8 +127,6 @@ router.get('/users/projects/:id', [bearerTokenParser, jwtVerifier, jsonBodyParse
     routeHandler(() => {
         const { params: { id }, sub } = req
 
-        // if (id !== sub) throw Error('token sub does not match user id')
-
         return logic.listOwnProjects(id)
             .then(projects => res.json({
                 data: projects
@@ -142,8 +140,6 @@ router.get('/users/projects/:id', [bearerTokenParser, jwtVerifier, jsonBodyParse
 router.get('/users/:id/collaborating', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
         const { params: { id }, sub } = req
-
-        // if (id !== sub) throw Error('token sub does not match user id')
 
         return logic.listCollaboratingProjects(id)
             .then(projects => res.json({
@@ -560,7 +556,7 @@ router.post('/users/:id/message', [bearerTokenParser, jwtVerifier, jsonBodyParse
         const { sub, params: { id }, body: { receiverId, text } } = req
 
         if (id !== sub) throw Error('token sub does not match user id')
-        debugger
+
         return logic.sendMessage(id, receiverId, text)
             .then(() => res.json({
                 message: 'message sent'
@@ -571,7 +567,7 @@ router.post('/users/:id/message', [bearerTokenParser, jwtVerifier, jsonBodyParse
 
 router.get('/users/:id/message/:receiverId', [bearerTokenParser, jwtVerifier, jsonBodyParser], (req, res) => {
     routeHandler(() => {
-        debugger
+
         const { sub, params: { id, receiverId } } = req
 
         if (id !== sub) throw Error('token sub does not match user id')

@@ -3,7 +3,7 @@ import { Navbar, NavbarBrand, NavbarNav, NavItem, NavbarToggler, Collapse } from
 import { withRouter, Link } from 'react-router-dom'
 import logic from '../../logic'
 import './navbar.css'
-import Error from '../error/Error'
+
 class Navbarpage extends React.Component {
     state = {
         isOpen: false,
@@ -15,6 +15,7 @@ class Navbarpage extends React.Component {
         },
         pendingNotifications: 0,
         sendToConversation: false,
+        name: ''
         
     };
 
@@ -63,12 +64,20 @@ class Navbarpage extends React.Component {
     }
 
     componentDidMount() {
-        return logic.listConversations()
+        logic.listConversations()
             .then(res => {
                 let total = 0
                 res.forEach(item => total = item[1].pendingMessages + total)
                 this.setState({ sendToConversation: res, pendingNotifications: total })
             })
+
+
+        logic.retrieveUserProfile(this.props.userId)
+            .then(res => {
+                this.setState({name: res.name})
+            })
+        
+
 
     }
 
@@ -149,7 +158,9 @@ class Navbarpage extends React.Component {
                         </NavItem>
                         <NavItem >
                             {this.renderMessageIcon()}
-
+                        </NavItem>
+                        <NavItem >
+                            <span className="name">Welcome {this.state.name ? this.state.name : null}</span>
                         </NavItem>
                         <NavItem >
                             <button onClick={this.handleLogout} className="navbar__button" type="button">Logout</button>

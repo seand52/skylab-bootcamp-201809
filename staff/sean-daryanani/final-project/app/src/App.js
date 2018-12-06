@@ -23,6 +23,7 @@ class App extends Component {
     error: null,
     userId: null, 
     pendingNotifications: 0,
+    username: ''
   }
 
   componentDidMount = () => {
@@ -84,6 +85,10 @@ class App extends Component {
     }
   }
 
+  handleUserName = (name) => {
+    this.setState({username : name})
+  }
+
 
 
   handlePendingNotifications = (total) => {
@@ -92,10 +97,10 @@ class App extends Component {
   }
 
   render() {
-    const { error, userId, pendingNotifications } = this.state
+    const { error, userId, pendingNotifications, username } = this.state
     return (
       <div className="App">
-      {logic.loggedIn && <Navbarpage pendingNotifications={pendingNotifications}  userId={userId} />}
+      {logic.loggedIn && <Navbarpage name={username} pendingNotifications={pendingNotifications}  userId={userId} />}
 
         <Switch>
           <Route exact path="/" render={() => !logic.loggedIn ? <Landing onRegisterClick={this.handleRegisterClick} onLoginClick={this.handleLoginClick} /> : <Redirect to="/home" />} />
@@ -104,7 +109,7 @@ class App extends Component {
 
           <Route path="/login" render={() => !logic.loggedIn ? <Login onLogin={this.handleLogin} onSkipToRegister={this.handleSkipToRegister} /> : <Redirect to="/home" />} />
 
-          <Route path="/home" render={() => logic.loggedIn ? <Home userId={userId} /> : <Redirect to="/" />} />
+          <Route path="/home" render={() => logic.loggedIn ? <Home userName={this.handleUserName} userId={userId} /> : <Redirect to="/" />} />
 
           <Route path="/explore/:query" render={props => logic.loggedIn ? <Explore userId={userId} query={props.match.params.query} /> : <Redirect to="/explore" />} />
 
@@ -120,7 +125,7 @@ class App extends Component {
 
 
         </Switch>
-        <Route path="/" render={() => <Footer />} />
+        {/* <Route path="/" render={() => <Footer />} /> */}
 
         {error && <Error message={error} />}
         
