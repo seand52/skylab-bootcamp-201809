@@ -5,18 +5,18 @@ import logic from '../../logic'
 import './create-project.css'
 import Error from '../error/Error'
 const skills = [
+    'Angular',
+    'C-Sharp',
     'Java',
     'Javascript',
-    'C-Sharp',
-    'Python',
-    'PHP',
-    'React',
-    'Angular',
-    'Vue',
-    'SQL',
     'Mongoose',
+    'PHP',
+    'Python',
+    'React',
     'Ruby',
+    'SQL',
     'Swift',
+    'Vue',
 ]
 
 class CreateProject extends Component {

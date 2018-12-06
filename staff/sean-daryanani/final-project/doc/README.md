@@ -36,11 +36,13 @@ This is where the user can see the projects they have created, the ones they are
 This is where users can find projects that others have started. The projects can be searched by name values and filtered by key skills (i.e 'javascript', 'python') and by location
 
 **Project Page**
+
 A user can view additional information of the project and request to collaborate or sign up to meetings.
 
 The project owner has the ability to create new meetings, add/remove collaborators, accept or decline pending collaborators and delete the project
 
 **Profile**
+
 This is the "hub" where the user can see any notifications (pending collaborators, chat messages, upcoming events) in addition to being able to edit their profile for other users to see.
 
 **Chat** 

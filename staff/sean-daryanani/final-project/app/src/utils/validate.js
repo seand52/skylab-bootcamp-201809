@@ -1,4 +1,4 @@
-const { ValueError } = require('../errors')
+// const { ValueError } = require('../errors')
 
 function validate(params) {
     params.forEach(({ key, value, type, optional }) => {
@@ -8,7 +8,7 @@ function validate(params) {
 
                 if (typeof value !== 'string') throw TypeError(`${value} is not a string`)
 
-                if (!value.trim().length) throw new ValueError(`${key} is empty or blank`)
+                if (!value.trim().length) throw new Error(`${key} is empty or blank`)
 
                 break
             case Boolean:

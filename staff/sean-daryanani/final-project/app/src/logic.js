@@ -1,5 +1,5 @@
 global.sessionStorage = require('sessionstorage')
-// const validate = require('./utils/validate')
+const validate = require('./utils/validate')
 const logic = {
     _userId: sessionStorage.getItem('userId') || null,
     _token: sessionStorage.getItem('token') || null,
@@ -107,7 +107,7 @@ const logic = {
      * @param {*} id 
      */
     retrieveUserProfile(id) {
-
+        
         return fetch(`${this.url}/user-profile/${id || this._userId}`, {
             method: 'GET',
             headers: {
@@ -131,6 +131,13 @@ const logic = {
      * @param {Array} skills 
      */
     updateProfile(id, city, githubProfile, bio, skills) {
+        validate([
+            { key: 'id', value: id, type: String },
+            { key: 'bio', value: bio, type: String, optional: true },
+            { key: 'githubProfile', value: githubProfile, type: String, optional: true },
+            { key: 'city', value: city, type: String, optional: true },
+            { key: 'skills', value: skills, type: Array, optional: true }
+        ])
 
 
         return fetch(`${this.url}/user-profile/${id}`, {

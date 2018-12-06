@@ -14,7 +14,7 @@ Live demo: xxxx
 ![Explore page screenshot](./doc/images/project-page.png)
 
 
-## Profile 
+## Manage your 
 ![Explore page screenshot](./doc/images/profile.png)
 # Instructions
 

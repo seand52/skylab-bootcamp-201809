@@ -4,18 +4,18 @@ import { Button } from 'mdbreact'
 import './updateprofileform.css'
 
 const skills = [
+    'Angular',
+    'C-Sharp',
     'Java',
     'Javascript',
-    'C-Sharp',
-    'Python',
-    'PHP',
-    'React',
-    'Angular',
-    'Vue',
-    'SQL',
     'Mongoose',
+    'PHP',
+    'Python',
+    'React',
     'Ruby',
+    'SQL',
     'Swift',
+    'Vue',
 ]
 class UpdateProfileForm extends Component {
 

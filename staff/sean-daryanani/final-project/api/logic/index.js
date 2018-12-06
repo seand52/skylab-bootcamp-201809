@@ -1,6 +1,6 @@
 'use strict';
 const { models: { User, Project, Meeting, Conversation, Message } } = require('data')
-const { AlreadyExistsError, AuthError, NotAllowedError, NotFoundError, ValueError } = require('../errors')
+const { AlreadyExistsError, AuthError, NotFoundError, ValueError } = require('../errors')
 const validate = require('../utils/validate')
 const cloudinary = require('cloudinary')
 const { env: { CLOUD__NAME, API__KEY, API__SECRET } } = process
@@ -82,7 +82,7 @@ const logic = {
         if (!id.trim()) throw new ValueError('id is empty or blank')
 
         return (async () => {
-
+            debugger
             const user = await User.findById(id, { '_id': 0, password: 0, joinDate: 0, bio: 0, githubProfile: 0, skills: 0, savedProjects: 0, city: 0, __v: 0 }).lean()
 
             if (!user) throw new NotFoundError(`user with id ${id} not found`)
@@ -115,51 +115,7 @@ const logic = {
 
         })()
     },
-    /**
-     * Update basic user information
-     * @param {string} id 
-     * @param {string} name 
-     * @param {string} email 
-     * @param {string} username 
-     * @param {string} newPassword
-     * @param {string} password
-     */
-    updateUser(id, name, email, username, newPassword, password) {
-        validate([
-            { key: 'id', value: id, type: String },
-            { key: 'name', value: name, type: String, optional: true },
-            { key: 'surname', value: email, type: String, optional: true },
-            { key: 'username', value: username, type: String, optional: true },
-            { key: 'password', value: password, type: String }
-        ])
-
-        return (async () => {
-            const user = await User.findById(id)
-
-            if (!user) throw new NotFoundError(`user with id ${id} not found`)
-
-            if (user.password !== password) throw new AuthError('invalid password')
-
-            if (username) {
-                const _user = await User.findOne({ username })
-
-                if (_user) throw new AlreadyExistsError(`username ${username} already exists`)
-
-                name != null && (user.name = name)
-                email != null && (user.email = email)
-                user.username = username
-                newPassword != null && (user.password = newPassword)
-
-                await user.save()
-            } else {
-                name != null && (user.name = name)
-                email != null && (user.email = email)
-                newPassword != null && (user.password = newPassword)
-
-                await user.save()
-            }
-        })()
-    },
+ 
     /**
      * Update user Profile info
      * @param {string} id 
@@ -1097,10 +1053,15 @@ const logic = {
      * @returns {Promise <Object/>}
      */
     listMessages(user1Id, user2Id) {
+        if (typeof user1Id !== 'string') throw TypeError(`${user1Id} is not a string`)
+        if (typeof user2Id !== 'string') throw TypeError(`${user2Id} is not a string`)
         return (async () => {
             const user1 = await User.findById(user1Id)
 
             const user2 = await User.findById(user2Id).select({ "username": 1, "profileImage": 1 }).lean();
+
+            if (!user2) throw new NotFoundError(`could not find user with id ${user2Id}`)
+
             user2._id && (user2.id = user2._id.toString())
             user2._id && delete user2._id
             delete user2.__v

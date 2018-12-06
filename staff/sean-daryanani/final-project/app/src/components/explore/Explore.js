@@ -8,18 +8,18 @@ import FiltersCollapsible from '../filters-collapsible/FiltersCollapsible'
 import Error from '../error/Error'
 
 const skills = [
+    'Angular',
+    'C-Sharp',
     'Java',
     'Javascript',
-    'C-Sharp',
-    'Python',
-    'PHP',
-    'React',
-    'Angular',
-    'Vue',
-    'SQL',
     'Mongoose',
+    'PHP',
+    'Python',
+    'React',
     'Ruby',
+    'SQL',
     'Swift',
+    'Vue',
 ]
 
 class Explore extends Component {
