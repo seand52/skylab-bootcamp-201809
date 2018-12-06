@@ -98,10 +98,7 @@
 }
 @media only screen and (max-width: 576px) {
   .project-page-project-info {
-    margin-left: 20px;
-    margin-top: 20px;
-    margin-right: 20px;
-    margin-bottom: 20px;
+    margin-left: 0px;
   }
 }
 .project-page-project-info h2 {
@@ -121,7 +118,7 @@
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
   margin-top: 20px;
   margin-left: 40px;
-  height: 400px;
+  height: 650px;
   overflow: auto;
   border: 2px solid #ccc;
   border-radius: 20px;
@@ -129,7 +126,7 @@
 }
 @media only screen and (max-width: 576px) {
   .project-page-meetings {
-    margin-left: 20px;
+    margin-left: 0px;
     margin-right: 20px;
     margin-top: 20px;
     margin-bottom: 20px;
@@ -199,7 +196,7 @@
 }
 @media only screen and (max-width: 576px) {
   .project-page-collaborators {
-    margin: 20px;
+    margin-left: 0px;
   }
 }
 .project-page-collaborators h1 {
@@ -267,6 +264,16 @@
   margin: 0;
   padding: 0;
   width: 100%;
+}
+
+.fa-circle-o:before {
+  margin-right: 10px;
+  font-size: 15px;
+}
+
+.fa-circle:before {
+  margin-right: 10px;
+  font-size: 15px;
 }
 
 /*# sourceMappingURL=projectpage.css.map */

@@ -1,7 +1,3 @@
-* {
-  font-family: "Roboto", sans-serif;
-}
-
 .home-collaborations-display, .home-myprojects-display, .home-savedprojects-display {
   display: flex;
   flex-direction: row;

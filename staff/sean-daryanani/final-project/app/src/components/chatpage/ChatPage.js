@@ -59,7 +59,7 @@ class ChatPage extends Component {
                     .then(res => {
                         if (this.state.messages.length !== res.messages.length) this.setState({ messages: [...res.messages], erorr: null }, () => this.scrollToBottom())
                     })
-                    .catch(err => { this.setState({ error: err.mesa }) })
+                    .catch(err => { this.setState({ error: err.message }) })
             }
             this.interval = setInterval(() => this.refresh(), 2000)
         } catch (err) {

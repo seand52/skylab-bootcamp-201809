@@ -6,7 +6,19 @@ const logic = {
 
     url: 'NO-URL',
 
+    _changeDate(isoDate, type) {
 
+        let cleanDate = new Date(isoDate)
+        if (type === 'meeting') {
+
+            return `${cleanDate.getDate()}-${cleanDate.getMonth()}-${cleanDate.getFullYear()} at ${cleanDate.getHours()}:${cleanDate.getMinutes()}:${cleanDate.getSeconds()}`
+
+        } else {
+
+            return `${cleanDate.getDate()}-${cleanDate.getMonth()}-${cleanDate.getFullYear()}`
+        }
+
+    },
     /**
      * Registers a user
      * @param {string} name 
@@ -119,13 +131,6 @@ const logic = {
      * @param {Array} skills 
      */
     updateProfile(id, city, githubProfile, bio, skills) {
-        // validate([
-        //     { key: 'id', value: id, type: String },
-        //     { key: 'bio', value: bio, type: String, optional: true },
-        //     { key: 'githubProfile', value: githubProfile, type: String, optional: true },
-        //     { key: 'city', value: city, type: String, optional: true },
-        //     { key: 'skills', value: skills, type: Array, optional: true }
-        // ])
 
 
         return fetch(`${this.url}/user-profile/${id}`, {
@@ -621,7 +626,11 @@ const logic = {
 
 
     },
-
+    /**
+     * Cancels the collaboration request
+     * @param {string} projectId 
+     * @param {string} collaboratorId 
+     */
     cancelCollaborationRequest(projectId, collaboratorId) {
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
         if (typeof collaboratorId !== 'string') throw TypeError(`${collaboratorId} is not a string`)
@@ -689,7 +698,7 @@ const logic = {
 
     /**
      * Adds a profile image
-     * @param {file} file 
+     * @param {Object} file 
      */
     addProfileImage(file) {
         let avatar = new FormData()
@@ -733,7 +742,13 @@ const logic = {
                 return res.data
             })
     },
-
+    /**
+     * 
+     * @param {string} id 
+     * @param {string} width 
+     * @param {string} height 
+     * @returns {Promise <Object>}
+     */
     retrieveProfileImage(id, width, height) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (!id.trim()) throw Error('id is empty or blank')
@@ -751,7 +766,12 @@ const logic = {
                 return res.data
             })
     },
-
+    /**
+     * Retrieves the information of the project
+     * @param {string} id 
+     * @param {string} projectId 
+     * @returns {Promise <Object>}
+     */
     retrieveProjectImage(id, projectId) {
 
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
@@ -771,6 +791,11 @@ const logic = {
             })
     },
 
+    /**
+     * Find and retrieve the conversation for two members
+     * @param {string} receiverId 
+     * @returns {Promise <Object>}
+     */
     findConversation(receiverId) {
         if (typeof receiverId !== 'string') throw TypeError(`${receiverId} is not a string`)
         if (!receiverId.trim()) throw Error('receiverId is empty or blank')
@@ -789,6 +814,12 @@ const logic = {
 
     },
 
+    /**
+     * Adds the new message to the database
+     * @param {string} senderId 
+     * @param {string} receiverId 
+     * @param {string} text 
+     */
     sendMessage(senderId, receiverId, text) {
         if (typeof senderId !== 'string') throw TypeError(`${senderId} is not a string`)
         if (!senderId.trim()) throw Error('senderId is empty or blank')
@@ -813,6 +844,11 @@ const logic = {
             })
     },
 
+    /**
+     * Lists the messages for a specific conversation
+     * @param {string} user2Id 
+     * @returns {}
+     */
     listMessages(user2Id) {
         if (typeof user2Id !== 'string') throw TypeError(`${user2Id} is not a string`)
         if (!user2Id.trim()) throw Error('user2Id is empty or blank')
@@ -831,6 +867,10 @@ const logic = {
             })
     },
 
+    /**
+     * Lists the conversations for the user that is logged in
+     * @returns {Promise <Object>}
+     */
     listConversations() {
 
         return fetch(`${this.url}/users/${this._userId}/chats`, {

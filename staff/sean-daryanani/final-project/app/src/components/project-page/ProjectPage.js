@@ -234,8 +234,24 @@ class ProjectPage extends Component {
             else return 'does not match with any of your interests :('
 
         }
+    }
 
+    renderCapacityCircles = () => {
+        const { project } = this.state
+        if (project) {          
+            const arr = []
+            for (var i = 0; i < parseInt(project.maxMembers); i++) arr.push(
+                <i class="fa fa-circle-o" aria-hidden="true"></i>
+            )
+            
+            for (var i=0; i< parseInt(project.currentMembers); i++) arr[i] = <i class="fa fa-circle" aria-hidden="true"></i>
 
+            return arr
+          
+        }
+   
+
+     
     }
 
     toggleCommonInterests = () => {
@@ -337,57 +353,54 @@ class ProjectPage extends Component {
                     </div> : null}
                 </div>
 
-
+       
 
             </header>
             <section className="project-page-main-section-container">
                 <div className="row">
-                    <section className="project-page-project-info col-md-5">
-                        <h2>Project Details</h2>
-                        <h3>Location</h3>
-                        <p>{project && project.location}</p>
-                        <h3>Description</h3>
-                        <p>{project && project.description}</p>
-                        <h3>Capacity</h3>
-                        <p className="members"> <span>Current Members</span>: {project && project.currentMembers}</p>
-                        <p className="members"><span>Maximum Capacity</span>: {project && project.maxMembers} </p>
-                        <h3>Tech stack used</h3>
-                        {project && project.skills.map((skill, index) => <SkillsTag searchTag={this.handleSearchTag} key={index} skill={skill} viewerSkills={project.viewerSkills} />)}
-                        <button onClick={this.toggleCommonInterests} className="common-interests-display"><i className="fa fa-question-circle" aria-hidden="true"></i></button><p>{commonInterestToggle && this.calculateCommonInterests()}</p>
-                    </section>
-                    <section className="project-page-meetings col-md-6">
-                        <h2>Upcoming Meetings</h2>
-                        {meetings && meetings.length ? meetings.sort((a, b) => a.realDate - b.realDate).map((meeting, index) => {
-                            return (
-                                <div className="individual-meeting-container col-md-10" key={index}>
-                                    <Meetings unAttendMeeting={this.handleUnAttendMeeting} attendMeeting={this.handleAttendMeeting} userId={this.props.userId} key={index} meeting={meeting} project={project} />
+                    <div className="col-md-5">
+                        <section className="project-page-project-info col-md-12">
+                            <h2>Project Details</h2>
+                            <h3>Location</h3>
+                            <p>{project && project.location}</p>
+                            <h3>Description</h3>
+                            <p>{project && project.description}</p>
+                            <h3>Capacity</h3>
+                            <p>{project && (project.maxMembers!=project.currentMembers) && this.renderCapacityCircles()}</p>
+                            {project && (project.maxMembers==project.currentMembers) ? <p>Project is full</p> :null}
+                            <h3>Tech stack used</h3>
+                            {project && project.skills.map((skill, index) => <SkillsTag searchTag={this.handleSearchTag} key={index} skill={skill} viewerSkills={project.viewerSkills} />)}
+                            <button onClick={this.toggleCommonInterests} className="common-interests-display"><i className="fa fa-question-circle" aria-hidden="true"></i></button><p>{commonInterestToggle && this.calculateCommonInterests()}</p>
+                        </section>
+                        <section className="project-page-collaborators col-md-12">
+                            <h1>Current Collaborators</h1>
+                            <div className="project-page-collaborators-display row">
+                                {project && project.collaborators.length ? project.collaborators.map((collaborator, index) => <CollaboratorCard clickName={this.clickProfileName} collaborator={collaborator} key={index} userId={this.props.userId} ownerId={project.owner.id} removeCollaborator={this.handleRemoveCollaborator} />) : <p>This project currently doesn't have any collaborators</p>}
+                            </div>
+                            {project && (this.props.userId === project.owner.id) ? <section className="project-page-pending-collaborators">
+                                <Collapsible clickName={this.clickProfileName} accept={this.acceptCollabHandle} reject={this.rejectCollabHandle} pendingCollabs={project.pendingCollaborators} />
+                            </section> : null}
+                        </section>
+                    </div>
 
-                                    <MeetingAttendeesModal clickName={this.clickProfileName} meetingId={meeting.id} />
-                                    {(project.owner.id === this.props.userId) && <Button onClick={() => this.handleDeleteMeeting(meeting.id)} color="red">Delete</Button>}
+
+                    <div className="current-and-pending-collaborators col-md-6">
+                        <section className="project-page-meetings col-md-12">
+                            <h2>Upcoming Meetings</h2>
+                            {meetings && meetings.length ? meetings.sort((a, b) => a.realDate - b.realDate).map((meeting, index) => {
+                                return (
+                                    <div className="individual-meeting-container col-md-10" key={index}>
+                                        <Meetings unAttendMeeting={this.handleUnAttendMeeting} attendMeeting={this.handleAttendMeeting} userId={this.props.userId} key={index} meeting={meeting} project={project} />
+
+                                        <MeetingAttendeesModal clickName={this.clickProfileName} meetingId={meeting.id} />
+                                        {(project.owner.id === this.props.userId) && <Button onClick={() => this.handleDeleteMeeting(meeting.id)} color="red">Delete</Button>}
 
 
-                                </div>)
-                        }) : <p>This event doesn't have any upcoming meetings</p>}
-                    </section>
+                                    </div>)
+                            }) : <p>This event doesn't have any upcoming meetings</p>}
+                        </section>
+                    </div>
                 </div>
-
-
-                <div className="current-and-pending-collaborators row">
-                    <section className="project-page-collaborators col-md-5">
-                        <h1>Current Collaborators</h1>
-                        <div className="project-page-collaborators-display row">
-                            {project && project.collaborators.length ? project.collaborators.map((collaborator, index) => <CollaboratorCard clickName={this.clickProfileName} collaborator={collaborator} key={index} userId={this.props.userId} ownerId={project.owner.id} removeCollaborator={this.handleRemoveCollaborator} />) : <p>This project currently doesn't have any collaborators</p>}
-                        </div>
-                        {project && (this.props.userId === project.owner.id) ? <section className="project-page-pending-collaborators">
-                            <Collapsible clickName={this.clickProfileName} accept={this.acceptCollabHandle} reject={this.rejectCollabHandle} pendingCollabs={project.pendingCollaborators} />
-                        </section> : null}
-                    </section>
-                    {/* <section className="project-page-collaborators col-md-6">
-                        <h1>Comments</h1>
-                        Comments in development :)
-                    </section> */}
-                </div>
-
 
             </section>
 

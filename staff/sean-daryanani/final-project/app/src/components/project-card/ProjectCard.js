@@ -18,9 +18,7 @@ const ProjectCard = props => {
                 />
                 <CardBody>
                     <CardTitle>{project.name}</CardTitle>
-                    <CardText>
-                        {project.description}
-                    </CardText>
+
                     <p>Location: {project.location}</p>
                     {project.skills.map((skill, index) => <SkillsTag searchTag={searchTag} key={index} skill={skill} pill />)}
                     <div className="card-bottom-area">

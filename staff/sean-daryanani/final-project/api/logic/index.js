@@ -320,7 +320,12 @@ const logic = {
 
         })()
     },
-
+    /**
+     * Removes a collaborator from a project
+     * @param {string} id 
+     * @param {string} collabId 
+     * @param {string} projectId 
+     */
     removeCollaboratorFromProject(id, collabId, projectId) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof collabId !== 'string') throw TypeError(`${collabId} is not a string`)
@@ -404,6 +409,11 @@ const logic = {
         })()
     },
 
+    /**
+     * Removes a saved project
+     * @param {string} id 
+     * @param {string} projectId 
+     */
     removeSavedProject(id, projectId) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
@@ -420,7 +430,7 @@ const logic = {
         })()
     },
     /**
-     * 
+     * Retrieve the information of a project
      * @param {string} projectId 
      * @returns {Promise <Object>}
      */
@@ -526,7 +536,7 @@ const logic = {
     },
 
     /**
-     * 
+     * Allows the user to decide whether to accept or reject the collaborator
      * @param {string} id 
      * @param {string} collabId 
      * @param {string} projectId 
@@ -576,6 +586,11 @@ const logic = {
         })()
     },
 
+    /**
+     * 
+     * @param {string} id 
+     * @returns {Promise <Object>}
+     */
     retrievePendingCollaboratorProjects(id) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (!id.trim()) throw new ValueError('id is empty or blank')
@@ -749,6 +764,11 @@ const logic = {
         })()
     },
 
+    /**
+     * 
+     * @param {string} meetingId 
+     * @returns {Promise <Object>}
+     */
     retrieveMeetingInfo(meetingId) {
         if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
         if (!meetingId.trim()) throw new ValueError('meetingId is empty or blank')
@@ -794,6 +814,12 @@ const logic = {
         })()
     },
 
+    /**
+     * 
+     * @param {string} id 
+     * @param {string} meetingId 
+
+     */
     unAttendMeeting(id, meetingId) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (typeof meetingId !== 'string') throw TypeError(`${meetingId} is not a string`)
@@ -811,6 +837,11 @@ const logic = {
         })()
     },
 
+    /**
+     * 
+     * @param {string} id 
+     * @returns {Promise <Object/>}
+     */
     userUpcomingMeetings(id) {
 
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
@@ -843,6 +874,12 @@ const logic = {
     },
 
 
+    /**
+     * 
+     * @param {string} query 
+     * @param {string} userId 
+     * @returns {Promise <Object/>}
+     */
     filterProjects(query, userId) {
 
         if (typeof query !== 'string') throw TypeError(`${query} is not a string`)
@@ -914,8 +951,13 @@ const logic = {
     },
 
 
-
+    /**
+     * 
+     * @param {string}} userId 
+     * @param {Object}} file 
+     */
     insertProfileImage(userId, file) {
+
         validate([
             { key: 'userId', value: userId, type: String },
 
@@ -940,7 +982,11 @@ const logic = {
 
         })()
     },
-
+    /**
+     * 
+     * @param {string} file 
+     * @param {string} projectId 
+     */
     insertProjectImage(file, projectId) {
         validate([
             { key: 'projectId', value: projectId, type: String },
@@ -968,7 +1014,13 @@ const logic = {
 
         })()
     },
-
+    /**
+     * 
+     * @param {string} id 
+     * @param {string} width 
+     * @param {string} height 
+     * @returns {string}
+     */
     returnUserImage(id, width, height) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         return (async () => {
@@ -981,6 +1033,11 @@ const logic = {
         })()
     },
 
+    /**
+     * 
+     * @param {string} projectId 
+     * @returns {string}
+     */
     returnProjectPageImages(projectId) {
         if (typeof projectId !== 'string') throw TypeError(`${projectId} is not a string`)
 
@@ -993,6 +1050,12 @@ const logic = {
         })()
     },
 
+    /**
+     * 
+     * @param {string} senderId 
+     * @param {string} receiverId 
+     * @param {string} text 
+     */
     sendMessage(senderId, receiverId, text) {
         if (typeof senderId !== 'string') throw TypeError(`${senderId} is not a string`)
         if (typeof receiverId !== 'string') throw TypeError(`${receiverId} is not a string`)
@@ -1027,10 +1090,13 @@ const logic = {
         })()
     },
 
+    /**
+     * 
+     * @param {string} user1Id 
+     * @param {string} user2Id 
+     * @returns {Promise <Object/>}
+     */
     listMessages(user1Id, user2Id) {
-
-        //userId sender
-        //user2id receiver  
         return (async () => {
             const user1 = await User.findById(user1Id)
 
@@ -1067,9 +1133,6 @@ const logic = {
 
             })
 
-            // TODO user2
-
-
             const output = { messages: newConversation.messages, receiver: user2 }
 
             return output
@@ -1077,6 +1140,12 @@ const logic = {
         })()
     },
 
+    /**
+     * 
+     * @param {string} user1Id 
+     * @param {string} user2Id 
+     * @returns {Promise <Object/>}
+     */
     findConversation(user1Id, user2Id) {
         if (typeof user1Id !== 'string') throw TypeError(`${user1Id} is not a string`)
         if (typeof user2Id !== 'string') throw TypeError(`${user2Id} is not a string`)
@@ -1107,6 +1176,11 @@ const logic = {
 
     },
 
+    /**
+     * 
+     * @param {*} userId 
+     * @returns {Promise <Object>}
+     */
     listConversations(userId) {
         if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
         if (!userId.trim()) throw new ValueError('userId is empty or blank')
