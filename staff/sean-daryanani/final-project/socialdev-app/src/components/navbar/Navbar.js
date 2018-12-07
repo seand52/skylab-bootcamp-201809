@@ -16,7 +16,7 @@ class Navbarpage extends React.Component {
         pendingNotifications: 0,
         sendToConversation: false,
         name: ''
-        
+
     };
 
 
@@ -41,12 +41,15 @@ class Navbarpage extends React.Component {
 
     handleLogout = () => {
         logic.logout()
-
         this.props.history.push('/')
+        this.setState({ name: '' }, () => this.props.history.push('/')
+      
+        )
+        window.location.reload(true)
     }
 
 
-    
+
 
 
     renderMessageIcon = () => {
@@ -64,7 +67,7 @@ class Navbarpage extends React.Component {
     }
 
     componentDidMount() {
-
+        debugger
         logic.listConversations()
             .then(res => {
                 let total = 0
@@ -75,9 +78,9 @@ class Navbarpage extends React.Component {
 
         logic.retrieveUserProfile(this.props.userId)
             .then(res => {
-                this.setState({name: res.name})
+                this.setState({ name: res.name })
             })
-        
+
     }
 
     componentWillReceiveProps(props) {
@@ -92,7 +95,7 @@ class Navbarpage extends React.Component {
 
         logic.retrieveUserProfile(this.props.userId)
             .then(res => {
-                this.setState({name: res.name})
+                this.setState({ name: res.name })
             })
         if (props.location.pathname.indexOf('home') >= 0) {
             let newSelected = {
@@ -179,7 +182,7 @@ class Navbarpage extends React.Component {
                     </NavbarNav>
 
                 </Collapse>
-              
+
             </Navbar>
         );
     }

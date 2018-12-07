@@ -25,11 +25,13 @@ class App extends Component {
     username: ''
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
 
     this.setState({userId: logic.userId})
 
   }
+
+  
 
   handleRegisterClick = () => {
     this.props.history.push('/register')
@@ -96,6 +98,7 @@ class App extends Component {
   }
 
   render() {
+
     const { error, userId, pendingNotifications, username } = this.state
     return (
       <div className="App">
