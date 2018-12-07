@@ -5,9 +5,9 @@ const validate = require('../utils/validate')
 const cloudinary = require('cloudinary')
 const { env: { CLOUD__NAME, API__KEY, API__SECRET } } = process
 cloudinary.config({
-    cloud_name: CLOUD__NAME,
-    api_key: API__KEY,
-    api_secret: API__SECRET
+    cloud_name: 'dql7wn1ej',
+    api_key: '853219916242289',
+    api_secret: 'xHAmRRBTudticrVV4h0K1sXPVpg'
 })
 
 const logic = {

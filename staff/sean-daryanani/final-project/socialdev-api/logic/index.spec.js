@@ -5,8 +5,13 @@ const fs = require('fs')
 const { AlreadyExistsError, ValueError, AuthError, NotFoundError } = require('../errors')
 const { expect } = require('chai')
 const MONGO_URL = 'mongodb://localhost:27017/socialdev-test'
+const cloudinary = require('cloudinary')
 
-
+cloudinary.config({
+    cloud_name: 'dql7wn1ej',
+    api_key: '853219916242289',
+    api_secret: 'xHAmRRBTudticrVV4h0K1sXPVpg'
+})
 describe('logic', () => {
     before(() => mongoose.connect(MONGO_URL, { useNewUrlParser: true, useCreateIndex: true }))
 
@@ -1891,7 +1896,8 @@ describe('logic', () => {
             })
 
             it('should succeed on correct data', async () => {
-                let image = './data/images/download.png'
+
+                let image = './images/profile-placeholder.jpg'
 
                 var file = fs.createReadStream(image)
 
@@ -1908,16 +1914,16 @@ describe('logic', () => {
                 const project = new Project({ name: 'test12', description: 'testdescription12', skills: ['react12', 'mongoose1', 'javascript1'], beginnerFriendly: 'true', maxMembers: '5', owner: user.id })
 
                 await project.save()
-                let image = './data/images/download.png'
+
+                let image = './images/profile-placeholder.jpg'
 
                 var file = fs.createReadStream(image)
 
-
                 await logic.insertProjectImage(file, project.id)
 
-                const _user = await User.findById(user.id)
+                const _project = await User.findById(project.id)
 
-                // expect(_user.insertProfileImage).not.to.equal('https://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg')
+                expect(_project.insertProfileImage).not.to.equal('https://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg')
 
             })
 

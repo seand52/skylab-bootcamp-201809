@@ -9,7 +9,7 @@ const ProjectCard = props => {
 
     if (project) {
         return (
-            <Card style={{ width: (from === 'profile') ? "19rem" : "16rem", margin: "20px" }}>
+            <Card style={{ width: (from === 'profile' || from === 'home') ? "19rem" : "16rem", margin: "20px" }}>
                 <CardImage
                     className="img-fluid"
                     src={project.projectImage}

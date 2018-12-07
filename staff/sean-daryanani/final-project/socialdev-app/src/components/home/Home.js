@@ -105,7 +105,7 @@ class Home extends Component {
 
                 <TabPanel>
                     <div className="home-myprojects-display">
-                        {ownProjects && (ownProjects.length ? ownProjects.map((project, index) => <ProjectCard userId={this.props.userId} searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">You don't have any projects. Start searching <Link to='/explore'>now</Link></p>)}
+                        {ownProjects && (ownProjects.length ? ownProjects.map((project, index) => <ProjectCard from={'home'} userId={this.props.userId} searchTag={this.handleSearchTag} key={index} project={project} />) : <p className="no-projects-text">You don't have any projects. Start searching <Link to='/explore'>now</Link></p>)}
                     </div>
                 </TabPanel>
 
