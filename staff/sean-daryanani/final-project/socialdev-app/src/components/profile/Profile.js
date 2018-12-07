@@ -187,8 +187,6 @@ class Profile extends Component {
     }
 
     render() {
-
-
         const { state: { user, ownProjects, collabProjects, showProjects, image, upComingMeetings, conversations, totalPending }, props: { id, userId } } = this
 
 
