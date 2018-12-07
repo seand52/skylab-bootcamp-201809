@@ -4,18 +4,18 @@ The objective of this application is to provide a platform for developers to fin
 
 Live demo: xxxx
 
-[View the documentation](./doc)
+[View the documentation](./socialdev-doc)
 
 # Screenshots
 ## Find projects with skills you are interested in
-![Explore page screenshot](./doc/images/explore.png)
+![Explore page screenshot](./socialdev-doc/images/explore.png)
 
 ## View project information
-![Explore page screenshot](./doc/images/project-page.png)
+![Explore page screenshot](./socialdev-doc/images/project-page.png)
 
 
 ## Manage your 
-![Explore page screenshot](./doc/images/profile.png)
+![Explore page screenshot](./socialdev-doc/images/profile.png)
 # Instructions
 
 Server
