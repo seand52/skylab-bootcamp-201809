@@ -12,7 +12,6 @@ import Profile from './components/profile/Profile'
 import ProjectPage from './components/project-page/ProjectPage'
 import CreateMeeting from './components/create-meetings/CreateMeeting'
 import Navbarpage from './components/navbar/Navbar'
-import Footer from './components/footer/Footer'
 import ChatPage from './components/chatpage/ChatPage'
 
 
@@ -125,7 +124,6 @@ class App extends Component {
 
 
         </Switch>
-        {/* <Route path="/" render={() => <Footer />} /> */}
 
         {error && <Error message={error} />}
         

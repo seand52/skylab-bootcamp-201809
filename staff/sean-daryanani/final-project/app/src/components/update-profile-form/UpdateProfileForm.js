@@ -43,7 +43,7 @@ class UpdateProfileForm extends Component {
         if (user) {
             user.skills.forEach(item => this.selectedCheckboxes.add(item) )
         }
-        debugger
+
 
     }
 
@@ -57,7 +57,6 @@ class UpdateProfileForm extends Component {
 
             skillsArray.push(checkbox)
         }
-        const { city, githubProfile, bio } = this.state
 
         await this.props.updateProfile(this.state.city, this.state.githubProfile, this.state.bio, skillsArray)
         

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Card, CardBody, CardImage, CardTitle, CardText } from 'mdbreact';
+import { Button, Card, CardBody, CardImage, CardTitle } from 'mdbreact';
 import { withRouter, Link } from 'react-router-dom'
 import SkillsTag from '../skills-tag/SkillsTag'
 import './projectcard.css'
@@ -15,6 +15,7 @@ const ProjectCard = props => {
                     src={project.projectImage}
                     style={{ height: "180px", width: "100%" }}
                     waves
+                
                 />
                 <CardBody>
                     <CardTitle>{project.name}</CardTitle>

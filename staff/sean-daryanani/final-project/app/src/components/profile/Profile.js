@@ -113,7 +113,6 @@ class Profile extends Component {
     }
 
     handleShowChats = () => {
-        console.log('hi')
         this.setState({ showProjects: 'chats' })
     }
 
@@ -189,7 +188,7 @@ class Profile extends Component {
 
     render() {
 
-
+        console.log('render')
         const { state: { user, ownProjects, collabProjects, showProjects, image, upComingMeetings, conversations, totalPending }, props: { id, userId } } = this
 
 
@@ -199,7 +198,7 @@ class Profile extends Component {
 
                 <section className="profile-top-area col-md-12  col-lg-4">
                     <div className="spinner">{this.state.loading ? <MDSpinner /> : ''}</div>
-                    <ProfileCard uploadImage={this.handleUpload} showCollabProjects={this.handleShowCollabProjects} user={user} myProjects={ownProjects} projectsStarted={this.handleshowOwnProjects} collabProjects={collabProjects} userId={userId} profileImage={image} meetings={this.handleUpComingMeetings} numberOfMeetings={upComingMeetings.length} chats={this.handleShowChats} totalPending={totalPending} />
+                    <ProfileCard uploadImage={this.handleUpload} showCollabProjects={this.handleShowCollabProjects} user={user} myProjects={ownProjects} projectsStarted={this.handleshowOwnProjects} collabProjects={collabProjects} userId={userId} profileImage={image} meetings={this.handleUpComingMeetings} numberOfMeetings={upComingMeetings && upComingMeetings.length} chats={this.handleShowChats} totalPending={totalPending} />
 
                     <section className="bio col-12">
                         <div className="bio__extra-info col-12">
@@ -259,7 +258,7 @@ class Profile extends Component {
                                 </div>
 
                                 <Link to={`/messages/${conversation[1].conversationId}/${conversation[0].id}`}>{conversation[0].username}</Link>
-                                <div><span class="badge light-blue badge-light-blue badge-pill">{conversation[1].pendingMessages}</span></div>
+                                <div><span className="badge light-blue badge-light-blue badge-pill">{conversation[1].pendingMessages}</span></div>
 
                             </div>
                         }) : <p className="no-projects-text">You don't have any active chats</p>)}

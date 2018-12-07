@@ -19,16 +19,13 @@ class ChatPage extends Component {
     }
 
     componentDidMount() {
+        debugger
         try {
             if (this.props.id && this.props.receiverId) {
                 logic.findConversation(this.props.receiverId)
                     .then(res => {
                         const receiver = res.members.find(item => item.id !== this.props.userId)
                         this.setState({ receiverName: receiver.username, receiverImage: receiver.profileImage, error: null })
-                    })
-                    .then(() => logic.listMessages(this.props.receiverId))
-                    .then(res => {
-                        this.setState({ messages: [...res.messages], error: null }, () => this.scrollToBottom())
                     })
                     .then(() => logic.listConversations())
                     .then(res => {
@@ -40,6 +37,13 @@ class ChatPage extends Component {
 
                         this.setState({ conversations: res, error: null })
                     })
+                    .then(() => logic.listMessages(this.props.receiverId))
+                    .then(res => {
+                        this.setState({ messages: [...res.messages], error: null }, () => {
+                            // this.interval = setInterval(() => this.refresh(), 2000)
+                            this.scrollToBottom()})
+                    })
+
                     .catch(err => this.setState({ error: err.message }))
             }
         } catch (err) {
@@ -47,29 +51,31 @@ class ChatPage extends Component {
         }
 
 
-        this.interval = setInterval(() => this.refresh(), 2000)
-    }
-
-    refresh() {
-        clearInterval(this.interval)
-        try {
-
-            if (this.props.id && this.props.receiverId) {
-                logic.listMessages(this.props.receiverId)
-                    .then(res => {
-                        if (this.state.messages.length !== res.messages.length) this.setState({ messages: [...res.messages], erorr: null }, () => this.scrollToBottom())
-                    })
-                    .catch(err => { this.setState({ error: err.message }) })
-            }
-            this.interval = setInterval(() => this.refresh(), 2000)
-        } catch (err) {
-            this.setState({ error: err.message })
-        }
 
     }
+
+    // refresh() {
+    //     clearInterval(this.interval)
+    //     try {
+
+    //         if (this.props.id && this.props.receiverId) {
+    //             logic.listMessages(this.props.receiverId)
+    //                 .then(res => {
+    //                     if (this.state.messages.length !== res.messages.length) this.setState({ messages: [...res.messages], erorr: null }, () => this.scrollToBottom())
+    //                 })
+    //                 .then(() => this.interval = setInterval(() => this.refresh(), 2000))
+    //                 .catch(err => { this.setState({ error: err.message }) })
+    //         }
+
+    //     } catch (err) {
+    //         this.setState({ error: err.message })
+    //     }
+
+    // }
 
 
     componentWillReceiveProps(nextProps) {
+        debugger
 
         try {
             if (nextProps.receiverId !== this.props.receiverId) {
@@ -147,6 +153,7 @@ class ChatPage extends Component {
     }
 
     render() {
+        console.log('render')
         const { messages, conversations, receiverImage, error } = this.state
         return <section className="chat">
             {error && <Error message={error} />}

@@ -241,10 +241,10 @@ class ProjectPage extends Component {
         if (project) {          
             const arr = []
             for (var i = 0; i < parseInt(project.maxMembers); i++) arr.push(
-                <i class="fa fa-circle-o" aria-hidden="true"></i>
+                <i key={i} className="fa fa-circle-o" aria-hidden="true"></i>
             )
             
-            for (var i=0; i< parseInt(project.currentMembers); i++) arr[i] = <i class="fa fa-circle" aria-hidden="true"></i>
+            for (var i=0; i< parseInt(project.currentMembers); i++) arr[i] = <i key={i} className="fa fa-circle" aria-hidden="true"></i>
 
             return arr
           

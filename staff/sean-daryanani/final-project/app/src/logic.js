@@ -390,7 +390,7 @@ const logic = {
     userUpcomingMeetings(id) {
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (!id.trim()) throw Error('id is empty or blank')
-        return fetch(`${this.url}/users/${this._userId}/meetings`, {
+        return fetch(`${this.url}/users/${id || this._userId}/meetings`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${this._token}`
@@ -857,6 +857,8 @@ const logic = {
      * @returns {}
      */
     listMessages(user2Id) {
+        debugger
+        
         if (typeof user2Id !== 'string') throw TypeError(`${user2Id} is not a string`)
         if (!user2Id.trim()) throw Error('user2Id is empty or blank')
 
@@ -879,7 +881,7 @@ const logic = {
      * @returns {Promise <Object>}
      */
     listConversations() {
-
+        debugger
         return fetch(`${this.url}/users/${this._userId}/chats`, {
             method: 'GET',
             headers: {

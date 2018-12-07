@@ -53,7 +53,7 @@ class Navbarpage extends React.Component {
         const { sendToConversation, pendingNotifications } = this.state
         if (sendToConversation) {
             if (sendToConversation.length && pendingNotifications !== 0) {
-                return <Link to={`/messages/${sendToConversation[0][1].conversationId}/${sendToConversation[0][0].id}`}><button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i><span class="badge badge-danger">{pendingNotifications}</span></div></button></Link>
+                return <Link to={`/messages/${sendToConversation[0][1].conversationId}/${sendToConversation[0][0].id}`}><button className='navbar__button'><div className="message-notification-container"><i className="fa fa-envelope" aria-hidden="true"></i><span className="badge badge-danger">{pendingNotifications}</span></div></button></Link>
             }
 
             else if (sendToConversation.length && pendingNotifications === 0) {
@@ -64,6 +64,7 @@ class Navbarpage extends React.Component {
     }
 
     componentDidMount() {
+
         logic.listConversations()
             .then(res => {
                 let total = 0
@@ -77,12 +78,22 @@ class Navbarpage extends React.Component {
                 this.setState({name: res.name})
             })
         
-
-
     }
 
     componentWillReceiveProps(props) {
 
+        logic.listConversations()
+            .then(res => {
+                let total = 0
+                res.forEach(item => total = item[1].pendingMessages + total)
+                this.setState({ sendToConversation: res, pendingNotifications: total })
+            })
+
+
+        logic.retrieveUserProfile(this.props.userId)
+            .then(res => {
+                this.setState({name: res.name})
+            })
         if (props.location.pathname.indexOf('home') >= 0) {
             let newSelected = {
                 home: true,

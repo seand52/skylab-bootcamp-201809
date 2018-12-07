@@ -799,7 +799,7 @@ const logic = {
      * @returns {Promise <Object/>}
      */
     userUpcomingMeetings(id) {
-
+        debugger
         if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
         if (!id.trim()) throw new ValueError('id is empty or blank')
 

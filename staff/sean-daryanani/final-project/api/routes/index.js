@@ -425,8 +425,6 @@ router.get('/users/:id/meetings', [bearerTokenParser, jwtVerifier, jsonBodyParse
     routeHandler(() => {
         const { params: { id }, sub } = req
 
-        if (id !== sub) throw Error('token sub does not match user id')
-
         return logic.userUpcomingMeetings(id)
             .then(meetings => res.json({
                 data: meetings
