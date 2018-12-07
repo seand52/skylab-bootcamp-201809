@@ -2,7 +2,7 @@
 
 The objective of this application is to provide a platform for developers to find and collaborate in projects that match with the skills they want to learn in order to grow as a developer.
 
-Live demo: xxxx
+[Live demo]('social-dev.surge.sh')
 
 [View the documentation](./socialdev-doc)
 

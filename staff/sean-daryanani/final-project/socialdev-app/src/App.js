@@ -15,7 +15,8 @@ import Navbarpage from './components/navbar/Navbar'
 import ChatPage from './components/chatpage/ChatPage'
 
 
-logic.url = 'http://localhost:5000/api'
+// logic.url = 'http://localhost:5000/api'
+logic.url = 'https://shielded-chamber-15987.herokuapp.com/api'
 
 class App extends Component {
   state = {
